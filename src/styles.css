@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+    font-family: 'Shrikhand';
+    src: url('/assets/fonts/Shrikhand/Shrikhand-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+@font-face {
+    font-family: 'Montserrat';
+    src: url('/assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
