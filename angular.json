@@ -3,9 +3,19 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "PhotoCube-Client_2024": {
+    "PhotoCube-Client": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "standalone": false
+        },
+        "@schematics/angular:directive": {
+          "standalone": false
+        },
+        "@schematics/angular:pipe": {
+          "standalone": false
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -13,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/photo-cube-client-2024",
+            "outputPath": "dist/photo-cube-client",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -60,12 +70,15 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
+          },
           "configurations": {
             "production": {
-              "buildTarget": "PhotoCube-Client_2024:build:production"
+              "buildTarget": "PhotoCube-Client:build:production"
             },
             "development": {
-              "buildTarget": "PhotoCube-Client_2024:build:development"
+              "buildTarget": "PhotoCube-Client:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -73,7 +86,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "PhotoCube-Client_2024:build"
+            "buildTarget": "PhotoCube-Client:build"
           }
         },
         "test": {
@@ -96,5 +109,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
