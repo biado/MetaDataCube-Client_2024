@@ -4,8 +4,28 @@ body {
     width: 100%;
     height: 100vh;
     margin: 0% 0% 0% 0%;
-    background-color: black;
+    background-color: var(--background-color);
 }
+
+/* #### General styles for hiding scrollbars #### */
+  /* Specific styles for Chrome, Safari and other WebKit-based browsers */
+  ::-webkit-scrollbar {
+    width: 0.5em;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Scroll handle colour */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background-color: transparent; /* Scroll track colour */
+  }
+  
+  /* For Firefox */
+  body {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent; /* Colour of the handle and scroll track */
+  }
 /* ############################################## */
 
 
@@ -15,8 +35,8 @@ header {
     justify-content: space-between;
     flex-wrap: wrap;
     height: auto;
-    background-color: rgba(59,187,156,0.7) ;
-    color: white;
+    background-color: var(--secondary-background-color);
+    color: var(--main-color);
 }
 
 .header_title{
@@ -29,6 +49,7 @@ header {
     height: auto;  
     width: auto;  
     margin: 0.3em 0.3em 0.3em 0.3em;
+    flex-wrap: wrap;
 }
 
 .header_undoredo_img{
@@ -40,8 +61,8 @@ header {
 .header_buttons{
     font-family: 'Shrikhand', serif;
     font-size: 1.7em;
-    color: white;
-    background: linear-gradient(90deg, #000000, #737373);
+    color: var(--main-color);
+    background: var(--button-color);;
     border: none;
     border-radius: 50px;
     height: min-content;
@@ -82,12 +103,14 @@ header {
 }
 
 .select_dimensions_pannel, .graph, .select_filters_pannel{
-    background-color: rgba(56,141,120,0.7) ;
+    background-color: var(--secondary-background-color); ;
 }
 
 .select_dimensions_pannel, .select_filters_pannel{
     min-width: 95%;
     max-width: 95%;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 .select_dimensions_pannel{
@@ -108,8 +131,8 @@ header {
     font-family: 'Montserrat', serif;
     font-size: 1vw;
     justify-content: center;
-    background-color: rgba(56,141,120,0.7) ;
-    color: white;
+    background-color: var(--secondary-background-color); 
+    color: var(--main-color);;
     height: 10%;
     border: none;
     cursor: pointer;
@@ -122,14 +145,13 @@ header {
 .select_filters_button button{
     border-radius: 50px 0 0 50px ;
 }
+/* ############################################## */
 
-.test{
-    color:white;
-    border: solid;
-    border-color: magenta;
+/* ############### Component sizes ############## */
+app-dimensions-selection{
+    width: 100%;
+    border-radius: 0 50px 50px 0;
 }
-
-
 /* ############################################## */
 
 
@@ -140,6 +162,12 @@ header {
     }
     .header_title{
         font-size: 3em;
+    }
+    .header_buttons_div, .header_undoredo_div{
+        justify-content: center;
+    }
+    .header_buttons{
+        margin: 0.2em 1em 0.2em 1em;
     }
 
     /* ################### Article ################## */
@@ -159,7 +187,7 @@ header {
         min-height: 100%;
         width: 92%;
         margin: 1em 0 1em 0;
-        background-color: rgba(56,141,120,0.7) ;
+        background-color: var(--secondary-background-color);
         border-radius: 50px 50px 50px 50px;
     }
 
@@ -180,8 +208,8 @@ header {
         font-family: 'Montserrat', serif;
         font-size: 3vh;
         justify-content: center;
-        background-color: rgba(56,141,120,0.7) ;
-        color: white;
+        background-color: var(--secondary-background-color);
+        color: var(--main-color);
         border: none;
         cursor: pointer;
         border-radius: 50px 50px 0 0;
@@ -191,7 +219,7 @@ header {
         min-height: 96%;
         max-height: 96%;
         border-radius: 50px 50px 50px 50px;
-        background-color: rgba(56,141,120,0.7) ;
+        background-color: var(--secondary-background-color);
     }
     
 

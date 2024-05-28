@@ -1,0 +1,33 @@
+.selection_component_title{
+    color:white;
+    font-size: 2.1em;
+    width:  100%;
+    height: auto;
+    text-align: center;
+    margin:0.4em 0 0 0;
+}
+
+.selection_component_searchbar{
+    width: 80%;
+    margin: 0 auto 0 auto;
+    border-radius: 50px 50px 50px 50px ;
+    margin-top: 0.4em;
+}
+
+
+.selection_component_searchbar input{
+    color: var(--background-color);
+    width: 100%;
+    height: 100%;
+    border-radius: 50px 50px 50px 50px ;
+    font-family: 'Shrikhand', serif;
+    font-size: 1.2em ;
+    border: none;
+    background-color: rgba(255,255,255,0.8);
+    padding: 0.4em 0 0.4em 0.4em;
+}
+
+.ttt{
+    width: 100%;
+    height: auto;
+}
