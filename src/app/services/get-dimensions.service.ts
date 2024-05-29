@@ -11,9 +11,11 @@ import { DOCUMENT } from '@angular/common';
 })
 
 export class GetDimensionsService {
-
   public tagsetList : Tagset[] = [];
 
+  /***
+   * When the service is built, we will retrieve the tagsetlist from localStorage and store it in a variable.
+   */
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private http: HttpClient
@@ -49,9 +51,10 @@ export class GetDimensionsService {
         if (Array.isArray(response)) {
             const requests = response.map(element => this.getTagsetInformations(element.id));
             const result = await Promise.all(requests);
-            console.log("Fin get dimensions");
             localStorage.clear();
-            localStorage.setItem("tagsetList", JSON.stringify(this.tagsetList));
+            console.log("LocalStorage clear");
+            await this.sleep(10000);    //Wait 10s
+            localStorage.setItem("tagsetList", JSON.stringify(this.tagsetList));  //Put the tagsetList in localStorage
         } else {
             console.error('The response is not an array:', response);
         }
@@ -171,6 +174,14 @@ export class GetDimensionsService {
     }
 
     return new Node(name, id, parents, children);
+  }
+
+
+  /***
+   * Sleep function. Allows you to wait for a given time
+   */
+  sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
 

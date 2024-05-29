@@ -1,0 +1,30 @@
+<div *ngIf="node.children && node.children.length > 0" class="dimensions_nodes_labels" [style.margin-left.em]="marginLeft" [style.fontSize.em]="getFontSize()">
+    <div class="dimensions_labels_title">
+        <input type="checkbox" [disabled]="shouldDisableCheckboxX(node)" [checked]="node.isCheckedX" (change)="toggleCheckboxX(node)"/>
+        <input type="checkbox" [disabled]="shouldDisableCheckboxY(node)" [checked]="node.isCheckedY" (change)="toggleCheckboxY(node)" [style.margin-right]="'50px'"/>
+        <span *ngIf="hasNonLeafChildren(node)" class="toggle-button" (click)="toggleNode(node)">{{toggleButton(node)}}</span> 
+        {{node.name}}
+    </div>
+    <ng-container class="dimensions_childnodes_labels" *ngIf="node.isExpanded">
+      <ng-container *ngFor="let childNode of sortNodes(node.children)">
+        <div *ngIf="hasNonLeafChildren(childNode)" class="dimensions_nodes_labels">
+            <div class="dimensions_labels_title">
+                <input type="checkbox" [disabled]="shouldDisableCheckboxX(childNode)" [checked]="childNode.isCheckedX" (change)="toggleCheckboxX(childNode)"/>
+                <input type="checkbox" [disabled]="shouldDisableCheckboxY(childNode)" [checked]="childNode.isCheckedY" (change)="toggleCheckboxY(childNode)" [style.margin-right]="'50px'"/>
+                <span class="toggle-button" (click)="toggleNode(childNode)">{{toggleButton(childNode)}}</span> 
+                {{childNode.name}}
+            </div>
+            <ng-container class="dimensions_childnodes_labels" *ngIf="childNode.isExpanded">
+                <app-dimensions-selection-node *ngFor="let grandChildNode of sortNodes(childNode.children)" [node]="grandChildNode" [nodegen]="nodegen+1"></app-dimensions-selection-node>
+            </ng-container>          
+        </div>
+        <div *ngIf="!hasNonLeafChildren(childNode)" class="dimensions_nodes_labels">
+            <div class="dimensions_labels_title">
+                <input type="checkbox" [disabled]="shouldDisableCheckboxX(childNode)" [checked]="childNode.isCheckedX" (change)="toggleCheckboxX(childNode)"/>
+                <input type="checkbox" [disabled]="shouldDisableCheckboxY(childNode)" [checked]="childNode.isCheckedY" (change)="toggleCheckboxY(childNode)" [style.margin-right]="'50px'"/>
+                {{childNode.name}}     
+            </div>     
+        </div>
+      </ng-container>
+    </ng-container>
+</div>

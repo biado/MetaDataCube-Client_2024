@@ -3,6 +3,9 @@ export class Node {
     id: number;
     parentID: number | null;
     children: Node[] | null;
+    isExpanded : boolean = false;
+    isCheckedX : boolean = false;
+    isCheckedY : boolean = false;
 
     constructor(name: string, id: number, parents: number | null = null, children: Node[] | null = null) {
         this.name = name;

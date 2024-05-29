@@ -40,9 +40,9 @@ export class AppComponent implements OnInit {
   }
 
   /* Used to invert the value of display_filters, in order to display the filters pannel or not. */
-  async update_selection_list(): Promise<void> {
+  async refresh_selection_list(): Promise<void> {
     await this.getDimensionsService.getDimensions();
-    console.log("End of the update");
+    console.log("End of refresh");
   }
 
   /* Each time the size of the browser window changes, it updates the smallscreen variable */

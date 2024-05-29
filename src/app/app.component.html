@@ -8,7 +8,7 @@
       <img class="header_undoredo_img" src="../assets/icons/redo.svg">
     </div>
     <div class="header_buttons_div">
-      <button class="header_buttons" (click)="update_selection_list()">Update</button>
+      <button class="header_buttons" (click)="refresh_selection_list()">Refresh</button>
       <button class="header_buttons">Import</button>
       <button class="header_buttons">Export</button>
     </div>
@@ -47,13 +47,13 @@
         </div>
       </section>
       
-      <section class="smcr_graph"></section>
+      <section class="smcr_graph">aaaa</section>
 
       <section class="smcr_select_filters" [style.min-height]="display_filters ? '100%' : '4%'" [style.max-height]="display_filters ? '100%' : '4%'">
         <div class="smcr_select_filters_button" [style.max-height]="display_filters ? '4%' : '100%'" [style.min-height]="display_filters ? '4%' : '100%'">
           <button (click)="display_filters_change()"> {{ display_filters ? '-' : '+' }} </button>
         </div>
-        <div class="smcr_select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'"></div>
+        <div class="smcr_select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'">aaaaa</div>
       </section>
     </article>
   </ng-template>

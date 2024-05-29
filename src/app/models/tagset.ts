@@ -6,6 +6,8 @@ export class Tagset {
     id: number;
     hierarchies: Hierarchy[];
     tags : Tag[]
+    isCheckedX:boolean = false;
+    isCheckedY:boolean = false;
 
     constructor(name: string, id: number,hierarchies: Hierarchy[],tags:Tag[] ) {
         this.name = name;

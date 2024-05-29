@@ -3,7 +3,26 @@
 </p>
 
 <div class="selection_component_searchbar"> 
-    <input type="text" [(ngModel)]="nodestosearch" (input)="search_suggestion()" placeholder="Search...">
-    <button class="ttt" (click)="go()"> fff</button>
-    <button class="ttt" (click)="go2()"> fff</button>
+    <input type="text" [(ngModel)]="nodestosearch" placeholder="Search..." > <!--(input)="search_suggestion()"-->
+</div>
+
+<div class="selection_component_labels">
+    <div class="dimensions_tagset_labels" *ngFor="let tagset of tagsetlist">
+      <div class="dimensions_labels_title">
+        <input type="checkbox" [disabled]="shouldDisableCheckboxX(tagset)" [checked]="tagset.isCheckedX" (change)="toggleCheckboxX(tagset)" />
+        <input type="checkbox" [disabled]="shouldDisableCheckboxY(tagset)" [checked]="tagset.isCheckedY" (change)="toggleCheckboxY(tagset)" [style.margin-right]="'50px'"/>
+        {{tagset.name}}
+      </div>
+      <div class="dimensions_hierarchy_labels" *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)">
+        <div class="dimensions_labels_title">
+            <input type="checkbox" [disabled]="shouldDisableCheckboxX(hierarchy.firstNode)" [checked]="hierarchy.firstNode.isCheckedX" (change)="toggleCheckboxX(hierarchy.firstNode)"/>
+            <input type="checkbox" [disabled]="shouldDisableCheckboxY(hierarchy.firstNode)" [checked]="hierarchy.firstNode.isCheckedY" (change)="toggleCheckboxY(hierarchy.firstNode)" [style.margin-right]="'50px'"/>
+            <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="toggleNode(hierarchy.firstNode)">{{toggleButton(hierarchy.firstNode)}}</span> 
+            {{hierarchy.firstNode.name}}
+        </div>
+        <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded">
+            <app-dimensions-selection-node *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode" [nodegen]="1"></app-dimensions-selection-node>
+        </ng-container>        
+      </div>     
+    </div>
 </div>

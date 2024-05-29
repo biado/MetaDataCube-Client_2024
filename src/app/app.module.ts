@@ -6,12 +6,14 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DimensionsSelectionComponent } from './components/dimensions-selection/dimensions-selection.component';
 import { FormsModule } from '@angular/forms';
 import { GetDimensionsService } from './services/get-dimensions.service';
+import { DimensionsSelectionNodeComponent } from './components/dimensions-selection/dimensions-selection-node/dimensions-selection-node.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    DimensionsSelectionComponent
+    DimensionsSelectionComponent,
+    DimensionsSelectionNodeComponent
   ],
   imports: [
     BrowserModule,
