@@ -14,23 +14,140 @@ import { SelectedDimensionsService } from '../../services/selected-dimensions.se
 export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
+  id=0;
 
   constructor(
     private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
-  ) { }
+  ) 
+  { 
+  }
 
   /***
-   * When the component is started, a list of all the tagset
+   * When the component is started, a list of all the tagset.
+   * 
+   * Also we put all tagsets / hierarchies / nodes to visible (initial state)
    */
-  ngOnInit(): void {
-    this.tagsetlist = this.sortTagsets(this.getDimensionsService.tagsetList);
+  async ngOnInit(): Promise<void> {
+    this.tagsetlist.forEach(tagset => {
+      tagset.isVisible = true;
+      tagset.hierarchies.forEach(hierarchy => {
+        hierarchy.isVisible = true;
+        const nodesToProcess: Node[] = [hierarchy.firstNode];
+        while (nodesToProcess.length > 0) {
+          const currentNode = nodesToProcess.pop()!;
+          currentNode.isVisible = true;
+          if (currentNode.children) {
+            nodesToProcess.push(...currentNode.children);
+          }
+        }
+      });
+    });
+
+    this.getDimensionsService.tagset$.subscribe(data => {
+      this.tagsetlist = this.sortTagsets(data);
+    });
+
   }
 
-/*  search_suggestion() {    
-    console.log(this.elements.filter(element => element.startsWith(this.nodestosearch)));
+
+
+  /***
+   * Function that, depending on what you type in the taskbar, displays tags / hierarchies / nodes starting with what you've typed. 
+   * It will then display only the corresponding elements and all its ancestors.
+   * 
+   * When you return to the initial state (nothing in the search bar), you will make everything visible again.
+   * 
+   * This function comprises two internal functions
+   */
+  search_suggestion(): void {
+
+    // Function to reset all nodes to isExpanded = false and isVisible = true
+    function resetAllNodes(tagsets: Tagset[]): void {
+        tagsets.forEach(tagset => {
+            tagset.isVisible = true;
+            tagset.hierarchies.forEach(hierarchy => {
+                hierarchy.isVisible = true;
+                const nodesToProcess: Node[] = [hierarchy.firstNode];
+                while (nodesToProcess.length > 0) {
+                    const currentNode = nodesToProcess.pop()!;
+                    currentNode.isExpanded = false;
+                    currentNode.isVisible = true;
+                    if (currentNode.children) {
+                        nodesToProcess.push(...currentNode.children);
+                    }
+                }
+            });
+        });
+    }
+
+    // Recursive function to mark parents as isExpanded and isVisible
+    function expandParents(node: Node, allNodes: Map<number, Node>): void {
+        if (node.parentID !== null) {
+            const parent = allNodes.get(node.parentID);
+            if (parent) {
+                parent.isExpanded = true;
+                parent.isVisible = true;
+                expandParents(parent, allNodes);
+            }
+        }
+    }
+
+    // Reset all nodes if nodestosearch is empty
+    if (this.nodestosearch === '') {
+        resetAllNodes(this.tagsetlist);
+        return;
+    }
+
+    // We go through the tagset list to retrieve items starting with nodetosearch and display them.
+    this.tagsetlist.forEach(tagset => {
+        tagset.isVisible = false; // Hide default tagsets
+        if(tagset.name.startsWith(this.nodestosearch)){
+          tagset.isVisible = true;
+        }
+        tagset.hierarchies.forEach(hierarchy => {
+            hierarchy.isVisible = false; // Hide default hierarchies
+            const nodesToProcess: Node[] = [hierarchy.firstNode];
+            const allNodes: Map<number, Node> = new Map();
+
+            if(hierarchy.name.startsWith(this.nodestosearch)){
+              hierarchy.isVisible = true;
+            }
+
+            // Map of all the nodes
+            while (nodesToProcess.length > 0) {
+                const currentNode = nodesToProcess.pop()!;
+                allNodes.set(currentNode.id, currentNode); 
+                if (currentNode.children) {
+                    nodesToProcess.push(...currentNode.children); // Adding children to the process
+                }
+            }
+
+            // Hide all nodes 
+            allNodes.forEach(node => node.isVisible = false);
+
+            // Search for nodes that are parents and whose name begins with nodestosearch
+            // If there is a match, we display the node and its parent nodes (and hierarchy and tagset)
+            allNodes.forEach(node => {
+              if(node.children && node.children.length > 0){
+                  if (node.name.startsWith(this.nodestosearch)) {
+                      node.isExpanded = true;
+                      node.isVisible = true;
+                      expandParents(node, allNodes);
+
+                      // Display the hierarchy and tagset of the corresponding node
+                      hierarchy.isVisible = true;
+                      tagset.isVisible = true;
+                  }
+              }
+            });
+
+        });
+    });
+
   }
-*/
+
+
 
   /***
    * Sort a Tagset list alphabetically (Symbol -> Number ->aAbCdDeF)
@@ -60,7 +177,6 @@ export class DimensionsSelectionComponent {
     return sortedChildren;
   }
 
-
   /***
    * Defines the visual to be taken by a node's scroll button
    * (- if the list is scrolled, + otherwise)
@@ -74,6 +190,16 @@ export class DimensionsSelectionComponent {
    */
   toggleNode(node:Node): void {
     node.isExpanded = !node.isExpanded;
+  }
+
+  /***
+   * True if a node has children, false otherwise 
+   */
+  hasNonLeafChildren(node: Node): boolean {
+    if(node.children){
+      return node.children && node.children.some(child => child.children && child.children.length > 0);
+    }
+    return false;
   }
 
   /***
@@ -93,7 +219,7 @@ export class DimensionsSelectionComponent {
     if((elt.isCheckedX)&&(this.selectedDimensionsService.ischeckedX)){
       this.selectedDimensionsService.xid = elt.id;
       this.selectedDimensionsService.xname = elt.name;
-      this.selectedDimensionsService.xtype = elt instanceof Node ? 'node' : 'tagset';
+      this.selectedDimensionsService.xtype = elt.type;
     }
   }
 
@@ -114,7 +240,7 @@ export class DimensionsSelectionComponent {
     if((elt.isCheckedY)&&(this.selectedDimensionsService.ischeckedY)){
       this.selectedDimensionsService.yid = elt.id;
       this.selectedDimensionsService.yname = elt.name;
-      this.selectedDimensionsService.ytype = elt instanceof Node ? 'node' : 'tagset';
+      this.selectedDimensionsService.ytype = elt.type;
     }
   }
 
@@ -152,10 +278,82 @@ export class DimensionsSelectionComponent {
     }
   }
 
+  // Function to delete the selection made for X and Y
+  clearSelection(){
+    console.log(this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid, "\n", this.selectedDimensionsService.xtype, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid, "\n", this.selectedDimensionsService.ytype, "\n")
+    
+    if(!(this.selectedDimensionsService.xid === null) && !(this.selectedDimensionsService.xtype === null)){
+      const elementX = this.findElementinTagsetList(this.selectedDimensionsService.xid, this.selectedDimensionsService.xtype);
+      if(!(elementX===null)){
+        elementX.isCheckedX = false;
+      }
+    }
 
-  //Test Function
-  go(){
-    console.log("X:",this.selectedDimensionsService.xname,",",this.selectedDimensionsService.xid,",",this.selectedDimensionsService.xtype,".\n Y:",this.selectedDimensionsService.yname,",",this.selectedDimensionsService.yid,",",this.selectedDimensionsService.ytype,".")
+    if(!(this.selectedDimensionsService.yid === null) && !(this.selectedDimensionsService.ytype === null)){
+      const elementY = this.findElementinTagsetList(this.selectedDimensionsService.yid, this.selectedDimensionsService.ytype);
+      if(!(elementY===null)){
+        elementY.isCheckedY = false;
+      }
+    }
+
+    this.selectedDimensionsService.xid = null;
+    this.selectedDimensionsService.xname = null;
+    this.selectedDimensionsService.xtype = null;
+    this.selectedDimensionsService.ischeckedX = false;
+
+    this.selectedDimensionsService.yid = null;
+    this.selectedDimensionsService.yname = null;
+    this.selectedDimensionsService.ytype = null;
+    this.selectedDimensionsService.ischeckedY = false;
+  }
+
+
+  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
+    let element: Tagset | Node | null = null;
+    
+    for (const tagset of this.tagsetlist) {
+        if (elementType === 'tagset') {
+            if (tagset.id ===  elementid) {
+                element = tagset;
+                break;
+            }
+        } 
+        else if (elementType === 'node') {
+            for (const hierarchy of tagset.hierarchies) {
+                if (hierarchy.firstNode.id === elementid) {
+                    element = hierarchy.firstNode;
+                    break;
+                } else {
+                    const foundNode = findNodeById(hierarchy.firstNode, elementid);
+                    if (foundNode) {
+                        element = foundNode;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function findNodeById(node: Node, id: number): Node | null {
+      if (node.id === id) {
+          return node;
+      }
+  
+      if (node.children) {
+          for (const childNode of node.children) {
+              const foundNode = findNodeById(childNode, id);
+              if (foundNode) {
+                  return foundNode;
+              }
+          }
+      }
+  
+      return null;
+    }
+
+
+    return element;
+
   }
   
 }

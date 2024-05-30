@@ -6,6 +6,7 @@ export class Hierarchy {
     tagsetID: number;
     rootNodeID: number;
     firstNode: Node;
+    isVisible : boolean;
 
     constructor(name: string, id: number, tagsetID: number, rootNodeID: number, firstNode: Node) {
         this.name = name;
@@ -13,5 +14,6 @@ export class Hierarchy {
         this.tagsetID = tagsetID;
         this.rootNodeID = rootNodeID;
         this.firstNode = firstNode;
+        this.isVisible = true;
     }
 }

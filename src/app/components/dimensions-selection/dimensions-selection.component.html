@@ -3,26 +3,34 @@
 </p>
 
 <div class="selection_component_searchbar"> 
-    <input type="text" [(ngModel)]="nodestosearch" placeholder="Search..." > <!--(input)="search_suggestion()"-->
+    <input type="text" [(ngModel)]="nodestosearch" placeholder="Search..." (input)="search_suggestion()" > 
 </div>
 
+<button (click)="clearSelection()"> Clear Selection </button>
+
 <div class="selection_component_labels">
-    <div class="dimensions_tagset_labels" *ngFor="let tagset of tagsetlist">
-      <div class="dimensions_labels_title">
-        <input type="checkbox" [disabled]="shouldDisableCheckboxX(tagset)" [checked]="tagset.isCheckedX" (change)="toggleCheckboxX(tagset)" />
-        <input type="checkbox" [disabled]="shouldDisableCheckboxY(tagset)" [checked]="tagset.isCheckedY" (change)="toggleCheckboxY(tagset)" [style.margin-right]="'50px'"/>
-        {{tagset.name}}
-      </div>
-      <div class="dimensions_hierarchy_labels" *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)">
+    <div class="dimensions_tagset_labels" *ngFor="let tagset of tagsetlist" >
+      <div *ngIf="tagset.isVisible">
         <div class="dimensions_labels_title">
-            <input type="checkbox" [disabled]="shouldDisableCheckboxX(hierarchy.firstNode)" [checked]="hierarchy.firstNode.isCheckedX" (change)="toggleCheckboxX(hierarchy.firstNode)"/>
-            <input type="checkbox" [disabled]="shouldDisableCheckboxY(hierarchy.firstNode)" [checked]="hierarchy.firstNode.isCheckedY" (change)="toggleCheckboxY(hierarchy.firstNode)" [style.margin-right]="'50px'"/>
-            <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="toggleNode(hierarchy.firstNode)">{{toggleButton(hierarchy.firstNode)}}</span> 
-            {{hierarchy.firstNode.name}}
+          <!-- An input can be deactivated if a box in its column (X or Y) has already been ticked elsewhere. Whether or not it will be checked is defined by the node's isChecked variable. Each time this is changed, the corresponding toggleCheckbox function is called. -->  
+          <input type="checkbox" [disabled]="shouldDisableCheckboxX(tagset)" [checked]="tagset.isCheckedX" (change)="toggleCheckboxX(tagset)" />
+          <input type="checkbox" [disabled]="shouldDisableCheckboxY(tagset)" [checked]="tagset.isCheckedY" (change)="toggleCheckboxY(tagset)" [style.margin-right]="'50px'"/>
+          {{tagset.name}}
         </div>
-        <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded">
-            <app-dimensions-selection-node *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode" [nodegen]="1"></app-dimensions-selection-node>
-        </ng-container>        
-      </div>     
+        <div class="dimensions_hierarchy_labels" *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)" >
+          <div *ngIf="hierarchy.isVisible && hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0 && hasNonLeafChildren(hierarchy.firstNode)">
+            <div class="dimensions_labels_title">
+                <input type="checkbox" [disabled]="shouldDisableCheckboxX(hierarchy.firstNode)" [checked]="hierarchy.firstNode.isCheckedX" (change)="toggleCheckboxX(hierarchy.firstNode)"/>
+                <input type="checkbox" [disabled]="shouldDisableCheckboxY(hierarchy.firstNode)" [checked]="hierarchy.firstNode.isCheckedY" (change)="toggleCheckboxY(hierarchy.firstNode)" [style.margin-right]="'50px'"/>
+                <!-- A button (+ or -) will be displayed only if the node to which it is assigned has children (this button is used to scroll the list of children or not). -->
+                <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="toggleNode(hierarchy.firstNode)">{{toggleButton(hierarchy.firstNode)}}</span> 
+                {{hierarchy.firstNode.name}}
+            </div>
+            <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded">
+                <app-dimensions-selection-node *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode"  [nodegen]="1"></app-dimensions-selection-node>
+            </ng-container>        
+          </div> 
+        </div>
+      </div>    
     </div>
 </div>

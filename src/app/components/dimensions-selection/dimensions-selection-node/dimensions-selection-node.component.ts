@@ -23,7 +23,6 @@ export class DimensionsSelectionNodeComponent {
    * Give the font size 
    */
   getFontSize():number{
-    console.log(this.nodegen)
     if(this.nodegen<2){
       return 0.9;
     }else{

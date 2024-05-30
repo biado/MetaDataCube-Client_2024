@@ -45,6 +45,17 @@ export class AppComponent implements OnInit {
     console.log("End of refresh");
   }
 
+  async co(){
+    //const r = await this.getDimensionsService.loadTagsets();
+  }
+
+  async deco(){
+    //const i = this.getDimensionsService.getTagsetList();
+  }
+
+  clear(){
+  }
+
   /* Each time the size of the browser window changes, it updates the smallscreen variable */
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {

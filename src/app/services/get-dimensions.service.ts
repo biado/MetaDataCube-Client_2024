@@ -4,7 +4,8 @@ import { Tagset } from '../models/tagset';
 import { Tag } from '../models/tag';
 import { Hierarchy } from '../models/hierarchy';
 import { Node } from '../models/node';
-import { DOCUMENT } from '@angular/common';
+import { IndexedDbService } from './indexed-db.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,27 +14,36 @@ import { DOCUMENT } from '@angular/common';
 export class GetDimensionsService {
   public tagsetList : Tagset[] = [];
 
+  /* Object observable so that if tagsetList changes, it will also change for everyone who uses it */
+  private tagsetSubject = new BehaviorSubject<Tagset[]>(this.tagsetList);
+  tagset$ = this.tagsetSubject.asObservable();
+
   /***
-   * When the service is built, we will retrieve the tagsetlist from localStorage and store it in a variable.
+   * When the service is built, we will retrieve the tagsetlist
    */
   constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private http: HttpClient
-  ) {
-    const localStorage = document.defaultView?.localStorage;
-
-    if (localStorage) {
-      const tagsetListJSON = localStorage.getItem('tagsetList');
-
-      if (tagsetListJSON) {
-        this.tagsetList = JSON.parse(tagsetListJSON);
-      }
-    }
-  }
-  
+    private http: HttpClient,
+    private indexedDbService: IndexedDbService,
+  ) {    this.loadTagsets();  }
 
   private baseUrl = '/api';
 
+  /***
+   * Function that loads the tagsetList. It will use the indexedDB service to retrieve the list stored on it.
+   */
+  async loadTagsets() {
+    await this.waitNSeconds(100);
+
+    try {
+      const res = await this.indexedDbService.retrieveTagsets();
+      console.log('Tagsets loaded from IndexedDB:', res);
+      this.tagsetList = res;
+      this.tagsetSubject.next(this.tagsetList);
+
+    } catch (error) {
+      //console.error('Error loading tagsets from IndexedDB:', error);
+    }
+  }
 
   /***
    * Main function of this service. 
@@ -48,13 +58,12 @@ export class GetDimensionsService {
         this.tagsetList = []
         const response = await this.http.get(`${this.baseUrl}/tagset`).toPromise();
 
-        if (Array.isArray(response)) {
+        if (Array.isArray(response)) {            
             const requests = response.map(element => this.getTagsetInformations(element.id));
             const result = await Promise.all(requests);
-            localStorage.clear();
-            console.log("LocalStorage clear");
-            await this.sleep(10000);    //Wait 10s
-            localStorage.setItem("tagsetList", JSON.stringify(this.tagsetList));  //Put the tagsetList in localStorage
+
+            await this.indexedDbService.storeTagsets(this.tagsetList);    // Store TagsetList in IndexedDB
+
         } else {
             console.error('The response is not an array:', response);
         }
@@ -174,14 +183,17 @@ export class GetDimensionsService {
     }
 
     return new Node(name, id, parents, children);
-  }
-
+  } 
 
   /***
-   * Sleep function. Allows you to wait for a given time
+   * Wait function. Take ms (1000 millisecondes = 1 secondes)
    */
-  sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  async waitNSeconds(N:number): Promise<void> {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, N);
+    });
   }
 
 
