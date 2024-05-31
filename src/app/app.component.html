@@ -31,7 +31,9 @@
       <div class="select_filters_button"  [style.max-width]="display_filters ? '4%' : '100%'" [style.min-width]="display_filters ? '4%' : '100%'">
         <button (click)="display_filters_change()"> {{ display_filters ? '-' : '+' }} </button>
       </div>
-      <div class="select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'"></div>
+      <div class="select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'">      
+        <app-filters-selection></app-filters-selection>
+      </div>
     </section>
   </article>
 
@@ -53,7 +55,9 @@
         <div class="smcr_select_filters_button" [style.max-height]="display_filters ? '4%' : '100%'" [style.min-height]="display_filters ? '4%' : '100%'">
           <button (click)="display_filters_change()"  [style.border-radius]="display_filters ? '50px 50px 0 0' : '50px 50px 50px 50px'"> {{ display_filters ? '-' : '+' }} </button>
         </div>
-        <div class="smcr_select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'">aaaaa</div>
+        <div class="smcr_select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'">
+          <app-filters-selection></app-filters-selection>
+        </div>
       </section>
     </article>
   </ng-template>

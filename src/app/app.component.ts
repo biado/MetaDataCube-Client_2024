@@ -29,23 +29,31 @@ export class AppComponent implements OnInit {
     }
   }
 
-  /* Used to invert the value of display_dimensions, in order to display the dimensions pannel or not. */
+  /**
+   * Used to invert the value of display_dimensions, in order to display the dimensions pannel or not.
+   */
   display_dimensions_change(): void {
     this.display_dimensions = !this.display_dimensions;
   }
 
-  /* Used to invert the value of display_filters, in order to display the filters pannel or not. */
+  /**
+   * Used to invert the value of display_filters, in order to display the filters pannel or not.
+   */
   display_filters_change(): void {
     this.display_filters = !this.display_filters;
   }
 
-  /* Used to invert the value of display_filters, in order to display the filters pannel or not. */
+  /**
+   * Used to invert the value of display_filters, in order to display the filters pannel or not. 
+   */ 
   async refresh_selection_list(): Promise<void> {
     await this.getDimensionsService.getDimensions();
     console.log("End of refresh");
   }
 
-    /* Each time the size of the browser window changes, it updates the smallscreen variable */
+  /** 
+   * Each time the size of the browser window changes, it updates the smallscreen variable 
+   */
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
     if (isPlatformBrowser(this.platformId)) {

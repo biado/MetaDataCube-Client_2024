@@ -14,23 +14,26 @@ import { SelectedDimensionsService } from '../../services/selected-dimensions.se
 export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
-  id=0;
 
   constructor(
     private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
   ) 
-  { 
-  }
+  {}
 
-  /***
+  /**
    * When the component is started, a list of all the tagset.
    * 
    * Also we put all tagsets / hierarchies / nodes to visible (initial state)
    */
   async ngOnInit(): Promise<void> {
+    this.getDimensionsService.tagset$.subscribe(data => {
+      this.tagsetlist = this.sortTagsets(data);
+    });
+
+    /*
     this.tagsetlist.forEach(tagset => {
-      tagset.isVisible = true;
+      tagset.isVisibleDimensions = true;
       tagset.hierarchies.forEach(hierarchy => {
         hierarchy.isVisible = true;
         const nodesToProcess: Node[] = [hierarchy.firstNode];
@@ -42,17 +45,13 @@ export class DimensionsSelectionComponent {
           }
         }
       });
-    });
-
-    this.getDimensionsService.tagset$.subscribe(data => {
-      this.tagsetlist = this.sortTagsets(data);
-    });
+    });*/
 
   }
 
 
 
-  /***
+  /**
    * Function that, depending on what you type in the taskbar, displays tags / hierarchies / nodes starting with what you've typed. 
    * It will then display only the corresponding elements and all its ancestors.
    * 
@@ -60,12 +59,12 @@ export class DimensionsSelectionComponent {
    * 
    * This function comprises two internal functions
    */
-  search_suggestion(): void {
+  search_Dimensions(): void {
 
     // Function to reset all nodes to isExpanded = false and isVisible = true
     function resetAllNodes(tagsets: Tagset[]): void {
         tagsets.forEach(tagset => {
-            tagset.isVisible = true;
+            tagset.isVisibleDimensions = true;
             tagset.hierarchies.forEach(hierarchy => {
                 hierarchy.isVisible = true;
                 const nodesToProcess: Node[] = [hierarchy.firstNode];
@@ -101,9 +100,9 @@ export class DimensionsSelectionComponent {
 
     // We go through the tagset list to retrieve items starting with nodetosearch and display them.
     this.tagsetlist.forEach(tagset => {
-        tagset.isVisible = false; // Hide default tagsets
+        tagset.isVisibleDimensions = false; // Hide default tagsets
         if(tagset.name.startsWith(this.nodestosearch)){
-          tagset.isVisible = true;
+          tagset.isVisibleDimensions = true;
         }
         tagset.hierarchies.forEach(hierarchy => {
             hierarchy.isVisible = false; // Hide default hierarchies
@@ -137,7 +136,7 @@ export class DimensionsSelectionComponent {
 
                       // Display the hierarchy and tagset of the corresponding node
                       hierarchy.isVisible = true;
-                      tagset.isVisible = true;
+                      tagset.isVisibleDimensions = true;
                   }
               }
             });
@@ -149,25 +148,25 @@ export class DimensionsSelectionComponent {
 
 
 
-  /***
+  /**
    * Sort a Tagset list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
   sortTagsets(tagsets: Tagset[]): Tagset[] {
     return tagsets.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  /***
+  /**
    * Sort a hierarchy list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
   sortHierarchy(hierarchy: Hierarchy[]): Hierarchy[] {
     return hierarchy.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  /***
+  /**
    * Two next function sort a node list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
   sortNodes(nodes: Node[]): Node[] {
-    return nodes.sort((a, b) => a.name.localeCompare(b.name));
+    return nodes.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
   }
   sortNodeChildren(node:Node):Node[]{
     if (!node || !node.children || node.children.length === 0) {
@@ -177,7 +176,7 @@ export class DimensionsSelectionComponent {
     return sortedChildren;
   }
 
-  /***
+  /**
    * Defines the visual to be taken by a node's scroll button
    * (- if the list is scrolled, + otherwise)
    */
@@ -185,14 +184,14 @@ export class DimensionsSelectionComponent {
     return node.isExpanded ? '-' : '+';
   }
 
-  /***
+  /**
    * Applies to the node whether it is scrolled down or not
    */
   toggleNode(node:Node): void {
     node.isExpanded = !node.isExpanded;
   }
 
-  /***
+  /**
    * True if a node has children, false otherwise 
    */
   hasNonLeafChildren(node: Node): boolean {
@@ -202,7 +201,7 @@ export class DimensionsSelectionComponent {
     return false;
   }
 
-  /***
+  /**
    * Function that will be launched if you click to check or uncheck one of the X boxes. 
    * If ticked, the variables for X are defined with the data the node that has been ticked. If we uncheck, we set the variables to null.
    */
@@ -223,7 +222,7 @@ export class DimensionsSelectionComponent {
     }
   }
 
-  /***
+  /**
    * Function that will be launched if you click to check or uncheck one of the Y boxes. 
    * If ticked, the variables for Y are defined with the data of the node that has been ticked. If we uncheck, we set the variables to null.
    */
@@ -244,7 +243,7 @@ export class DimensionsSelectionComponent {
     }
   }
 
-  /***
+  /**
    * Function which, depending on whether a box X has been ticked, makes all the 
    * others unavailable (function [disabled]="true/false" in an input). 
    * We'll make all the X boxes unavailable except the one we've ticked (so that we can untick it).
@@ -261,7 +260,7 @@ export class DimensionsSelectionComponent {
     }
   }
 
-  /***
+  /**
    * Function which, depending on whether a box Y has been ticked, makes all the 
    * others unavailable (function [disabled]="true/false" in an input). 
    * We'll make all the Y boxes unavailable except the one we've ticked (so that we can untick it).
@@ -278,11 +277,11 @@ export class DimensionsSelectionComponent {
     }
   }
 
-  /***
+  /**
    * Function to delete the selection made for X and Y
    */ 
   clearDimensionsSelection(){
-    console.log(this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid, "\n", this.selectedDimensionsService.xtype, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid, "\n", this.selectedDimensionsService.ytype, "\n")
+    console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid, "\n", this.selectedDimensionsService.xtype, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid, "\n", this.selectedDimensionsService.ytype, "\n")
     
     if(!(this.selectedDimensionsService.xid === null) && !(this.selectedDimensionsService.xtype === null)){
       const elementX = this.findElementinTagsetList(this.selectedDimensionsService.xid, this.selectedDimensionsService.xtype);
@@ -309,7 +308,7 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.ischeckedY = false;
   }
 
-  /***
+  /**
    * Retrieves a node or tagset using the type and id of the element. This will retrieve the exact object from the tagsetList.
    * 
    * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.

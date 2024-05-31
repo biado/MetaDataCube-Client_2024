@@ -9,7 +9,11 @@ export class Tagset {
     tags : Tag[];
     isCheckedX:boolean;
     isCheckedY:boolean;
-    isVisible : boolean;
+    isCheckedFilters:boolean;
+    isVisibleDimensions : boolean;
+    isVisibleFilters : boolean;
+    isExpanded : boolean;
+
 
     constructor(name: string, id: number,hierarchies: Hierarchy[],tags:Tag[] ) {
         this.name = name;
@@ -19,7 +23,10 @@ export class Tagset {
 
         this.isCheckedX = false;
         this.isCheckedY = false;
-        this.isVisible = true;
+        this.isCheckedFilters = false;
+        this.isVisibleDimensions = true;
+        this.isVisibleFilters = true;
+        this.isExpanded = false;
 
         this.type = 'tagset';
     }
