@@ -9,7 +9,7 @@
 /* ############################################## */
 
 
-/* ################### SearchBar ################## */
+/* ################## SearchBar ################# */
 .selection_component_searchbar{
     width: 80%;
     margin: 0 auto 0 auto;
@@ -32,7 +32,23 @@
 /* ############################################## */
 
 
-.selection_component_title,.selection_component_searchbar{
+/* ################### Clear Button ################## */
+.clear_selection_component{
+    font-family: 'Shrikhand', serif;
+    font-size: 1.2em;
+    color: var(--main-color);
+    background: var(--button-color);;
+    border: none;
+    border-radius: 50px;
+    height: min-content;
+    width: 80%; 
+    margin: 1.5em auto 0em auto;
+    cursor: pointer;
+}
+/* ############################################## */
+
+
+.selection_component_title,.selection_component_searchbar,.clear_selection_component{
     flex-grow: 0;
 }
 

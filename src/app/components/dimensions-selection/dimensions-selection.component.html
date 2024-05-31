@@ -6,7 +6,7 @@
     <input type="text" [(ngModel)]="nodestosearch" placeholder="Search..." (input)="search_suggestion()" > 
 </div>
 
-<button (click)="clearSelection()"> Clear Selection </button>
+<button class="clear_selection_component" (click)="clearDimensionsSelection()"> Clear Selection </button>
 
 <div class="selection_component_labels">
     <div class="dimensions_tagset_labels" *ngFor="let tagset of tagsetlist" >

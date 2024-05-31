@@ -278,8 +278,10 @@ export class DimensionsSelectionComponent {
     }
   }
 
-  // Function to delete the selection made for X and Y
-  clearSelection(){
+  /***
+   * Function to delete the selection made for X and Y
+   */ 
+  clearDimensionsSelection(){
     console.log(this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid, "\n", this.selectedDimensionsService.xtype, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid, "\n", this.selectedDimensionsService.ytype, "\n")
     
     if(!(this.selectedDimensionsService.xid === null) && !(this.selectedDimensionsService.xtype === null)){
@@ -307,9 +309,29 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.ischeckedY = false;
   }
 
-
+  /***
+   * Retrieves a node or tagset using the type and id of the element. This will retrieve the exact object from the tagsetList.
+   * 
+   * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.
+   */
   findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
     let element: Tagset | Node | null = null;
+
+    function findNodeById(node: Node, id: number): Node | null {
+      if (node.id === id) {
+          return node;
+      }  
+      if (node.children) {
+          for (const childNode of node.children) {
+              const foundNode = findNodeById(childNode, id);
+              if (foundNode) {
+                  return foundNode;
+              }
+          }
+      }
+  
+      return null;
+    }
     
     for (const tagset of this.tagsetlist) {
         if (elementType === 'tagset') {
@@ -333,24 +355,6 @@ export class DimensionsSelectionComponent {
             }
         }
     }
-
-    function findNodeById(node: Node, id: number): Node | null {
-      if (node.id === id) {
-          return node;
-      }
-  
-      if (node.children) {
-          for (const childNode of node.children) {
-              const foundNode = findNodeById(childNode, id);
-              if (foundNode) {
-                  return foundNode;
-              }
-          }
-      }
-  
-      return null;
-    }
-
 
     return element;
 

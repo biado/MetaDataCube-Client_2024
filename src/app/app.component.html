@@ -9,9 +9,8 @@
     </div>
     <div class="header_buttons_div">
       <button class="header_buttons" (click)="refresh_selection_list()">Refresh</button>
-      <button class="header_buttons" (click)="co()">Import</button>
-      <button class="header_buttons" (click)="deco()">Export</button>
-      <button class="header_buttons" (click)="clear()">???</button>
+      <button class="header_buttons">Import</button>
+      <button class="header_buttons">Export</button>
     </div>
   </header>
 
@@ -21,7 +20,7 @@
       <div class="select_dimensions_pannel" [style.display]="display_dimensions ? 'flex' : 'none'">
         <app-dimensions-selection></app-dimensions-selection>
       </div>
-      <div class="select_dimensions_button" [style.max-width]="display_dimensions ? '4%' : '100%'" [style.min-width]="display_dimensions ? '4%' : '100%'">
+      <div class="select_dimensions_button" [style.max-width]="display_dimensions ? '4%' : '100%'" [style.min-width]="display_dimensions ? '4%' : '100%'" >
         <button (click)="display_dimensions_change()"> {{ display_dimensions ? '-' : '+' }} </button>
       </div>
     </section>
@@ -41,7 +40,7 @@
     <article class="smcr_article">
       <section class="smcr_select_dimensions" [style.min-height]="display_dimensions ? '100%' : '4%'" [style.max-height]="display_dimensions ? '100%' : '4%'">
         <div class="smcr_select_dimensions_button" [style.max-height]="display_dimensions ? '4%' : '100%'" [style.min-height]="display_dimensions ? '4%' : '100%'">
-          <button (click)="display_dimensions_change()"> {{ display_dimensions ? '-' : '+' }} </button>
+          <button (click)="display_dimensions_change()" [style.border-radius]="display_dimensions ? '50px 50px 0 0' : '50px 50px 50px 50px'"> {{ display_dimensions ? '-' : '+' }} </button>
         </div>
         <div class="smcr_select_dimensions_pannel" [style.display]="display_dimensions ? 'flex' : 'none'">
           <app-dimensions-selection></app-dimensions-selection>
@@ -52,7 +51,7 @@
 
       <section class="smcr_select_filters" [style.min-height]="display_filters ? '100%' : '4%'" [style.max-height]="display_filters ? '100%' : '4%'">
         <div class="smcr_select_filters_button" [style.max-height]="display_filters ? '4%' : '100%'" [style.min-height]="display_filters ? '4%' : '100%'">
-          <button (click)="display_filters_change()"> {{ display_filters ? '-' : '+' }} </button>
+          <button (click)="display_filters_change()"  [style.border-radius]="display_filters ? '50px 50px 0 0' : '50px 50px 50px 50px'"> {{ display_filters ? '-' : '+' }} </button>
         </div>
         <div class="smcr_select_filters_pannel" [style.display]="display_filters ? 'flex' : 'none'">aaaaa</div>
       </section>
