@@ -1,0 +1,29 @@
+<p class="selection_component_title">
+    Filters
+</p>
+
+<div class="selection_component_searchbar"> 
+    <input type="text" [(ngModel)]="filterstosearch" placeholder="Search..." (input)="search_Filters()" > 
+</div>
+
+<button class="clear_selection_component" (click)="clearFiltersSelection()"> Clear Selection </button>
+
+<div class="selection_component_labels">
+    <div class="filters_tagset_labels" *ngFor="let tagset of tagsetlist" >
+      <div *ngIf="tagset.isVisibleFilters">
+        <div class="filters_labels_title">
+          <!-- An input can be deactivated if a box in its column (X or Y) has already been ticked elsewhere. Whether or not it will be checked is defined by the node's isChecked variable. Each time this is changed, the corresponding toggleCheckbox function is called. -->  
+          <input type="checkbox" [checked]="tagset.isCheckedFilters" (change)="toggleCheckboxTagsetFilters(tagset)" [style.margin-right]="'50px'" />
+          <span  class="toggle-button" (click)="toggleTagset(tagset)">{{toggleButton(tagset)}}</span>
+          {{tagset.name}}
+        </div>
+
+        <div *ngIf="tagset.isExpanded">
+            <ng-container class="filters_tags_labels" *ngFor="let tag of sortTags(tagset.tags)">
+                <app-filters-selection-tag [tag]="tag" (idchecked)="onTagFilterSelected($event)"></app-filters-selection-tag>
+            </ng-container>  
+        </div>
+        
+      </div>    
+    </div>
+</div>

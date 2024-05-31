@@ -7,13 +7,17 @@ import { DimensionsSelectionComponent } from './components/dimensions-selection/
 import { FormsModule } from '@angular/forms';
 import { GetDimensionsService } from './services/get-dimensions.service';
 import { DimensionsSelectionNodeComponent } from './components/dimensions-selection/dimensions-selection-node/dimensions-selection-node.component';
+import { FiltersSelectionComponent } from './components/filters-selection/filters-selection.component';
+import { FiltersSelectionTagComponent } from './components/filters-selection/filters-selection-tag/filters-selection-tag.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     DimensionsSelectionComponent,
-    DimensionsSelectionNodeComponent
+    DimensionsSelectionNodeComponent,
+    FiltersSelectionComponent,
+    FiltersSelectionTagComponent
   ],
   imports: [
     BrowserModule,

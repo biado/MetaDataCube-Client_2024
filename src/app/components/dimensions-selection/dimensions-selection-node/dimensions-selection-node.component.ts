@@ -9,8 +9,8 @@ import { SelectedDimensionsService } from '../../../services/selected-dimensions
   styleUrls: ['../dimensions-selection.component.css'],
 })
 export class DimensionsSelectionNodeComponent {
-  list:Node[]=[]
-  @Input() node: Node = new Node("test",0,0,this.list)
+  list:Node[]=[];
+  @Input() node: Node = new Node("test",0,0,this.list);
   @Input() nodegen: number=-1;
   marginLeft: number = 0.8;
   fontSize: number=1;
@@ -36,7 +36,7 @@ export class DimensionsSelectionNodeComponent {
   sortNodes(nodes: Node[] | null = null): Node[] {
     if (nodes) {
       const sortedNodes = nodes.slice();
-      return sortedNodes.sort((a, b) => a.name.localeCompare(b.name));
+      return sortedNodes.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
     } else {
       return [];
     }

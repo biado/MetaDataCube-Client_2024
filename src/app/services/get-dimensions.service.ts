@@ -18,7 +18,7 @@ export class GetDimensionsService {
   private tagsetSubject = new BehaviorSubject<Tagset[]>(this.tagsetList);
   tagset$ = this.tagsetSubject.asObservable();
 
-  /***
+  /**
    * When the service is built, we will retrieve the tagsetlist
    */
   constructor(
@@ -28,7 +28,7 @@ export class GetDimensionsService {
 
   private baseUrl = '/api';
 
-  /***
+  /**
    * Function that loads the tagsetList. It will use the indexedDB service to retrieve the list stored on it.
    */
   async loadTagsets() {
@@ -45,7 +45,7 @@ export class GetDimensionsService {
     }
   }
 
-  /***
+  /**
    * Main function of this service. 
    * It will retrieve the list of tagsets and then run the function to obtain the tagset information.
    *
@@ -72,7 +72,7 @@ export class GetDimensionsService {
     }
   }
 
-  /***
+  /**
    * Function that retrieves information from tagsets. 
    * It will send the list of tags and hierarchies for further processing, 
    * wait to receive the list of tags and hierarchies in return and then create a 
@@ -116,7 +116,7 @@ export class GetDimensionsService {
     );
   } */
 
-  /***
+  /**
    *  Function that takes the list of tags from api/tagset/{id} 
    * (from getTagsetInformations) and uses it to create a list of Tag.
    * 
@@ -135,7 +135,7 @@ export class GetDimensionsService {
     }
   }
 
-  /***
+  /**
    *  Function that takes the list of hierarchies from api/tagset/{id} 
    * (from getTagsetInformations) and uses it to create a list of Hierarchy.   * 
    * It then returns it to getTagsetInformations
@@ -155,7 +155,7 @@ export class GetDimensionsService {
     return res;
   }
 
-  /***
+  /**
    * This function takes a nodeid and retrieves all the node's informations.
    *
    * For the list of children, we'll retrieve the id of each child node, 
@@ -185,7 +185,7 @@ export class GetDimensionsService {
     return new Node(name, id, parents, children);
   } 
 
-  /***
+  /**
    * Wait function. Take ms (1000 millisecondes = 1 secondes)
    */
   async waitNSeconds(N:number): Promise<void> {
