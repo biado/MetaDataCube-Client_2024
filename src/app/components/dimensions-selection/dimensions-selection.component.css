@@ -64,6 +64,15 @@
     white-space: nowrap;
 }
 
+.dimensions_column_title{
+    display: flex;
+    flex-direction: row;
+    font-size: 20px;
+}
+.dimensions_column_title div{
+    margin:0 0em 0 0.5em;
+}
+
 .dimensions_tagset_labels{
     height: auto;
     font-size: 1.2em ;

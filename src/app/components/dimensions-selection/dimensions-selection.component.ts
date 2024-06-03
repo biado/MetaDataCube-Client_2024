@@ -203,78 +203,77 @@ export class DimensionsSelectionComponent {
 
   /**
    * Function that will be launched if you click to check or uncheck one of the X boxes. 
-   * If ticked, the variables for X are defined with the data the node that has been ticked. If we uncheck, we set the variables to null.
+   * 
+   * If ticked, the variables for X are defined with the data the element that has been ticked. If we uncheck, we set the variables to null.
+   * If an element was already checked, we'll uncheck it and then update the values. 
    */
   toggleCheckboxX(elt:Node|Tagset): void {
-    elt.isCheckedX = !elt.isCheckedX ;
-    this.selectedDimensionsService.ischeckedX = !this.selectedDimensionsService.ischeckedX;
-
-    if((!elt.isCheckedX)&&(!this.selectedDimensionsService.ischeckedX)){
-      this.selectedDimensionsService.xid = null;
-      this.selectedDimensionsService.xname = null;
-      this.selectedDimensionsService.xtype = null;
-    }
-
-    if((elt.isCheckedX)&&(this.selectedDimensionsService.ischeckedX)){
+    if(this.selectedDimensionsService.ischeckedX && !elt.isCheckedX){ 
+      if(!(this.selectedDimensionsService.xid === null) && !(this.selectedDimensionsService.xtype === null)){
+        const actualElementX = this.findElementinTagsetList(this.selectedDimensionsService.xid, this.selectedDimensionsService.xtype);
+        if(!(actualElementX===null)){
+          actualElementX.isCheckedX = false;
+        }
+      }
+      elt.isCheckedX = !elt.isCheckedX ;
       this.selectedDimensionsService.xid = elt.id;
       this.selectedDimensionsService.xname = elt.name;
       this.selectedDimensionsService.xtype = elt.type;
+    }
+    else{
+      elt.isCheckedX = !elt.isCheckedX ;
+      this.selectedDimensionsService.ischeckedX = !this.selectedDimensionsService.ischeckedX;
+
+      if((!elt.isCheckedX)&&(!this.selectedDimensionsService.ischeckedX)){
+        this.selectedDimensionsService.xid = null;
+        this.selectedDimensionsService.xname = null;
+        this.selectedDimensionsService.xtype = null;
+      }
+
+      if((elt.isCheckedX)&&(this.selectedDimensionsService.ischeckedX)){
+        this.selectedDimensionsService.xid = elt.id;
+        this.selectedDimensionsService.xname = elt.name;
+        this.selectedDimensionsService.xtype = elt.type;
+      }
     }
   }
 
   /**
    * Function that will be launched if you click to check or uncheck one of the Y boxes. 
-   * If ticked, the variables for Y are defined with the data of the node that has been ticked. If we uncheck, we set the variables to null.
+   * 
+   * If ticked, the variables for Y are defined with the data of the element that has been ticked. If we uncheck, we set the variables to null.
+   * If an element was already checked, we'll uncheck it and then update the values.
    */
   toggleCheckboxY(elt:Node|Tagset): void {
-    elt.isCheckedY = !elt.isCheckedY ;
-    this.selectedDimensionsService.ischeckedY = !this.selectedDimensionsService.ischeckedY;
-
-    if((!elt.isCheckedY)&&(!this.selectedDimensionsService.ischeckedY)){
-      this.selectedDimensionsService.yid = null;
-      this.selectedDimensionsService.yname = null;
-      this.selectedDimensionsService.ytype = null;
-    }
-
-    if((elt.isCheckedY)&&(this.selectedDimensionsService.ischeckedY)){
+    if(this.selectedDimensionsService.ischeckedY && !elt.isCheckedY){ 
+      if(!(this.selectedDimensionsService.yid === null) && !(this.selectedDimensionsService.ytype === null)){
+        const actualElementY = this.findElementinTagsetList(this.selectedDimensionsService.yid, this.selectedDimensionsService.ytype);
+        if(!(actualElementY===null)){
+          actualElementY.isCheckedY = false;
+        }
+      }
+      elt.isCheckedY = !elt.isCheckedY ;
       this.selectedDimensionsService.yid = elt.id;
       this.selectedDimensionsService.yname = elt.name;
       this.selectedDimensionsService.ytype = elt.type;
     }
-  }
 
-  /**
-   * Function which, depending on whether a box X has been ticked, makes all the 
-   * others unavailable (function [disabled]="true/false" in an input). 
-   * We'll make all the X boxes unavailable except the one we've ticked (so that we can untick it).
-   */
-  shouldDisableCheckboxX(node:Node|Tagset):boolean{
-    if(node.isCheckedX){
-      return false;
-    }
+    else{
+      elt.isCheckedY = !elt.isCheckedY ;
+      this.selectedDimensionsService.ischeckedY = !this.selectedDimensionsService.ischeckedY;
 
-    if(this.selectedDimensionsService.ischeckedX){
-      return true;
-    }else{
-      return false;
-    }
-  }
+      if((!elt.isCheckedY)&&(!this.selectedDimensionsService.ischeckedY)){
+        this.selectedDimensionsService.yid = null;
+        this.selectedDimensionsService.yname = null;
+        this.selectedDimensionsService.ytype = null;
+      }
 
-  /**
-   * Function which, depending on whether a box Y has been ticked, makes all the 
-   * others unavailable (function [disabled]="true/false" in an input). 
-   * We'll make all the Y boxes unavailable except the one we've ticked (so that we can untick it).
-   */
-  shouldDisableCheckboxY(elt:Node|Tagset):boolean{
-    if(elt.isCheckedY){
-      return false;
-    }
-
-    if(this.selectedDimensionsService.ischeckedY){
-      return true;
-    }else{
-      return false;
-    }
+      if((elt.isCheckedY)&&(this.selectedDimensionsService.ischeckedY)){
+        this.selectedDimensionsService.yid = elt.id;
+        this.selectedDimensionsService.yname = elt.name;
+        this.selectedDimensionsService.ytype = elt.type;
+      }
+    }    
   }
 
   /**
