@@ -12,11 +12,10 @@ import { BehaviorSubject } from 'rxjs';
 })
 
 export class GetDimensionsService {
-  public tagsetList : Tagset[] = [];
-
-  /* Object observable so that if tagsetList changes, it will also change for everyone who uses it */
-  private tagsetSubject = new BehaviorSubject<Tagset[]>(this.tagsetList);
-  tagset$ = this.tagsetSubject.asObservable();
+  /** tagsetListSubject is an observable subject, storing a list of Tagsets.  */
+  private tagsetListSubject = new BehaviorSubject<Tagset[]>([]);
+  /** tagset$ is a public observable, providing access to tagsetListSubject externally.  */
+  tagsetList$ = this.tagsetListSubject.asObservable();
 
   /**
    * When the service is built, we will retrieve the tagsetlist
@@ -37,12 +36,18 @@ export class GetDimensionsService {
     try {
       const res = await this.indexedDbService.retrieveTagsets();
       console.log('Tagsets loaded from IndexedDB:', res);
-      this.tagsetList = res;
-      this.tagsetSubject.next(this.tagsetList);
+      this.tagsetListSubject.next(res);
 
     } catch (error) {
       //console.error('Error loading tagsets from IndexedDB:', error);
     }
+  }
+
+  /**
+   * Sort a Tagset list alphabetically (Symbol -> Number ->aAbCdDeF)
+   */
+  sortTagsets(tagsets: Tagset[]): Tagset[] {
+    return tagsets.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   /**
@@ -55,14 +60,16 @@ export class GetDimensionsService {
    */
   async getDimensions(): Promise<void> {
     try {
-        this.tagsetList = []
+      this.tagsetListSubject.next([]);
         const response = await this.http.get(`${this.baseUrl}/tagset`).toPromise();
 
         if (Array.isArray(response)) {            
             const requests = response.map(element => this.getTagsetInformations(element.id));
             const result = await Promise.all(requests);
 
-            await this.indexedDbService.storeTagsets(this.tagsetList);    // Store TagsetList in IndexedDB
+            const sortedTagsets = this.sortTagsets(this.tagsetListSubject.value);
+            this.tagsetListSubject.next(sortedTagsets);
+            await this.indexedDbService.storeTagsets(sortedTagsets);    // Store TagsetList in IndexedDB
 
         } else {
             console.error('The response is not an array:', response);
@@ -88,7 +95,10 @@ export class GetDimensionsService {
                 let tags = await this.getTagsInformations(response.tags);
                 let hierarchies = await this.getHierarchyInformations(response.hierarchies);
                 let tagset = new Tagset(response.name, response.id, hierarchies, tags);
-                this.tagsetList.push(tagset);
+                
+                const updatedTagsets = [...this.tagsetListSubject.value, tagset];
+                this.tagsetListSubject.next(updatedTagsets);
+
                 resolve(2);
             },
             (error) => {

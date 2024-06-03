@@ -2,6 +2,7 @@ export class Tag {
     name: string;
     id: number;
     tagsetid : number;
+    type:'tag';
 
     ischecked : boolean;
     isVisible : boolean;
@@ -13,5 +14,7 @@ export class Tag {
 
         this.ischecked=false;
         this.isVisible=true;
+
+        this.type = 'tag';
     }
 }

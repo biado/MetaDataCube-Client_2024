@@ -1,0 +1,25 @@
+<div class="axis-container">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th *ngFor="let x of AxisX">{{ x }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let y of AxisY">
+          <td>{{ y }}</td>
+          <td *ngFor="let x of AxisX">
+            <div class="cell-content">
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>{{AxeXType}}</p>
+  <p>{{AxeXID}}</p>
+
+  <p>{{AxeYType}}</p>
+  <p>{{AxeYID}}</p>

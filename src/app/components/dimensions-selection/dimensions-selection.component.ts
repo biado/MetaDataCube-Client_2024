@@ -15,6 +15,11 @@ export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
 
+  dimXId :number|null = null;
+  dimXType :'node' | 'tagset' |null = null;
+  dimYId :number|null = null;
+  dimYType :'node' | 'tagset' |null = null;
+
   constructor(
     private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
@@ -27,25 +32,25 @@ export class DimensionsSelectionComponent {
    * Also we put all tagsets / hierarchies / nodes to visible (initial state)
    */
   async ngOnInit(): Promise<void> {
-    this.getDimensionsService.tagset$.subscribe(data => {
-      this.tagsetlist = this.sortTagsets(data);
+    this.getDimensionsService.tagsetList$.subscribe(data => {
+      this.tagsetlist = data;
     });
 
-    /*
-    this.tagsetlist.forEach(tagset => {
-      tagset.isVisibleDimensions = true;
-      tagset.hierarchies.forEach(hierarchy => {
-        hierarchy.isVisible = true;
-        const nodesToProcess: Node[] = [hierarchy.firstNode];
-        while (nodesToProcess.length > 0) {
-          const currentNode = nodesToProcess.pop()!;
-          currentNode.isVisible = true;
-          if (currentNode.children) {
-            nodesToProcess.push(...currentNode.children);
-          }
-        }
-      });
-    });*/
+    this.selectedDimensionsService.xid$.subscribe(data => {
+      this.dimXId = data;
+    });
+
+    this.selectedDimensionsService.xtype$.subscribe(data => {
+      this.dimXType = data;
+    });
+
+    this.selectedDimensionsService.yid$.subscribe(data => {
+      this.dimYId = data;
+    });
+
+    this.selectedDimensionsService.ytype$.subscribe(data => {
+      this.dimYType = data;
+    });
 
   }
 
@@ -146,15 +151,6 @@ export class DimensionsSelectionComponent {
 
   }
 
-
-
-  /**
-   * Sort a Tagset list alphabetically (Symbol -> Number ->aAbCdDeF)
-   */
-  sortTagsets(tagsets: Tagset[]): Tagset[] {
-    return tagsets.sort((a, b) => a.name.localeCompare(b.name));
-  }
-
   /**
    * Sort a hierarchy list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
@@ -209,31 +205,31 @@ export class DimensionsSelectionComponent {
    */
   toggleCheckboxX(elt:Node|Tagset): void {
     if(this.selectedDimensionsService.ischeckedX && !elt.isCheckedX){ 
-      if(!(this.selectedDimensionsService.xid === null) && !(this.selectedDimensionsService.xtype === null)){
-        const actualElementX = this.findElementinTagsetList(this.selectedDimensionsService.xid, this.selectedDimensionsService.xtype);
+      if(!(this.dimXId === null) && !(this.dimXType === null)){
+        const actualElementX = this.findElementinTagsetList(this.dimXId, this.dimXType);
         if(!(actualElementX===null)){
           actualElementX.isCheckedX = false;
         }
       }
       elt.isCheckedX = !elt.isCheckedX ;
-      this.selectedDimensionsService.xid = elt.id;
+      this.selectedDimensionsService.xid.next(elt.id);
       this.selectedDimensionsService.xname = elt.name;
-      this.selectedDimensionsService.xtype = elt.type;
+      this.selectedDimensionsService.xtype.next(elt.type);
     }
     else{
       elt.isCheckedX = !elt.isCheckedX ;
       this.selectedDimensionsService.ischeckedX = !this.selectedDimensionsService.ischeckedX;
 
       if((!elt.isCheckedX)&&(!this.selectedDimensionsService.ischeckedX)){
-        this.selectedDimensionsService.xid = null;
+        this.selectedDimensionsService.xid.next(null);
         this.selectedDimensionsService.xname = null;
-        this.selectedDimensionsService.xtype = null;
+        this.selectedDimensionsService.xtype.next(null);
       }
 
       if((elt.isCheckedX)&&(this.selectedDimensionsService.ischeckedX)){
-        this.selectedDimensionsService.xid = elt.id;
+        this.selectedDimensionsService.xid.next(elt.id);
         this.selectedDimensionsService.xname = elt.name;
-        this.selectedDimensionsService.xtype = elt.type;
+        this.selectedDimensionsService.xtype.next(elt.type);
       }
     }
   }
@@ -246,16 +242,16 @@ export class DimensionsSelectionComponent {
    */
   toggleCheckboxY(elt:Node|Tagset): void {
     if(this.selectedDimensionsService.ischeckedY && !elt.isCheckedY){ 
-      if(!(this.selectedDimensionsService.yid === null) && !(this.selectedDimensionsService.ytype === null)){
-        const actualElementY = this.findElementinTagsetList(this.selectedDimensionsService.yid, this.selectedDimensionsService.ytype);
+      if(!(this.dimYId === null) && !(this.dimYType === null)){
+        const actualElementY = this.findElementinTagsetList(this.dimYId, this.dimYType);
         if(!(actualElementY===null)){
           actualElementY.isCheckedY = false;
         }
       }
       elt.isCheckedY = !elt.isCheckedY ;
-      this.selectedDimensionsService.yid = elt.id;
+      this.selectedDimensionsService.yid.next(elt.id);
       this.selectedDimensionsService.yname = elt.name;
-      this.selectedDimensionsService.ytype = elt.type;
+      this.selectedDimensionsService.ytype.next(elt.type);
     }
 
     else{
@@ -263,15 +259,15 @@ export class DimensionsSelectionComponent {
       this.selectedDimensionsService.ischeckedY = !this.selectedDimensionsService.ischeckedY;
 
       if((!elt.isCheckedY)&&(!this.selectedDimensionsService.ischeckedY)){
-        this.selectedDimensionsService.yid = null;
+        this.selectedDimensionsService.yid.next(null);
         this.selectedDimensionsService.yname = null;
-        this.selectedDimensionsService.ytype = null;
+        this.selectedDimensionsService.ytype.next(null);
       }
 
       if((elt.isCheckedY)&&(this.selectedDimensionsService.ischeckedY)){
-        this.selectedDimensionsService.yid = elt.id;
+        this.selectedDimensionsService.yid.next(elt.id);
         this.selectedDimensionsService.yname = elt.name;
-        this.selectedDimensionsService.ytype = elt.type;
+        this.selectedDimensionsService.ytype.next(elt.type);
       }
     }    
   }
@@ -280,30 +276,30 @@ export class DimensionsSelectionComponent {
    * Function to delete the selection made for X and Y
    */ 
   clearDimensionsSelection(){
-    console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid, "\n", this.selectedDimensionsService.xtype, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid, "\n", this.selectedDimensionsService.ytype, "\n")
+    console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid.value, "\n", this.selectedDimensionsService.xtype.value, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid.value, "\n", this.selectedDimensionsService.ytype.value, "\n")
     
-    if(!(this.selectedDimensionsService.xid === null) && !(this.selectedDimensionsService.xtype === null)){
-      const elementX = this.findElementinTagsetList(this.selectedDimensionsService.xid, this.selectedDimensionsService.xtype);
+    if(!(this.dimXId === null) && !(this.dimXType === null)){
+      const elementX = this.findElementinTagsetList(this.dimXId, this.dimXType);
       if(!(elementX===null)){
         elementX.isCheckedX = false;
       }
     }
 
-    if(!(this.selectedDimensionsService.yid === null) && !(this.selectedDimensionsService.ytype === null)){
-      const elementY = this.findElementinTagsetList(this.selectedDimensionsService.yid, this.selectedDimensionsService.ytype);
+    if(!(this.dimYId=== null) && !(this.dimYType === null)){
+      const elementY = this.findElementinTagsetList(this.dimYId, this.dimYType);
       if(!(elementY===null)){
         elementY.isCheckedY = false;
       }
     }
 
-    this.selectedDimensionsService.xid = null;
+    this.selectedDimensionsService.xid.next(null);
     this.selectedDimensionsService.xname = null;
-    this.selectedDimensionsService.xtype = null;
+    this.selectedDimensionsService.xtype.next(null);
     this.selectedDimensionsService.ischeckedX = false;
 
-    this.selectedDimensionsService.yid = null;
+    this.selectedDimensionsService.yid.next(null);
     this.selectedDimensionsService.yname = null;
-    this.selectedDimensionsService.ytype = null;
+    this.selectedDimensionsService.ytype.next(null);
     this.selectedDimensionsService.ischeckedY = false;
   }
 
