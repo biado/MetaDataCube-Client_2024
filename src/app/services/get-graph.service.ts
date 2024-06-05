@@ -3,7 +3,7 @@ import { SelectedDimensionsService } from './selected-dimensions.service';
 import { SelectedFiltersService } from './selected-filters.service';
 import { Filter } from '../models/filter';
 import { Tagset } from '../models/tagset';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin, map } from 'rxjs';
 import { Cell } from '../models/cell';
 import { HttpClient } from '@angular/common/http';
 import { SelectedAxis } from '../models/selected-axis';
@@ -63,7 +63,8 @@ export class GetGraphService {
    * With the result, we'll first reset most of the lists to 0, then update the cell list, then retrieve the list of axisX names (CoordToNameX & AxisX). 
    * Ditto for Y. Next, we'll retrieve the contents of our table cells.
    * 
-   * 
+   * The various unused constants are there to make sure that typescript will wait for the end of the function to which the constant is associated 
+   * before moving on (because await alone isn't enough in some cases).
    */
   private getCells(filters:Filter[],xid?: number, xtype?: 'node'|'tagset', yid?: number, ytype?: 'node'|'tagset'): void {
     const cellUrl = this.createCellUrl(filters,xid, xtype, yid, ytype);
@@ -81,6 +82,10 @@ export class GetGraphService {
         const r1 = await this.getAxeX(xid, xtype);
         const r2 = await this.getAxeY(yid, ytype);
         const r3 = this.getContent();
+        console.log("Test Cell : ",this.cells.value);
+        console.log("Test X : ",this.AxisX.value);
+        console.log("Test Y : ",this.AxisY.value);
+        console.log("Test Content : ",this.content.value);
       });
   }
 
@@ -94,43 +99,50 @@ export class GetGraphService {
    * We'll then sort the list of all names, which we'll put in CoordToNameX. 
    * Then we'll keep the names that appear only in xCoordinate cells. We'll then put this list into this.AxisX
    */  
-  private async getAxeX(xid?: number, xtype?: 'node'|'tagset'):Promise<void>{
-      const NamesX : string[] = [];
-      if(xid && xtype){
-        let AxeXUrl = `api/${xtype}/${xid}`;
-
-        if(xtype==='tagset'){
-          const res = this.http.get(`${AxeXUrl}`).subscribe(
-            (response: any) => {
-              response.tags.forEach((tag : any) => { 
-                NamesX.push(tag.name.toString());
-              });
-            });
-        }
-        else if(xtype==='node'){
-          const res = this.http.get(`${AxeXUrl}/Children`).subscribe(
-            (response: any) => {
-              response.forEach((node : any) => { 
-                NamesX.push(node.name.toString());
-              });
-            });
-        }
-
-        await this.waitNSeconds(100);
-        
-        const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
-        this.CoordToNameX=SortName;
-        
-        const uniqueNames = new Set<string>();
-        this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
+  private async getAxeX(xid?: number, xtype?: 'node'|'tagset'): Promise<void> {
+    const NamesX: string[] = [];
+  
+    if (xid && xtype) {
+      let AxeXUrl = `api/${xtype}/${xid}`;
+      let requests;
+  
+      if (xtype === 'tagset') {
+        requests = this.http.get(`${AxeXUrl}`).pipe(
+          map((response: any) => response.tags.map((tag: any) => tag.name))
+        );
+      } else if (xtype === 'node') {
+        requests = this.http.get(`${AxeXUrl}/Children`).pipe(
+          map((response: any) => response.map((node: any) => node.name))
+        );
+      }
+  
+      if (requests) {
+        try {
+          const results = await forkJoin(requests).toPromise();
+          if(results){
+            NamesX.push(...results.flat());
+          }
+  
+          const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
+          this.CoordToNameX = SortName;
+  
+          const uniqueNames = new Set<string>();
+          this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
             const name = SortName[x - 1];
             if (name !== undefined) {
-                uniqueNames.add(name);
+              uniqueNames.add(name);
             }
-        });
-        const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));        
-        this.AxisX.next(SortFilterName);
+          });
+  
+          const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+          this.AxisX.next(SortFilterName);
+  
+          console.log("EndXAxis");
+        } catch (error) {
+          console.error("Failed to fetch data", error);
+        }
       }
+    }
   }
   
   /**
@@ -143,42 +155,50 @@ export class GetGraphService {
    * We'll then sort the list of all names, which we'll put in CoordToNameY. 
    * Then we'll keep the names that appear only in yCoordinate cells. We'll then put this list into this.AxisY
    */  
-  private async getAxeY(yid?: number, ytype?: 'node'|'tagset'):Promise<void>{
-      const NamesY : string[] = [];
-      if(yid && ytype){
-        let AxeYUrl = `api/${ytype}/${yid}`;
-
-        if(ytype==='tagset'){
-          const res = this.http.get(`${AxeYUrl}`).subscribe(
-            (response: any) => {
-              response.tags.forEach((tag : any) => { 
-                NamesY.push(tag.name);
-              });
-            });
-        }
-        else if(ytype==='node'){
-          const res = this.http.get(`${AxeYUrl}/Children`).subscribe(
-            (response: any) => {
-              response.forEach((node : any) => { 
-                NamesY.push(node.name);
-              });
-            });
-        }
-
-        await this.waitNSeconds(100);
-
-        const SortName = NamesY.sort((a, b) => a.toString().localeCompare(b.toString()));       
-        this.CoordToNameY = SortName;
-        const uniqueNames = new Set<string>();
-        this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
+  private async getAxeY(yid?: number, ytype?: 'node'|'tagset'): Promise<void> {
+    const NamesY: string[] = [];
+  
+    if (yid && ytype) {
+      let AxeYUrl = `api/${ytype}/${yid}`;
+      let requests;
+  
+      if (ytype === 'tagset') {
+        requests = this.http.get(`${AxeYUrl}`).pipe(
+          map((response: any) => response.tags.map((tag: any) => tag.name))
+        );
+      } else if (ytype === 'node') {
+        requests = this.http.get(`${AxeYUrl}/Children`).pipe(
+          map((response: any) => response.map((node: any) => node.name))
+        );
+      }
+  
+      if (requests) {
+        try {
+          const results = await forkJoin(requests).toPromise();
+          if(results){
+            NamesY.push(...results.flat());
+          }
+  
+          const SortName = NamesY.sort((a, b) => a.toString().localeCompare(b.toString()));
+          this.CoordToNameY = SortName;
+  
+          const uniqueNames = new Set<string>();
+          this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
             const name = SortName[y - 1];
             if (name !== undefined) {
-                uniqueNames.add(name);
+              uniqueNames.add(name);
             }
-        });
-        const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));        
-        this.AxisY.next(SortFilterName);
+          });
+  
+          const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+          this.AxisY.next(SortFilterName);
+  
+          console.log("EndYAxis");
+        } catch (error) {
+          console.error("Failed to fetch data", error);
+        }
       }
+    }
   }
   
   /**

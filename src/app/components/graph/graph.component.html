@@ -2,17 +2,17 @@
     <table>
       <thead>
         <tr>
-          <th></th>
-          <th *ngFor="let x of AxisX">{{ x }}</th>
+          <th class="intersection-cell"></th>
+          <th class="head-row" *ngFor="let x of AxisX">{{ x }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let y of AxisY">
           <td>{{ y }}</td>
           <td *ngFor="let x of AxisX">
-            <div class="cell-content">
-              {{ getContent(x, y) }}
-            </div>
+            <ng-container  >
+              <img class="cell-content_img" *ngIf="getContent(x, y); let imageUrl"  [src]="imageUrl" alt="Cell Image"/>
+            </ng-container>
           </td>
         </tr>
       </tbody>

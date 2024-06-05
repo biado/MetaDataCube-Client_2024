@@ -1,17 +1,16 @@
   .axis-container {
     display: flex;
-    min-width: 95%;
     max-width: 95%;
-    min-height: 95%;
     max-height: 95%;
-    margin : auto auto auto auto;
     overflow: hidden;
     overflow-x: auto;
     overflow-y: auto;
+    margin : 1em 0 0 1em;
+    padding : 0 0.5em 0.5em 0;
   }
 
 /* #### General styles for hiding scrollbars #### */
-  /* Specific styles for Chrome, Safari and other WebKit-based browsers */
+  /* Specific styles for Chrome, Safari and other WebKit-based browserss */
   .axis-container::-webkit-scrollbar {
     width: 0.5em;
   }
@@ -38,32 +37,62 @@
   }
 
   th, td {
-    padding: 8px;
-    text-align: left;
-    border: 2px solid black; 
+    text-align: center;
   }
 
-  thead th, thead td {
-    position: sticky;
-    top: 0;
+  thead th{
+    width: 11em;
+    height: 11em;
+    min-width: 11em;
+    max-width: 11em;
+    min-height: 11em;
+    max-height: 11em;
     background-color: var(--secondary-background-color);
-    z-index: 2; 
   }
 
-  tbody td:first-child {
+  tbody tr td{
+    border: solid black 1px;
+    box-sizing: border-box;
+    min-width: 11em;
+    max-width: 11em;
+    min-height: 11em;
+    max-height: 11em;
+    width: 11em;
+    height: 11em;
+  }
+
+  tbody tr td:first-child {
     position: sticky;
     left: 0;
     background-color: var(--secondary-background-color);
+    border :none;
     z-index: 1;
+    width: 11em;
+    height: 11em;
+    min-width: 11em;
+    max-width: 11em;
+    min-height: 11em;
+    max-height: 11em;
   }
 
-  tbody th, tbody td {
-    background-clip: padding-box;
+  .intersection-cell{
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 3; 
   }
 
-  .cell-content {
-    min-height: 50px;
-    z-index: 0;
+
+  .head-row{
+    position: sticky;
+    top: 0;
+    z-index: 2; 
   }
 
-    
+
+  .cell-content_img{
+    max-width: 10em;
+    max-height: 10em;
+    vertical-align: middle;
+    margin:0.1em 0.1em 0.1em 0.1em;
+  }

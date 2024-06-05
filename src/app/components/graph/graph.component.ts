@@ -4,6 +4,8 @@ import { SelectedFiltersService } from '../../services/selected-filters.service'
 import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
 import { GetGraphService } from '../../services/get-graph.service';
 import { SelectedAxis } from '../../models/selected-axis';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-graph',
@@ -25,6 +27,7 @@ export class GraphComponent {
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
     private getGraphService : GetGraphService,
+    private http: HttpClient,
   ){}
 
   async ngOnInit(): Promise<void> {
@@ -53,6 +56,16 @@ export class GraphComponent {
 
 
   getContent(x: string, y: string): string {
-    return this.content[`${x}-${y}`] || '';
+    if(this.content[`${x}-${y}`]){
+      return `assets/images/test.jpg`;
+    }
+    return '';
+    /*
+    const url = this.content[`${x}-${y}`];
+    if(url){
+      return `http://bjth.itu.dk:5007/${url}`
+    }
+    return '';
+    */
   }
 }
