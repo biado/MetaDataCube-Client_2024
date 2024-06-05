@@ -60,7 +60,7 @@ export class GetDimensionsService {
    */
   async getDimensions(): Promise<void> {
     try {
-      this.tagsetListSubject.next([]);
+        this.tagsetListSubject.next([]);
         const response = await this.http.get(`${this.baseUrl}/tagset`).toPromise();
 
         if (Array.isArray(response)) {            

@@ -80,6 +80,7 @@ header {
     justify-content: space-between;
     height: 88vh;
     margin: 2vh 0 2vh 0;
+    width: 100vw;
 }
 
 .select_dimensions{
@@ -87,12 +88,7 @@ header {
     display: flex;
     justify-content: start;
     margin-right: 0.6em;
-}
-
-.graph{
-    min-height: 100%;
-    width: 80%;
-    border-radius: 50px 50px 50px 50px;
+    flex-grow: 0;
 }
 
 .select_filters{
@@ -100,6 +96,14 @@ header {
     display: flex;
     justify-content: end;
     margin-left: 0.6em;
+    flex-grow: 0;
+}
+
+.graph{
+    min-height: 100%;
+    /*border-radius: 50px 50px 50px 50px;*/
+    flex-grow: 1;
+    overflow: auto;
 }
 
 .select_dimensions_pannel, .graph, .select_filters_pannel{
@@ -168,9 +172,9 @@ app-graph{
     display: flex;
     flex-direction: column;
     width: 100%;
-    border-radius: 50px 50px 50px 50px;
+    /*border-radius: 50px 50px 50px 50px;*/
     height: 100%;
-    border: solid magenta;
+    padding: 0.1em 0.1em 0.1em 0.1em;
 }
 /* ############################################## */
 

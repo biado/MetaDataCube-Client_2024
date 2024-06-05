@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { GetDimensionsService } from './services/get-dimensions.service';
+import { GetGraphService } from './services/get-graph.service';
 
 interface Element {
   id: number;
@@ -20,7 +21,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-      private getDimensionsService: GetDimensionsService
+      private getDimensionsService: GetDimensionsService,
+      private getGraphservice: GetGraphService
     ) {}
 
   ngOnInit(): void {
@@ -51,6 +53,9 @@ export class AppComponent implements OnInit {
     console.log("End of refresh");
   }
 
+  co(){
+  }
+
   /** 
    * Each time the size of the browser window changes, it updates the smallscreen variable 
    */
@@ -58,7 +63,6 @@ export class AppComponent implements OnInit {
   onResize(event: Event): void {
     if (isPlatformBrowser(this.platformId)) {
       this.smallscreen = window.innerWidth < 1101;
-      console.log("Valeur :",this.smallscreen)
     }
   }
   

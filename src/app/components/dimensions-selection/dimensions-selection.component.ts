@@ -4,6 +4,7 @@ import { Tagset } from '../../models/tagset';
 import { Node } from '../../models/node';
 import { Hierarchy } from '../../models/hierarchy';
 import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
+import { SelectedAxis } from '../../models/selected-axis';
 
 @Component({
   selector: 'app-dimensions-selection',
@@ -15,10 +16,7 @@ export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
 
-  dimXId :number|null = null;
-  dimXType :'node' | 'tagset' |null = null;
-  dimYId :number|null = null;
-  dimYType :'node' | 'tagset' |null = null;
+  selectedAxis : SelectedAxis = new SelectedAxis();
 
   constructor(
     private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
@@ -27,29 +25,17 @@ export class DimensionsSelectionComponent {
   {}
 
   /**
-   * When the component is started, a list of all the tagset.
+   * When the component is started, we get a list of all the tagset.
    * 
-   * Also we put all tagsets / hierarchies / nodes to visible (initial state)
+   * Also we get the selected dimensions with selectedAxis
    */
   async ngOnInit(): Promise<void> {
     this.getDimensionsService.tagsetList$.subscribe(data => {
       this.tagsetlist = data;
     });
 
-    this.selectedDimensionsService.xid$.subscribe(data => {
-      this.dimXId = data;
-    });
-
-    this.selectedDimensionsService.xtype$.subscribe(data => {
-      this.dimXType = data;
-    });
-
-    this.selectedDimensionsService.yid$.subscribe(data => {
-      this.dimYId = data;
-    });
-
-    this.selectedDimensionsService.ytype$.subscribe(data => {
-      this.dimYType = data;
+    this.selectedDimensionsService.selectedAxis$.subscribe(data => {
+      this.selectedAxis = data;
     });
 
   }
@@ -205,31 +191,31 @@ export class DimensionsSelectionComponent {
    */
   toggleCheckboxX(elt:Node|Tagset): void {
     if(this.selectedDimensionsService.ischeckedX && !elt.isCheckedX){ 
-      if(!(this.dimXId === null) && !(this.dimXType === null)){
-        const actualElementX = this.findElementinTagsetList(this.dimXId, this.dimXType);
+      if((this.selectedAxis.xid) && (this.selectedAxis.xtype)){
+        const actualElementX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
         if(!(actualElementX===null)){
           actualElementX.isCheckedX = false;
         }
       }
       elt.isCheckedX = !elt.isCheckedX ;
-      this.selectedDimensionsService.xid.next(elt.id);
+      const newSelectedAxis = new SelectedAxis(elt.id,elt.type, this.selectedAxis.yid,this.selectedAxis.ytype);
+      this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
       this.selectedDimensionsService.xname = elt.name;
-      this.selectedDimensionsService.xtype.next(elt.type);
     }
     else{
       elt.isCheckedX = !elt.isCheckedX ;
       this.selectedDimensionsService.ischeckedX = !this.selectedDimensionsService.ischeckedX;
 
       if((!elt.isCheckedX)&&(!this.selectedDimensionsService.ischeckedX)){
-        this.selectedDimensionsService.xid.next(null);
+        const newSelectedAxis = new SelectedAxis(undefined,undefined, this.selectedAxis.yid,this.selectedAxis.ytype);
+        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
         this.selectedDimensionsService.xname = null;
-        this.selectedDimensionsService.xtype.next(null);
       }
 
       if((elt.isCheckedX)&&(this.selectedDimensionsService.ischeckedX)){
-        this.selectedDimensionsService.xid.next(elt.id);
+        const newSelectedAxis = new SelectedAxis(elt.id,elt.type, this.selectedAxis.yid,this.selectedAxis.ytype);
+        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
         this.selectedDimensionsService.xname = elt.name;
-        this.selectedDimensionsService.xtype.next(elt.type);
       }
     }
   }
@@ -242,16 +228,16 @@ export class DimensionsSelectionComponent {
    */
   toggleCheckboxY(elt:Node|Tagset): void {
     if(this.selectedDimensionsService.ischeckedY && !elt.isCheckedY){ 
-      if(!(this.dimYId === null) && !(this.dimYType === null)){
-        const actualElementY = this.findElementinTagsetList(this.dimYId, this.dimYType);
+      if(this.selectedAxis.yid && this.selectedAxis.ytype ){
+        const actualElementY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
         if(!(actualElementY===null)){
           actualElementY.isCheckedY = false;
         }
       }
       elt.isCheckedY = !elt.isCheckedY ;
-      this.selectedDimensionsService.yid.next(elt.id);
+      const newSelectedAxis = new SelectedAxis(this.selectedAxis.xid,this.selectedAxis.xtype, elt.id,elt.type);
+      this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
       this.selectedDimensionsService.yname = elt.name;
-      this.selectedDimensionsService.ytype.next(elt.type);
     }
 
     else{
@@ -259,15 +245,15 @@ export class DimensionsSelectionComponent {
       this.selectedDimensionsService.ischeckedY = !this.selectedDimensionsService.ischeckedY;
 
       if((!elt.isCheckedY)&&(!this.selectedDimensionsService.ischeckedY)){
-        this.selectedDimensionsService.yid.next(null);
+        const newSelectedAxis = new SelectedAxis(this.selectedAxis.xid,this.selectedAxis.xtype, undefined,undefined);
+        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
         this.selectedDimensionsService.yname = null;
-        this.selectedDimensionsService.ytype.next(null);
       }
 
       if((elt.isCheckedY)&&(this.selectedDimensionsService.ischeckedY)){
-        this.selectedDimensionsService.yid.next(elt.id);
+        const newSelectedAxis = new SelectedAxis(this.selectedAxis.xid,this.selectedAxis.xtype, elt.id,elt.type);
+        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
         this.selectedDimensionsService.yname = elt.name;
-        this.selectedDimensionsService.ytype.next(elt.type);
       }
     }    
   }
@@ -276,31 +262,31 @@ export class DimensionsSelectionComponent {
    * Function to delete the selection made for X and Y
    */ 
   clearDimensionsSelection(){
-    console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedDimensionsService.xid.value, "\n", this.selectedDimensionsService.xtype.value, "\n", this.selectedDimensionsService.yname, "\n", this.selectedDimensionsService.yid.value, "\n", this.selectedDimensionsService.ytype.value, "\n")
+    console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedAxis.xid, "\n", this.selectedAxis.xtype, "\n", this.selectedAxis.yid, "\n", this.selectedAxis.ytype, "\n")
     
-    if(!(this.dimXId === null) && !(this.dimXType === null)){
-      const elementX = this.findElementinTagsetList(this.dimXId, this.dimXType);
+    if(this.selectedAxis.xid && this.selectedAxis.xtype){
+      const elementX = this.findElementinTagsetList(this.selectedAxis.xid , this.selectedAxis.xtype);
       if(!(elementX===null)){
         elementX.isCheckedX = false;
       }
     }
 
-    if(!(this.dimYId=== null) && !(this.dimYType === null)){
-      const elementY = this.findElementinTagsetList(this.dimYId, this.dimYType);
+    if(this.selectedAxis.yid && this.selectedAxis.ytype){
+      const elementY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
       if(!(elementY===null)){
         elementY.isCheckedY = false;
       }
     }
 
-    this.selectedDimensionsService.xid.next(null);
-    this.selectedDimensionsService.xname = null;
-    this.selectedDimensionsService.xtype.next(null);
-    this.selectedDimensionsService.ischeckedX = false;
+   
+    const newSelectedAxis = new SelectedAxis(undefined,undefined,undefined,undefined);
+    this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
 
-    this.selectedDimensionsService.yid.next(null);
+    this.selectedDimensionsService.xname = null;
+    this.selectedDimensionsService.ischeckedX = false;
     this.selectedDimensionsService.yname = null;
-    this.selectedDimensionsService.ytype.next(null);
     this.selectedDimensionsService.ischeckedY = false;
+
   }
 
   /**

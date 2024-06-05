@@ -22,9 +22,7 @@ export class FiltersSelectionComponent {
   {}
 
   /**
-   * When the component is started, a list of all the tagset.
-   * 
-   * Also we put all tagsets / hierarchies / nodes to visible (initial state)
+   * When the component is started, we get a list of all the tagset.
    */
   async ngOnInit(): Promise<void> {
     this.getDimensionsService.tagsetList$.subscribe(data => {
@@ -44,8 +42,6 @@ export class FiltersSelectionComponent {
     } else {
       this.selectedFiltersService.removeFilter(tag.id,tag.type);
     }
-
-    console.log(this.selectedFiltersService.getFiltersList());
   }
 
   /**

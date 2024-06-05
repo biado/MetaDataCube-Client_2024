@@ -11,15 +11,10 @@
           <td>{{ y }}</td>
           <td *ngFor="let x of AxisX">
             <div class="cell-content">
+              {{ getContent(x, y) }}
             </div>
           </td>
         </tr>
       </tbody>
     </table>
-  </div>
-
-  <p>{{AxeXType}}</p>
-  <p>{{AxeXID}}</p>
-
-  <p>{{AxeYType}}</p>
-  <p>{{AxeYID}}</p>
+</div>
