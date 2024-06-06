@@ -5,7 +5,7 @@ import { SelectedDimensionsService } from '../../services/selected-dimensions.se
 import { GetGraphService } from '../../services/get-graph.service';
 import { SelectedAxis } from '../../models/selected-axis';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, combineLatest, map } from 'rxjs';
 
 @Component({
   selector: 'app-graph',
@@ -22,6 +22,10 @@ export class GraphComponent {
   AxisY: string[] = [];
   
   content: { [key: string]: string } = {};
+
+  imageUrls: { [key: string]: string } = {};
+  isLoading: { [key: string]: boolean } = {};
+  isError: { [key: string]: boolean } = {};
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
@@ -52,20 +56,69 @@ export class GraphComponent {
       this.content = data;
     });
 
+    combineLatest([
+      this.getGraphService.AxisX$,
+      this.getGraphService.AxisY$,
+      this.getGraphService.content$,
+    ]).subscribe(([x, y,content]) => {
+      this.getImagesURL(x,y);
+    });
+
+  }
+
+
+  getImagesURL(x:string[],y:string[]){
+    this.imageUrls = {};
+    this.isLoading = {};
+    this.isError = {};
+    x.forEach(x => {
+      y.forEach(y => {
+        const key = `${x}-${y}`;
+        this.imageUrls[key] = this.getContent(x, y);
+        this.isLoading[key] = true;
+        this.isError[key] = false;
+      });
+    });
+    console.log("ImgURL : ",this.imageUrls);
+    console.log("AxisX : ",x);
+    console.log("AxisY : ",y);
   }
 
 
   getContent(x: string, y: string): string {
+    const rand = this.getRandomInt(1,7)
     if(this.content[`${x}-${y}`]){
-      return `assets/images/test.jpg`;
+      console.log()
+      return `assets/images/test${rand}.jpg`;
     }
     return '';
-    /*
+    
+    /*let baseurl = `http://bjth.itu.dk:5007/`;
     const url = this.content[`${x}-${y}`];
     if(url){
-      return `http://bjth.itu.dk:5007/${url}`
+      console.log("img_url :",baseurl+url);
+      return baseurl+url;
     }
-    return '';
-    */
+    console.log("img_url : ",'');
+    return '';*/
+  }
+
+
+  onLoad(key: string) {
+    this.isLoading[key] = false;
+    this.isError[key] = false;
+  }
+
+
+  onError(key: string) {
+    this.isLoading[key] = false;
+    this.isError[key] = true;
+  }
+  
+
+  getRandomInt(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }

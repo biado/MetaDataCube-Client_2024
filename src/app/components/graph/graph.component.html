@@ -10,8 +10,23 @@
         <tr *ngFor="let y of AxisY">
           <td>{{ y }}</td>
           <td *ngFor="let x of AxisX">
-            <ng-container  >
-              <img class="cell-content_img" *ngIf="getContent(x, y); let imageUrl"  [src]="imageUrl" alt="Cell Image"/>
+            <ng-container>
+              <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
+                <div *ngIf="isLoading[x + '-' + y] && imageUrl" class="loading">
+                  Loading...
+                </div>
+                <img
+                  *ngIf="!isError[x + '-' + y] && imageUrl"
+                  class="cell-content_img"
+                  [src]="imageUrl"
+                  alt="Cell Image"
+                  (load)="onLoad(x + '-' + y)"
+                  (error)="onError(x + '-' + y)"
+                />
+                <div *ngIf="isError[x + '-' + y]" class="error">
+                  Image Not Found!
+                </div>
+              </div>
             </ng-container>
           </td>
         </tr>
