@@ -82,10 +82,6 @@ export class GetGraphService {
         const r1 = await this.getAxeX(xid, xtype);
         const r2 = await this.getAxeY(yid, ytype);
         const r3 = this.getContent();
-        console.log("Test Cell : ",this.cells.value);
-        console.log("Test X : ",this.AxisX.value);
-        console.log("Test Y : ",this.AxisY.value);
-        console.log("Test Content : ",this.content.value);
       });
   }
 
@@ -136,8 +132,7 @@ export class GetGraphService {
   
           const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
           this.AxisX.next(SortFilterName);
-  
-          console.log("EndXAxis");
+          
         } catch (error) {
           console.error("Failed to fetch data", error);
         }
@@ -192,8 +187,7 @@ export class GetGraphService {
   
           const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
           this.AxisY.next(SortFilterName);
-  
-          console.log("EndYAxis");
+
         } catch (error) {
           console.error("Failed to fetch data", error);
         }
@@ -245,7 +239,7 @@ export class GetGraphService {
 
     url = url.substring(0, url.length-1);
 
-    console.log(url);
+    //console.log(url);
     return url;
   }
   

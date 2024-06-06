@@ -9,27 +9,28 @@
     padding : 0 0.5em 0.5em 0;
   }
 
-/* #### General styles for hiding scrollbars #### */
-  /* Specific styles for Chrome, Safari and other WebKit-based browserss */
-  .axis-container::-webkit-scrollbar {
-    width: 0.5em;
-  }
-  
-  .axis-container::-webkit-scrollbar-thumb {
-    background-color: var(--main-color); /* Scroll handle colour */
-  }
-  
-  .axis-container::-webkit-scrollbar-track {
-    background-color: var(--main-color) /* Scroll track colour */
-  }
 
-  /* Firefox */
-  .axis-container {
-    scrollbar-width:thin;
-    scrollbar-color: var(--main-color) var(--main-color); /* Colour of the handle and scroll track */
-  }
+  /* ## Styles for hiding scrollbars (In this component) ## */
+    /* Specific styles for Chrome, Safari and other WebKit-based browsers */
+    .axis-container::-webkit-scrollbar {
+      width: 0.5em;
+    }  
+    .axis-container::-webkit-scrollbar-thumb {
+      background-color: var(--main-color); /* Scroll handle colour */
+    }  
+    .axis-container::-webkit-scrollbar-track {
+      background-color: var(--main-color); /* Scroll track colour */
+    }
+
+    /* Firefox */
+    .axis-container {
+      scrollbar-width:thin;
+      scrollbar-color: var(--main-color) var(--main-color); /* Colour of the handle and scroll track */
+    }
   /* ############################################## */
 
+
+  /* ################# Table style ################ */
   table {
     border-collapse: collapse;
     width: 100%;
@@ -51,7 +52,7 @@
   }
 
   tbody tr td{
-    border: solid black 1px;
+    border: solid var(--main-color) 1px;
     box-sizing: border-box;
     min-width: 11em;
     max-width: 11em;
@@ -82,13 +83,11 @@
     z-index: 3; 
   }
 
-
   .head-row{
     position: sticky;
     top: 0;
     z-index: 2; 
   }
-
 
   .cell-content_img{
     max-width: 10em;
@@ -96,3 +95,72 @@
     vertical-align: middle;
     margin:0.1em 0.1em 0.1em 0.1em;
   }
+  /* ############################################## */
+
+
+/*  ##### Media queries for smaller screens ##### */
+@media screen and (max-width: 1100px) {
+  .axis-container {
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
+    margin : 0.1em 0 0 0.1em;
+    border-radius: 50px 50px 50px 50px;
+  }
+
+  table{
+    font-size: 0.7em;
+  }
+
+  thead th{
+    width: 8em;
+    height: 8em;
+    min-width: 8em;
+    max-width: 8em;
+    min-height: 8em;
+    max-height: 8em;
+  }
+
+  tbody tr td{
+    width: 8em;
+    height: 8em;
+    min-width: 8em;
+    max-width: 8em;
+    min-height: 8em;
+    max-height: 8em;
+  }
+
+  tbody tr td:first-child {
+    width: 8em;
+    height: 8em;
+    min-width: 8em;
+    max-width: 8em;
+    min-height: 8em;
+    max-height: 8em;
+  }
+
+  .cell-content_img{
+    max-width: 7em;
+    max-height: 7em;
+    margin:0.05em 0.05em 0.05em 0.05em;
+  }
+
+  /* ## Styles for hiding scrollbars (In this component) ## */
+    /* Specific styles for Chrome, Safari and other WebKit-based browsers */
+    .axis-container::-webkit-scrollbar {
+      width: 0.5em;
+    }  
+    .axis-container::-webkit-scrollbar-thumb {
+      background-color: transparent; /* Scroll handle colour */
+    }  
+    .axis-container::-webkit-scrollbar-track {
+      background-color: transparent; /* Scroll track colour */
+    }
+    /* Firefox */
+    .axis-container {
+      scrollbar-width:thin;
+      scrollbar-color: transparent transparent; /* Colour of the handle and scroll track */
+    }
+  /* ############################################## */
+}
+/* ############################################## */

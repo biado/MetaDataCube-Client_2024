@@ -12,9 +12,13 @@
           <td *ngFor="let x of AxisX">
             <ng-container>
               <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
+
+                <!-- Block loading: Waiting for the image to load -->
                 <div *ngIf="isLoading[x + '-' + y] && imageUrl" class="loading">
                   Loading...
                 </div>
+                
+                <!-- Block Image: When image loading is successful -->
                 <img
                   *ngIf="!isError[x + '-' + y] && imageUrl"
                   class="cell-content_img"
@@ -23,9 +27,12 @@
                   (load)="onLoad(x + '-' + y)"
                   (error)="onError(x + '-' + y)"
                 />
+                
+                <!-- Block error: When image loading fails -->
                 <div *ngIf="isError[x + '-' + y]" class="error">
                   Image Not Found!
                 </div>
+                
               </div>
             </ng-container>
           </td>
@@ -33,3 +40,12 @@
       </tbody>
     </table>
 </div>
+
+
+<!--
+<ng-container>
+  <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
+    {{imageUrls[x + '-' + y]}}
+  </div>
+</ng-container>
+-->

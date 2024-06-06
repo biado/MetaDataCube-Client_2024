@@ -133,7 +133,7 @@ header {
 
 .select_dimensions_button button, .select_filters_button button{
     font-family: 'Montserrat', serif;
-    font-size: 1vw;
+    font-size: 1.5em;
     justify-content: center;
     background-color: var(--secondary-background-color); 
     color: var(--main-color);;
@@ -174,7 +174,6 @@ app-graph{
     justify-content: start;
     align-items: start;
     width: 100%;
-    /*border-radius: 50px 50px 50px 50px;*/
     height: 100%;
     padding: 0.1em 0.1em 0.1em 0.1em;
 }
@@ -232,7 +231,7 @@ app-graph{
         width: 50%;
         min-height: 100%;
         font-family: 'Montserrat', serif;
-        font-size: 3vh;
+        font-size: 1.5em;
         justify-content: center;
         background-color: var(--secondary-background-color);
         color: var(--main-color);
