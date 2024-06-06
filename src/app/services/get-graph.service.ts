@@ -82,6 +82,7 @@ export class GetGraphService {
         const r1 = await this.getAxeX(xid, xtype);
         const r2 = await this.getAxeY(yid, ytype);
         const r3 = this.getContent();
+        console.log("Content: ",this.content.value)
       });
   }
 
@@ -132,7 +133,7 @@ export class GetGraphService {
   
           const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
           this.AxisX.next(SortFilterName);
-          
+
         } catch (error) {
           console.error("Failed to fetch data", error);
         }
@@ -207,6 +208,20 @@ export class GetGraphService {
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (xName && yName) {
             const key = `${xName}-${yName}`;
+            res[key] = cell.img_url;
+        }
+      }
+      else if(cell.xCoordinate){
+        const xName = this.CoordToNameX[cell.xCoordinate-1];
+        if (xName) {
+            const key = `${xName}`;
+            res[key] = cell.img_url;
+        }
+      }
+      else if (cell.yCoordinate){
+        const yName = this.CoordToNameY[cell.yCoordinate-1];
+        if (yName) {
+            const key = `${yName}`;
             res[key] = cell.img_url;
         }
       }

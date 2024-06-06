@@ -32,7 +32,7 @@ export class GraphComponent {
 
   /** For each x-y duo, If loading the image causes an error, set to true. False otherwise. */
   isError: { [key: string]: boolean } = {};
-  
+
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
@@ -82,14 +82,35 @@ export class GraphComponent {
     this.imageUrls = {};
     this.isLoading = {};
     this.isError = {};
-    x.forEach(x => {
-      y.forEach(y => {
-        const key = `${x}-${y}`;
-        this.imageUrls[key] = this.getContent(x, y);
+    console.log("X:",x);
+    console.log("Y:",y);
+    if(x && x.length > 0 && y && y.length > 0){
+      x.forEach(x => {
+        y.forEach(y => {
+          const key = `${x}-${y}`;
+          this.imageUrls[key] = this.getContent(key);
+          this.isLoading[key] = true;
+          this.isError[key] = false;
+        });
+      });
+    }
+    else if(x && x.length > 0){
+      x.forEach(x => {
+        const key = `${x}`;
+        this.imageUrls[key] = this.getContent(x);
         this.isLoading[key] = true;
         this.isError[key] = false;
       });
-    });
+    }
+    else if(y && y.length > 0){
+      y.forEach(y => {
+        const key = `${y}`;
+        this.imageUrls[key] = this.getContent(y);
+        this.isLoading[key] = true;
+        this.isError[key] = false;
+      });
+    }
+    
   }
 
   /**
@@ -97,11 +118,11 @@ export class GraphComponent {
    * 
    * Returns the url if there is one, if there are no results for the cells in the array, then an empty string is returned.
    */
-  getContent(x: string, y: string): string {
+  getContent(key:string): string {
     // Test code to check whether the display is correct in html. Take a random number between 1 and 7. We have 6 test images. 
     // We'll be able to test the display of different images and check that if we can't find the image we'll get an error display.
     const rand = this.getRandomInt(1,7)
-    if(this.content[`${x}-${y}`]){
+    if(this.content[`${key}`]){
       return `assets/images/test${rand}.jpg`;
     }
     return '';
