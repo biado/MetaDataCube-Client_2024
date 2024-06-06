@@ -95,6 +95,10 @@ export class GetGraphService {
    * 
    * We'll then sort the list of all names, which we'll put in CoordToNameX. 
    * Then we'll keep the names that appear only in xCoordinate cells. We'll then put this list into this.AxisX
+   * 
+   * .filter((name: string) => name !== '') is used to remove an empty string. In fact, the retrieved data may contain an empty string. 
+   * However, when the request is made to obtain the cells, the server will automatically remove this empty string from the equation. 
+   * To make the association, we need to do the same.
    */  
   private async getAxeX(xid?: number, xtype?: 'node'|'tagset'): Promise<void> {
     const NamesX: string[] = [];
@@ -105,11 +109,11 @@ export class GetGraphService {
   
       if (xtype === 'tagset') {
         requests = this.http.get(`${AxeXUrl}`).pipe(
-          map((response: any) => response.tags.map((tag: any) => tag.name))
+          map((response: any) => response.tags.map((tag: any) => tag.name).filter((name: string) => name !== ''))
         );
       } else if (xtype === 'node') {
         requests = this.http.get(`${AxeXUrl}/Children`).pipe(
-          map((response: any) => response.map((node: any) => node.name))
+          map((response: any) => response.map((node: any) => node.name).filter((name: string) => name !== ''))
         );
       }
   
@@ -122,6 +126,7 @@ export class GetGraphService {
   
           const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
           this.CoordToNameX = SortName;
+          console.log("SortName :",SortName);
   
           const uniqueNames = new Set<string>();
           this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
@@ -150,6 +155,10 @@ export class GetGraphService {
    * 
    * We'll then sort the list of all names, which we'll put in CoordToNameY. 
    * Then we'll keep the names that appear only in yCoordinate cells. We'll then put this list into this.AxisY
+   * 
+   * .filter((name: string) => name !== '') is used to remove an empty string. In fact, the retrieved data may contain an empty string. 
+   * However, when the request is made to obtain the cells, the server will automatically remove this empty string from the equation. 
+   * To make the association, we need to do the same.
    */  
   private async getAxeY(yid?: number, ytype?: 'node'|'tagset'): Promise<void> {
     const NamesY: string[] = [];
@@ -160,11 +169,11 @@ export class GetGraphService {
   
       if (ytype === 'tagset') {
         requests = this.http.get(`${AxeYUrl}`).pipe(
-          map((response: any) => response.tags.map((tag: any) => tag.name))
+          map((response: any) => response.tags.map((tag: any) => tag.name).filter((name: string) => name !== ''))
         );
       } else if (ytype === 'node') {
         requests = this.http.get(`${AxeYUrl}/Children`).pipe(
-          map((response: any) => response.map((node: any) => node.name))
+          map((response: any) => response.map((node: any) => node.name).filter((name: string) => name !== ''))
         );
       }
   
@@ -201,6 +210,7 @@ export class GetGraphService {
    * of the cell images corresponding to the coordinates in the graph.component table.
    */  
   private getContent(){
+    console.log("Cells: ",this.cells.value);
     const res : { [key: string]: string } = {};
     this.cells.value.forEach(cell => {
       if(cell.xCoordinate && cell.yCoordinate){
@@ -254,7 +264,7 @@ export class GetGraphService {
 
     url = url.substring(0, url.length-1);
 
-    //console.log(url);
+    console.log(url);
     return url;
   }
   
