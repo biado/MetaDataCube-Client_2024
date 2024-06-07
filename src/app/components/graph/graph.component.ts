@@ -82,8 +82,6 @@ export class GraphComponent {
     this.imageUrls = {};
     this.isLoading = {};
     this.isError = {};
-    console.log("X:",x);
-    console.log("Y:",y);
     if(x && x.length > 0 && y && y.length > 0){
       x.forEach(x => {
         y.forEach(y => {
@@ -121,21 +119,20 @@ export class GraphComponent {
   getContent(key:string): string {
     // Test code to check whether the display is correct in html. Take a random number between 1 and 7. We have 6 test images. 
     // We'll be able to test the display of different images and check that if we can't find the image we'll get an error display.
-    const rand = this.getRandomInt(1,7)
+    /*const rand = this.getRandomInt(1,7)
     if(this.content[`${key}`]){
       return `assets/images/test${rand}.jpg`;
     }
-    return '';
+    return '';*/
     
     // Actual function code, which returns the url corresponding to the cell image.
-    /*let baseurl = `http://bjth.itu.dk:5007/`;
-    const url = this.content[`${x}-${y}`];
+    let baseurl = `assets/images/lsc_thumbs512/thumbnails512/`;
+    const url = this.content[key];
     if(url){
-      console.log("img_url :",baseurl+url);
+      console.log(baseurl+url);
       return baseurl+url;
     }
-    console.log("img_url : ",'');
-    return '';*/
+    return '';
   }
 
   /** Function launched when an image is correctly loaded. We'll then set the isLoading and isError of the corresponding array cell to false. */

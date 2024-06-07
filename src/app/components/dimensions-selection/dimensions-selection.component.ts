@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { GetDimensionsService } from '../../services/get-dimensions.service';
+import { GetTagsetListService } from '../../services/get-tagset-list.service';
 import { Tagset } from '../../models/tagset';
 import { Node } from '../../models/node';
 import { Hierarchy } from '../../models/hierarchy';
@@ -19,7 +19,7 @@ export class DimensionsSelectionComponent {
   selectedAxis : SelectedAxis = new SelectedAxis();
 
   constructor(
-    private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
+    private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
   ) 
   {}
@@ -30,7 +30,7 @@ export class DimensionsSelectionComponent {
    * Also we get the selected dimensions with selectedAxis
    */
   async ngOnInit(): Promise<void> {
-    this.getDimensionsService.tagsetList$.subscribe(data => {
+    this.getTagsetListService.tagsetList$.subscribe(data => {
       this.tagsetlist = data;
     });
 

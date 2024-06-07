@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Filter } from '../models/filter';
 import { Tag } from '../models/tag';
 import { Tagset } from '../models/tagset';
-import { GetDimensionsService } from './get-dimensions.service';
+import { GetTagsetListService } from './get-tagset-list.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -17,9 +17,9 @@ export class SelectedFiltersService {
   private tagsetlist: Tagset[] = [];
 
   constructor(
-    private getDimensionsService: GetDimensionsService,
+    private getTagsetListService: GetTagsetListService,
   ) {
-    this.getDimensionsService.tagsetList$.subscribe(data => {
+    this.getTagsetListService.tagsetList$.subscribe(data => {
       this.tagsetlist = data;
     });
   }

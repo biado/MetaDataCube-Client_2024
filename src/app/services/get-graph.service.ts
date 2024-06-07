@@ -82,7 +82,6 @@ export class GetGraphService {
         const r1 = await this.getAxeX(xid, xtype);
         const r2 = await this.getAxeY(yid, ytype);
         const r3 = this.getContent();
-        console.log("Content: ",this.content.value)
       });
   }
 
@@ -126,7 +125,6 @@ export class GetGraphService {
   
           const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
           this.CoordToNameX = SortName;
-          console.log("SortName :",SortName);
   
           const uniqueNames = new Set<string>();
           this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
@@ -210,7 +208,6 @@ export class GetGraphService {
    * of the cell images corresponding to the coordinates in the graph.component table.
    */  
   private getContent(){
-    console.log("Cells: ",this.cells.value);
     const res : { [key: string]: string } = {};
     this.cells.value.forEach(cell => {
       if(cell.xCoordinate && cell.yCoordinate){
@@ -264,7 +261,7 @@ export class GetGraphService {
 
     url = url.substring(0, url.length-1);
 
-    console.log(url);
+    console.log("URL: ",url);
     return url;
   }
   

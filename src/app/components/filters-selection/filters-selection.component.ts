@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GetDimensionsService } from '../../services/get-dimensions.service';
+import { GetTagsetListService } from '../../services/get-tagset-list.service';
 import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
 import { Tagset } from '../../models/tagset';
 import { Tag } from '../../models/tag';
@@ -15,7 +15,7 @@ export class FiltersSelectionComponent {
   tagsetlist: Tagset[] = [];
 
   constructor(
-    private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
+    private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
     private selectedFiltersService:SelectedFiltersService                  // Service containing information on selected filters
   ) 
@@ -25,7 +25,7 @@ export class FiltersSelectionComponent {
    * When the component is started, we get a list of all the tagset.
    */
   async ngOnInit(): Promise<void> {
-    this.getDimensionsService.tagsetList$.subscribe(data => {
+    this.getTagsetListService.tagsetList$.subscribe(data => {
       this.tagsetlist = data;
     });
   }
