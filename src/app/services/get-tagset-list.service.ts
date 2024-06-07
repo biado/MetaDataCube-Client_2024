@@ -37,7 +37,11 @@ export class GetTagsetListService {
       const res = await this.indexedDbService.retrieveTagsets();
       console.log('Tagsets loaded from IndexedDB:', res);
       this.tagsetListSubject.next(res);
-
+      if(this.tagsetListSubject.value && this.tagsetListSubject.value.length<=0){
+        console.log('Start getTagsetList from GetTagsetListService');
+        const res = await this.getTagsetList();
+        console.log('End of getTagsetList');
+      }
     } catch (error) {
       //console.error('Error loading tagsets from IndexedDB:', error);
     }
@@ -150,14 +154,17 @@ export class GetTagsetListService {
    * (from getTagsetInformations) and uses it to create a list of Hierarchy.   * 
    * It then returns it to getTagsetInformations
    *
-   * To create the list, it will need to call the getNodeInformation function with 
-   * his rootnodeid to receive its list of nodes
+   * To create the list, it will need to call the getNodeInformation. 
+   * To do this, we go to api/hierarchy/{id} because nodes[0] contains the entire hierarchical tree.
+   * 
+   * We'll send this first node to the getNodeInformations function, which will process this node and its descendants and place them in the node models.
    */
   async getHierarchyInformations(hierarchies: any[]): Promise<Hierarchy[]> {
     let res: Hierarchy[] = [];
 
     for (const hierarchy of hierarchies) {
-        const firstNode = await this.getNodeInformations(hierarchy.rootNodeId, null);
+        const hierarchyInformations : any = await this.http.get(`${this.baseUrl}/hierarchy/${hierarchy.id}`).toPromise()
+        const firstNode = await this.getNodeInformations(hierarchyInformations.nodes[0], null);
         const newHierarchy = new Hierarchy(hierarchy.name, hierarchy.id, hierarchy.tagsetId, hierarchy.rootNodeId, firstNode);
         res.push(newHierarchy);
     }
@@ -166,26 +173,22 @@ export class GetTagsetListService {
   }
 
   /**
-   * This function takes a nodeid and retrieves all the node's informations.
+   * This function takes a rawnode (from api/hierarchy/{id}) and retrieves all the node's informations.
    *
-   * For the list of children, we'll retrieve the id of each child node, 
-   * and restart the function with the new node. We therefore have a recursion 
-   * that stops as soon as a node has no children.
+   * For the list of children, for each child of the actual node, we'll send each child to the function (recursivity). 
+   * We therefore have a recursion that stops as soon as a node has no children.
    */
-  async getNodeInformations(nodeid: number, parentID: number | null = null): Promise<Node> {
+  async getNodeInformations(rawnode: any, parentID: number | null = null): Promise<Node> {
     let parents: number | null = parentID;
     let children: Node[] = [];
     let name = "";
-    let id = nodeid;
+    let id = rawnode.id;
 
     try{
-      const NameResponse : any = await this.http.get(`${this.baseUrl}/node/${nodeid}`).toPromise();
-      const ChildResponse : any  = await this.http.get(`${this.baseUrl}/node/${nodeid}/Children`).toPromise();
-      
-      name = NameResponse.tagName;
+      name = rawnode.tag.name;
 
-      if (ChildResponse.length > 0) {
-        const childPromises = ChildResponse.map((element: any) => this.getNodeInformations(element.id, id));
+      if (rawnode.children && rawnode.children.length > 0) {
+        const childPromises = rawnode.children.map((element: any) => this.getNodeInformations(element, id));
         children = await Promise.all(childPromises);
       }      
     } catch (error) {
