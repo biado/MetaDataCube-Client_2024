@@ -83,6 +83,19 @@ export class DimensionsSelectionComponent {
         }
     }
 
+    // Recursive function to mark children Visible
+    function childrenVisible(node:Node, toSearch : string){
+      if(node.children && node.children.length > 0){
+        node.children.forEach(child =>{
+          child.isVisible = true;
+          if (!(child.name.startsWith(toSearch))) {
+            child.isExpanded = false;
+          }
+          childrenVisible(child,toSearch);
+        })
+      }
+    }
+
     // Reset all nodes if nodestosearch is empty
     if (this.nodestosearch === '') {
         resetAllNodes(this.tagsetlist);
@@ -123,6 +136,7 @@ export class DimensionsSelectionComponent {
                   if (node.name.startsWith(this.nodestosearch)) {
                       node.isExpanded = true;
                       node.isVisible = true;
+                      childrenVisible(node, this.nodestosearch);
                       expandParents(node, allNodes);
 
                       // Display the hierarchy and tagset of the corresponding node
