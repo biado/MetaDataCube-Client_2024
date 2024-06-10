@@ -82,8 +82,8 @@ export class GetGraphService {
         response.forEach((elt : any) => {
           this.addCellToList(elt);
         });
-        const r1 = await this.getAxeX(xid, xtype);
-        const r2 = await this.getAxeY(yid, ytype);
+        const r1 = await this.getAxisX(xid, xtype);
+        const r2 = await this.getAxisY(yid, ytype);
         const r3 = this.getContent();
       });
   }
@@ -102,7 +102,7 @@ export class GetGraphService {
    * However, when the request is made to obtain the cells, the server will automatically remove this empty string from the equation. 
    * To make the association, we need to do the same.
    */  
-  private async getAxeX(xid?: number, xtype?: 'node'|'tagset'): Promise<void> {
+  private async getAxisX(xid?: number, xtype?: 'node'|'tagset'): Promise<void> {
     const NamesX: string[] = [];
   
     if (xid && xtype) {
@@ -111,11 +111,11 @@ export class GetGraphService {
   
       if (xtype === 'tagset') {
         requests = this.http.get(`${AxeXUrl}`).pipe(
-          map((response: any) => response.tags.map((tag: any) => tag.name).filter((name: string) => name !== ''))
+          map((response: any) => response.tags.map((tag: any) => tag.name).filter((name: string) => name !== response.name))
         );
       } else if (xtype === 'node') {
         requests = this.http.get(`${AxeXUrl}/Children`).pipe(
-          map((response: any) => response.map((node: any) => node.name).filter((name: string) => name !== ''))
+          map((response: any) => response.map((node: any) => node.name)/*.filter((name: string) => name !== '')*/)
         );
       }
   
@@ -125,8 +125,9 @@ export class GetGraphService {
           if(results){
             NamesX.push(...results.flat());
           }
-  
+          
           const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
+          console.log("SX : ",SortName)
           this.CoordToNameX = SortName;
   
           const uniqueNames = new Set<string>();
@@ -136,8 +137,10 @@ export class GetGraphService {
               uniqueNames.add(name);
             }
           });
+          console.log("SX : ",SortName)
   
           const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+          console.log("SX : ",SortFilterName)
           this.AxisX.next(SortFilterName);
 
         } catch (error) {
@@ -161,7 +164,7 @@ export class GetGraphService {
    * However, when the request is made to obtain the cells, the server will automatically remove this empty string from the equation. 
    * To make the association, we need to do the same.
    */  
-  private async getAxeY(yid?: number, ytype?: 'node'|'tagset'): Promise<void> {
+  private async getAxisY(yid?: number, ytype?: 'node'|'tagset'): Promise<void> {
     const NamesY: string[] = [];
   
     if (yid && ytype) {
@@ -170,11 +173,11 @@ export class GetGraphService {
   
       if (ytype === 'tagset') {
         requests = this.http.get(`${AxeYUrl}`).pipe(
-          map((response: any) => response.tags.map((tag: any) => tag.name).filter((name: string) => name !== ''))
+          map((response: any) => response.tags.map((tag: any) => tag.name).filter((name: string) => name !== response.name))
         );
       } else if (ytype === 'node') {
         requests = this.http.get(`${AxeYUrl}/Children`).pipe(
-          map((response: any) => response.map((node: any) => node.name).filter((name: string) => name !== ''))
+          map((response: any) => response.map((node: any) => node.name)/*.filter((name: string) => name !== '')*/)
         );
       }
   
