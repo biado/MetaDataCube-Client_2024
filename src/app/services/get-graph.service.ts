@@ -207,7 +207,7 @@ export class GetGraphService {
   }
   
   /**
-   * Function that allows you to set the correct content format for displaying the URLs 
+   * Function that allows you to set the correct content format for displaying the URLs and the number of images
    * of the cell images corresponding to the coordinates in the graph.component table.
    */  
   private getContent(){

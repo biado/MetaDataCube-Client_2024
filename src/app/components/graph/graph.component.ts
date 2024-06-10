@@ -168,6 +168,8 @@ export class GraphComponent {
 
   /** 
    * Function to zoom on X or Y labels 
+   * 
+   * If a node to be zoomed in on was not extended in the dimension list, then it is extended.
    */
   zoomOnLabels(xname:string, axis:'X'|'Y'){
     let newElement : Node|Tagset|null;
@@ -215,6 +217,9 @@ export class GraphComponent {
       }
     }
 
+    /**
+     * Internal function to retrieve the new Axis node (the one clicked)
+     */
     function getNewNode(node: Node, newNodeName: string): Node | null {
       if (node.name === newNodeName) {
         return node;
@@ -232,7 +237,7 @@ export class GraphComponent {
   }
 
   /**
-   * 
+   * Function that extends all the parents of a node.
    */
   expandNodeParents(parentid: number|null): void {
     if(!(parentid===null)){
@@ -252,22 +257,6 @@ export class GraphComponent {
    */
   findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
     let element: Tagset | Node | null = null;
-
-    function findNodeById(node: Node, id: number): Node | null {
-      if (node.id === id) {
-          return node;
-      }  
-      if (node.children) {
-          for (const childNode of node.children) {
-              const foundNode = findNodeById(childNode, id);
-              if (foundNode) {
-                  return foundNode;
-              }
-          }
-      }
-  
-      return null;
-    }
     
     for (const tagset of this.tagsetList) {
         if (elementType === 'tagset') {
@@ -291,7 +280,24 @@ export class GraphComponent {
             }
         }
     }
+
     return element;
+    
+
+    function findNodeById(node: Node, id: number): Node | null {
+      if (node.id === id) {
+          return node;
+      }  
+      if (node.children) {
+          for (const childNode of node.children) {
+              const foundNode = findNodeById(childNode, id);
+              if (foundNode) {
+                  return foundNode;
+              }
+          }
+      }  
+      return null;
+    }
   }
 
 }
