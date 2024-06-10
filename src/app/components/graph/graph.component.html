@@ -6,14 +6,14 @@
       <thead>
         <tr>
           <th class="intersection-cell"></th>
-          <th class="head-row" *ngFor="let x of AxisX">{{ x }}</th>
+          <th class="head-row" *ngFor="let x of AxisX" (click)="zoomOnLabels(x,'X')">{{ x }}</th>
         </tr>
       </thead>
 
       <!-- If no Y is selected, we'll use template XButNoY instead of the entire <tbody> tag and its contents (see end of file). -->
       <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
         <tr *ngFor="let y of AxisY">
-          <td>{{ y }}</td>
+          <td (click)="zoomOnLabels(y,'Y')">{{ y }}</td>
           <td *ngFor="let x of AxisX">
             <ng-container>
               <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
@@ -37,6 +37,11 @@
                 <div *ngIf="isError[x + '-' + y]" class="error">
                   Image Not Found!
                 </div>
+                    
+                <!-- Block Number of images: When image loading is successful -->
+                <div *ngIf="imageUrl && contentCount[x + '-' + y]; let contentCount">
+                  Images : {{contentCount}}
+                </div>
                 
               </div>
             </ng-container>
@@ -47,15 +52,6 @@
     </table>
 
 </div>
-
-
-<!--
-<ng-container>
-  <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
-    {{imageUrls[x + '-' + y]}}
-  </div>
-</ng-container>
--->
 
 
 <!-- Template for the case where only the X dimension is selected.  -->
@@ -86,6 +82,11 @@
               <div *ngIf="isError[x]" class="error">
                 Image Not Found!
               </div>
+                    
+              <!-- Block Number of images: When image loading is successful -->
+              <div *ngIf="imageUrl && contentCount[x]; let contentCount">
+                Images : {{contentCount}}
+              </div>
 
             </div>
           </ng-container>
@@ -106,7 +107,7 @@
     </thead>
     <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
       <tr *ngFor="let y of AxisY">
-        <td>{{ y }}</td>
+        <td (click)="zoomOnLabels(y,'Y')">{{ y }}</td>
         <td>
           <ng-container>
             <div *ngIf="imageUrls[y]; let imageUrl">
@@ -129,6 +130,11 @@
               <!-- Block error: When image loading fails -->
               <div *ngIf="isError[y]" class="error">
                 Image Not Found!
+              </div>
+                    
+              <!-- Block Number of images: When image loading is successful -->
+              <div *ngIf="imageUrl && contentCount[y]; let contentCount">
+                Images : {{contentCount}}
               </div>
               
             </div>

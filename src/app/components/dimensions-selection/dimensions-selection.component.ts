@@ -274,6 +274,8 @@ export class DimensionsSelectionComponent {
 
   /**
    * Function to delete the selection made for X and Y
+   * 
+   * We uncheck and reduce as much as possible.
    */ 
   clearDimensionsSelection(){
     console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedAxis.xid, "\n", this.selectedAxis.xtype, "\n", this.selectedAxis.yid, "\n", this.selectedAxis.ytype, "\n")
@@ -292,6 +294,22 @@ export class DimensionsSelectionComponent {
       }
     }
 
+    this.tagsetlist.forEach(tagset => {
+      tagset.hierarchies.forEach(hierarchy => {
+          const nodesToProcess: Node[] = [hierarchy.firstNode];
+          const allNodes: Map<number, Node> = new Map();
+
+          while (nodesToProcess.length > 0) {
+              const currentNode = nodesToProcess.pop()!;
+              allNodes.set(currentNode.id, currentNode); 
+              if (currentNode.children) {
+                  nodesToProcess.push(...currentNode.children);
+              }
+          }
+
+          allNodes.forEach(node => node.isExpanded = false);
+      });
+    });
    
     const newSelectedAxis = new SelectedAxis(undefined,undefined,undefined,undefined);
     this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
@@ -300,6 +318,8 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.ischeckedX = false;
     this.selectedDimensionsService.yname = null;
     this.selectedDimensionsService.ischeckedY = false;
+
+
 
   }
 

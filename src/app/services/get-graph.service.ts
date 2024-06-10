@@ -28,8 +28,11 @@ export class GetGraphService {
   CoordToNameX : string[]=[];     //All the names of the AxisX sort (we will used it to ge the name of the coordinate in getContent)
   CoordToNameY : string[]=[];     //All the names of the AxisY sort (we will used it to ge the name of the coordinate in getContent)
   
-  private content = new BehaviorSubject<{ [key: string]: string }>({});     //Content of the graph (coordXName-coordYname : img_url of corresponding cell)
-  content$ = this.content.asObservable();
+  private contentUrl = new BehaviorSubject<{ [key: string]: string }>({});     //Content of the graph (coordXName-coordYname : img_url of corresponding cell)
+  contentUrl$ = this.contentUrl.asObservable();
+
+  private contentCount = new BehaviorSubject<{ [key: string]: number }>({});     //Content of the graph (coordXName-coordYname : number of imgage of corresponding cell)
+  contentCount$ = this.contentCount.asObservable();
 
 
 
@@ -75,7 +78,7 @@ export class GetGraphService {
         this.AxisY.next([]);
         this.CoordToNameX = [];
         this.CoordToNameY = [];
-        this.content.next({});
+        this.contentUrl.next({});
         response.forEach((elt : any) => {
           this.addCellToList(elt);
         });
@@ -208,32 +211,37 @@ export class GetGraphService {
    * of the cell images corresponding to the coordinates in the graph.component table.
    */  
   private getContent(){
-    const res : { [key: string]: string } = {};
+    const resUrl : { [key: string]: string } = {};
+    const resCount : { [key: string]: number } = {};
     this.cells.value.forEach(cell => {
       if(cell.xCoordinate && cell.yCoordinate){
         const xName = this.CoordToNameX[cell.xCoordinate-1];
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (xName && yName) {
             const key = `${xName}-${yName}`;
-            res[key] = cell.img_url;
+            resUrl[key] = cell.img_url;
+            resCount[key] = cell.count;
         }
       }
       else if(cell.xCoordinate){
         const xName = this.CoordToNameX[cell.xCoordinate-1];
         if (xName) {
             const key = `${xName}`;
-            res[key] = cell.img_url;
+            resUrl[key] = cell.img_url;
+            resCount[key] = cell.count;
         }
       }
       else if (cell.yCoordinate){
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (yName) {
             const key = `${yName}`;
-            res[key] = cell.img_url;
+            resUrl[key] = cell.img_url;
+            resCount[key] = cell.count;
         }
       }
     });
-    this.content.next(res);
+    this.contentUrl.next(resUrl);
+    this.contentCount.next(resCount);
   }
   
   /**

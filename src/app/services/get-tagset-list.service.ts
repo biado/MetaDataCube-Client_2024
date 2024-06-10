@@ -170,7 +170,7 @@ export class GetTagsetListService {
     }
 
     return res;
-  }
+  } 
 
   /**
    * This function takes a rawnode (from api/hierarchy/{id}) and retrieves all the node's informations.
