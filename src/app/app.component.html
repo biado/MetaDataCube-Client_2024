@@ -9,7 +9,7 @@
     </div>
     <div class="header_buttons_div">
       <button class="header_buttons" (click)="refresh_selection_list()">Refresh</button>
-      <button class="header_buttons">Import</button>
+      <button class="header_buttons" (click)="co()">Import</button>
       <button class="header_buttons">Export</button>
     </div>
   </header>
@@ -25,7 +25,9 @@
       </div>
     </section>
 
-    <section class="graph"></section>
+    <section class="graph">
+      <app-graph></app-graph>
+    </section>
 
     <section class="select_filters" [style.max-width]="display_filters ? '22%' : '1%'" [style.min-width]="display_filters ? '22%' : '1%'">
       <div class="select_filters_button"  [style.max-width]="display_filters ? '4%' : '100%'" [style.min-width]="display_filters ? '4%' : '100%'">
@@ -49,7 +51,9 @@
         </div>
       </section>
       
-      <section class="smcr_graph">aaaa</section>
+      <section class="smcr_graph">
+        <app-graph></app-graph>
+      </section>
 
       <section class="smcr_select_filters" [style.min-height]="display_filters ? '100%' : '4%'" [style.max-height]="display_filters ? '100%' : '4%'">
         <div class="smcr_select_filters_button" [style.max-height]="display_filters ? '4%' : '100%'" [style.min-height]="display_filters ? '4%' : '100%'">

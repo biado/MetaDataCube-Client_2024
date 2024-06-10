@@ -133,3 +133,11 @@ input[type="checkbox"]:disabled {
 }
 /* ############################################## */
 
+@media screen and (max-width: 1100px) {
+    .selection_component_searchbar input{
+        font-size: 1em ;
+    }
+    .filters_tagset_labels{
+        font-size: 1em ;
+    }
+}

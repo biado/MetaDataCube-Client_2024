@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { GetDimensionsService } from '../../services/get-dimensions.service';
+import { GetTagsetListService } from '../../services/get-tagset-list.service';
 import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
 import { Tagset } from '../../models/tagset';
 import { Tag } from '../../models/tag';
+import { SelectedFiltersService } from '../../services/selected-filters.service';
 
 @Component({
   selector: 'app-filters-selection',
@@ -12,72 +13,53 @@ import { Tag } from '../../models/tag';
 export class FiltersSelectionComponent {
   filterstosearch = '';
   tagsetlist: Tagset[] = [];
-  selectedTagFilters: Tag[] = [];
-  selectedTagsetFilters: Tagset[] = [];
 
   constructor(
-    private getDimensionsService: GetDimensionsService,                   // Service that will obtain the list of tagset
+    private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
+    private selectedFiltersService:SelectedFiltersService                  // Service containing information on selected filters
   ) 
   {}
 
   /**
-   * When the component is started, a list of all the tagset.
-   * 
-   * Also we put all tagsets / hierarchies / nodes to visible (initial state)
+   * When the component is started, we get a list of all the tagset.
    */
   async ngOnInit(): Promise<void> {
-    this.getDimensionsService.tagset$.subscribe(data => {
-      this.tagsetlist = this.sortTagsets(data);
+    this.getTagsetListService.tagsetList$.subscribe(data => {
+      this.tagsetlist = data;
     });
-
-    /*this.tagsetlist.forEach(tagset => {
-      tagset.isVisibleFilters = true;
-      tagset.tags.forEach(tag=>{
-        tag.isVisible = true;
-      });
-    });*/
   }
 
   /**
    * When a tag (filters-selection-tags.component) is selected, 
    * it will send a signal to this component, which will launch this function. 
    * 
-   * Depending on whether the tag has been selected or deselected, we will add
-   * it to selectedTagFilters or remove it.
+   * Depending on whether the tag has been selected or deselected, we will call the add function of the service or the remove function.
    */
   onTagFilterSelected(tag: Tag) {
     if (tag.ischecked) {
-      if (!this.selectedTagFilters.includes(tag)) {
-        this.selectedTagFilters.push(tag);
-      }
+      this.selectedFiltersService.addFilter(tag.id,tag.type);
     } else {
-      const index = this.selectedTagFilters.indexOf(tag);
-      if (index !== -1) {
-        this.selectedTagFilters.splice(index, 1);
-      }
+      this.selectedFiltersService.removeFilter(tag.id,tag.type);
     }
   }
 
   /**
    * Function launched when a tagset is selected or deselected as a filter. 
    * 
-   * If the tagset is selected, it is added to selectedTagsetFilters, 
-   * if it is deselected, it is removed.
+   * If the tagset is selected, we call add function of the service, 
+   * if it is deselected, it is the remove function.
    */
   toggleCheckboxTagsetFilters(tagset:Tagset): void {
     tagset.isCheckedFilters = !tagset.isCheckedFilters;
 
     if (tagset.isCheckedFilters) {
-      if (!this.selectedTagsetFilters.includes(tagset)) {
-        this.selectedTagsetFilters.push(tagset);
-      }
+      this.selectedFiltersService.addFilter(tagset.id,tagset.type);
     } else {
-      const index = this.selectedTagsetFilters.indexOf(tagset);
-      if (index !== -1) {
-        this.selectedTagsetFilters.splice(index, 1);
-      }
+      this.selectedFiltersService.removeFilter(tagset.id,tagset.type);
     }
+
+    console.log(this.selectedFiltersService.getFiltersList());
   }
 
   //Search the tag we want 
@@ -124,24 +106,7 @@ export class FiltersSelectionComponent {
    * Function to delete the selection of filters made.
    */ 
   clearFiltersSelection():void{
-    console.log("\n ListTagsets : ",this.selectedTagsetFilters,"\n ListTags : ",this.selectedTagFilters);
-    this.selectedTagFilters.forEach(tag => {
-        tag.ischecked = false;
-    });
-
-    this.selectedTagsetFilters.forEach(tagset => {
-      tagset.isCheckedFilters = false;
-    });
-
-    this.selectedTagFilters=[];
-    this.selectedTagsetFilters=[];
-  }
-
-  /**
-  * Sort a Tagset list alphabetically (Symbol -> Number ->aAbCdDeF).
-  */
-  sortTagsets(tagsets: Tagset[]): Tagset[] {
-    return tagsets.sort((a, b) => a.name.localeCompare(b.name));
+    this.selectedFiltersService.clearSelection();
   }
 
   /**

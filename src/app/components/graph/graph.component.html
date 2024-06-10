@@ -1,0 +1,140 @@
+<div class="axis-container">
+
+    <!-- If no X is selected, we'll use template YButNoX instead of the entire <table> tag and its contents (see end of file). -->
+    <table *ngIf="AxisX && AxisX.length>0; else YButNoX">
+
+      <thead>
+        <tr>
+          <th class="intersection-cell"></th>
+          <th class="head-row" *ngFor="let x of AxisX">{{ x }}</th>
+        </tr>
+      </thead>
+
+      <!-- If no Y is selected, we'll use template XButNoY instead of the entire <tbody> tag and its contents (see end of file). -->
+      <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
+        <tr *ngFor="let y of AxisY">
+          <td>{{ y }}</td>
+          <td *ngFor="let x of AxisX">
+            <ng-container>
+              <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
+
+                <!-- Block loading: Waiting for the image to load -->
+                <div *ngIf="isLoading[x + '-' + y] && imageUrl" class="loading">
+                  Loading...
+                </div>
+                
+                <!-- Block Image: When image loading is successful -->
+                <img
+                  *ngIf="!isError[x + '-' + y] && imageUrl"
+                  class="cell-content_img"
+                  [src]="imageUrl"
+                  alt="Cell Image"
+                  (load)="onLoad(x + '-' + y)"
+                  (error)="onError(x + '-' + y)"
+                />
+                
+                <!-- Block error: When image loading fails -->
+                <div *ngIf="isError[x + '-' + y]" class="error">
+                  Image Not Found!
+                </div>
+                
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+</div>
+
+
+<!--
+<ng-container>
+  <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
+    {{imageUrls[x + '-' + y]}}
+  </div>
+</ng-container>
+-->
+
+
+<!-- Template for the case where only the X dimension is selected.  -->
+<ng-template #XButNoY>
+  <tbody>
+    <tr>
+        <td></td>
+        <td *ngFor="let x of AxisX">
+          <ng-container>
+            <div *ngIf="imageUrls[x]; let imageUrl">
+
+              <!-- Block loading: Waiting for the image to load -->
+              <div *ngIf="isLoading[x] && imageUrl" class="loading">
+                Loading...
+              </div>
+                    
+              <!-- Block Image: When image loading is successful -->
+              <img
+                *ngIf="!isError[x] && imageUrl"
+                class="cell-content_img"
+                [src]="imageUrl"
+                alt="Cell Image"
+                (load)="onLoad(x)"
+                (error)="onError(x)"
+              />
+                    
+              <!-- Block error: When image loading fails -->
+              <div *ngIf="isError[x]" class="error">
+                Image Not Found!
+              </div>
+
+            </div>
+          </ng-container>
+        </td>
+    </tr>
+  </tbody>
+</ng-template>
+
+
+<!-- Template for the case where only the Y dimension is selected.  -->
+<ng-template #YButNoX>
+  <table>
+    <thead>
+      <tr>
+        <th class="intersection-cell"></th>
+        <th class="head-row">{{ '' }}</th>
+      </tr>
+    </thead>
+    <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
+      <tr *ngFor="let y of AxisY">
+        <td>{{ y }}</td>
+        <td>
+          <ng-container>
+            <div *ngIf="imageUrls[y]; let imageUrl">
+
+              <!-- Block loading: Waiting for the image to load -->
+              <div *ngIf="isLoading[y] && imageUrl" class="loading">
+                Loading...
+              </div>
+              
+              <!-- Block Image: When image loading is successful -->
+              <img
+                *ngIf="!isError[y] && imageUrl"
+                class="cell-content_img"
+                [src]="imageUrl"
+                alt="Cell Image"
+                (load)="onLoad(y)"
+                (error)="onError(y)"
+              />
+              
+              <!-- Block error: When image loading fails -->
+              <div *ngIf="isError[y]" class="error">
+                Image Not Found!
+              </div>
+              
+            </div>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>

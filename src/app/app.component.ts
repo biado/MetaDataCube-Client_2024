@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { GetDimensionsService } from './services/get-dimensions.service';
+import { GetTagsetListService } from './services/get-tagset-list.service';
+import { GetGraphService } from './services/get-graph.service';
 
 interface Element {
   id: number;
@@ -20,7 +21,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-      private getDimensionsService: GetDimensionsService
+      private getTagsetListService: GetTagsetListService,
+      private getGraphservice: GetGraphService
     ) {}
 
   ngOnInit(): void {
@@ -47,8 +49,11 @@ export class AppComponent implements OnInit {
    * Used to invert the value of display_filters, in order to display the filters pannel or not. 
    */ 
   async refresh_selection_list(): Promise<void> {
-    await this.getDimensionsService.getDimensions();
+    await this.getTagsetListService.getTagsetList();
     console.log("End of refresh");
+  }
+
+  co(){
   }
 
   /** 
@@ -58,7 +63,6 @@ export class AppComponent implements OnInit {
   onResize(event: Event): void {
     if (isPlatformBrowser(this.platformId)) {
       this.smallscreen = window.innerWidth < 1101;
-      console.log("Valeur :",this.smallscreen)
     }
   }
   
