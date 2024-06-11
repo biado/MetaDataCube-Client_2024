@@ -179,7 +179,7 @@ export class GraphComponent {
         if(this.selectedAxis.xid && this.selectedAxis.xtype){
           const actualX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
           if(actualX?.type==='node'){
-            console.log(actualX);
+            //console.log(actualX);
             newElement = getNewNode(actualX,xname);
             if(newElement?.children && newElement.children.length>0){
               actualX.isCheckedX = false;
@@ -200,7 +200,7 @@ export class GraphComponent {
         if(this.selectedAxis.yid && this.selectedAxis.ytype){
           const actualY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
           if(actualY?.type==='node'){
-            console.log(actualY);
+            //console.log(actualY);
             newElement = getNewNode(actualY,xname);
             if(newElement?.children && newElement.children.length>0){
               actualY.isCheckedY = false;

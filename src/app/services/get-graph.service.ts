@@ -93,14 +93,17 @@ export class GetGraphService {
    * 
    * Two different cases depending on whether the type is tagset or node.
    * 
-   * Wait 100ms, because if you go too fast, you lose data.
-   * 
    * We'll then sort the list of all names, which we'll put in CoordToNameX. 
    * Then we'll keep the names that appear only in xCoordinate cells. We'll then put this list into this.AxisX
    * 
-   * .filter((name: string) => name !== '') is used to remove an empty string. In fact, the retrieved data may contain an empty string. 
-   * However, when the request is made to obtain the cells, the server will automatically remove this empty string from the equation. 
-   * To make the association, we need to do the same.
+   * .filter((name: string) => name !== response.name) is used to remove the tag with the same name as the tagset. 
+   * The server will automatically remove this tag from its list before assigning the coordinates. If we don't do this too, 
+   * then we'll have an offset in our alphabetical list once we've passed the tag with the tagset name.
+   * 
+   * 2 different ways of sorting depending on whether you have a node or tagset type. 
+   * In fact, when the server assigns coordinates to cells, for a tagset it will make sure that “space” is the weakest, 
+   * but when it's a node it will be the strongest if the space is in the middle of a string, if it a start or end it's the weakest. 
+   * Since we use the position of words in the sorted list to determine which name corresponds to a coordinate, we need to adapt the sorting to each case.
    */  
   private async getAxisX(xid?: number, xtype?: 'node'|'tagset'): Promise<void> {
     const NamesX: string[] = [];
@@ -115,7 +118,7 @@ export class GetGraphService {
         );
       } else if (xtype === 'node') {
         requests = this.http.get(`${AxeXUrl}/Children`).pipe(
-          map((response: any) => response.map((node: any) => node.name)/*.filter((name: string) => name !== '')*/)
+          map((response: any) => response.map((node: any) => node.name))
         );
       }
   
@@ -125,23 +128,40 @@ export class GetGraphService {
           if(results){
             NamesX.push(...results.flat());
           }
-          
-          const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
-          console.log("SX : ",SortName)
-          this.CoordToNameX = SortName;
-  
+             
           const uniqueNames = new Set<string>();
-          this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
-            const name = SortName[x - 1];
-            if (name !== undefined) {
-              uniqueNames.add(name);
-            }
-          });
-          console.log("SX : ",SortName)
-  
-          const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
-          console.log("SX : ",SortFilterName)
-          this.AxisX.next(SortFilterName);
+          let SortUniqueNames :string[] = [];
+          //console.log("NamesX : ", NamesX)
+
+          if (xtype === 'node') { 
+            const SortName = this.customSort(NamesX)
+            this.CoordToNameX = SortName;
+            console.log("SortNameX : ", SortName)
+            this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
+              const name = SortName[x - 1];
+              if (name !== undefined) {
+                uniqueNames.add(name);
+              }
+            });    
+            SortUniqueNames = this.customSort(Array.from(uniqueNames));
+            //console.log(SortUniqueNames)
+          } 
+
+          else if (xtype === 'tagset') { 
+            const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
+            this.CoordToNameX = SortName;
+      
+            const uniqueNames = new Set<string>();
+            this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
+              const name = SortName[x - 1];
+              if (name !== undefined) {
+                uniqueNames.add(name);
+              }
+            });    
+            SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+          }
+
+          this.AxisX.next(SortUniqueNames);
 
         } catch (error) {
           console.error("Failed to fetch data", error);
@@ -155,14 +175,17 @@ export class GetGraphService {
    * 
    * Two different cases depending on whether the type is tagset or node.
    * 
-   * Wait 100ms, because if you go too fast, you lose data.
-   * 
    * We'll then sort the list of all names, which we'll put in CoordToNameY. 
    * Then we'll keep the names that appear only in yCoordinate cells. We'll then put this list into this.AxisY
    * 
-   * .filter((name: string) => name !== '') is used to remove an empty string. In fact, the retrieved data may contain an empty string. 
-   * However, when the request is made to obtain the cells, the server will automatically remove this empty string from the equation. 
-   * To make the association, we need to do the same.
+   * .filter((name: string) => name !== response.name) is used to remove the tag with the same name as the tagset. 
+   * The server will automatically remove this tag from its list before assigning the coordinates. If we don't do this too, 
+   * then we'll have an offset in our alphabetical list once we've passed the tag with the tagset name.
+   * 
+   * 2 different ways of sorting depending on whether you have a node or tagset type. 
+   * In fact, when the server assigns coordinates to cells, for a tagset it will make sure that “space” is the weakest, 
+   * but when it's a node it will be the strongest. Since we use the position of words in the sorted list to determine which name corresponds to a coordinate, 
+   * we need to adapt the sorting to each case.
    */  
   private async getAxisY(yid?: number, ytype?: 'node'|'tagset'): Promise<void> {
     const NamesY: string[] = [];
@@ -177,7 +200,7 @@ export class GetGraphService {
         );
       } else if (ytype === 'node') {
         requests = this.http.get(`${AxeYUrl}/Children`).pipe(
-          map((response: any) => response.map((node: any) => node.name)/*.filter((name: string) => name !== '')*/)
+          map((response: any) => response.map((node: any) => node.name))
         );
       }
   
@@ -187,20 +210,38 @@ export class GetGraphService {
           if(results){
             NamesY.push(...results.flat());
           }
-  
-          const SortName = NamesY.sort((a, b) => a.toString().localeCompare(b.toString()));
-          this.CoordToNameY = SortName;
-  
+             
           const uniqueNames = new Set<string>();
-          this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
-            const name = SortName[y - 1];
-            if (name !== undefined) {
-              uniqueNames.add(name);
-            }
-          });
-  
-          const SortFilterName = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
-          this.AxisY.next(SortFilterName);
+          let SortUniqueNames :string[] = [];
+
+          if (ytype === 'node') { 
+            const SortName = this.customSort(NamesY)
+            this.CoordToNameY = SortName;
+            this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
+              const name = SortName[y - 1];
+              if (name !== undefined) {
+                uniqueNames.add(name);
+              }
+            });    
+            SortUniqueNames = this.customSort(Array.from(uniqueNames));
+            console.log(SortUniqueNames)
+          } 
+
+          else if (ytype === 'tagset') { 
+            const SortName = NamesY.sort((a, b) => a.toString().localeCompare(b.toString()));
+            this.CoordToNameY = SortName;
+      
+            const uniqueNames = new Set<string>();
+            this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
+              const name = SortName[y - 1];
+              if (name !== undefined) {
+                uniqueNames.add(name);
+              }
+            });    
+            SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+          }
+         
+          this.AxisY.next(SortUniqueNames);
 
         } catch (error) {
           console.error("Failed to fetch data", error);
@@ -294,14 +335,43 @@ export class GetGraphService {
   }
 
   /**
-   * Wait function. Take ms (1000 millisecondes = 1 secondes)
+   * Function to define which characters are the most powerful (for custom sorting). 
+   * 
+   * First we have special characters, then numbers, then letters without distinction, then for the same letter lowercase before uppercase. 
+   * And finally, space, which is last if it's in the middle of the word and first if it's at the beginning or end.
    */
-  async waitNSeconds(N:number): Promise<void> {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, N);
-    });
+  customSortKey(char: string, position: number, length: number): [number, number, boolean?] {
+    if (char === ' ') {
+        if (position === 0 || position === length - 1) {
+            return [0, char.charCodeAt(0)]; // Spaces at the beginning or end are considered special characters.
+        } else {
+            return [4, char.charCodeAt(0)]; // Spaces in the middle are strong.
+        }
+    } else if (/\d/.test(char)) {
+        return [1, char.charCodeAt(0)]; // Numbers after special characters.
+    } else if (/[a-zA-Z]/.test(char)) {
+        // Group letters case-insensitively, but lowercase before uppercase.
+        return [2, char.toLowerCase().charCodeAt(0), char === char.toUpperCase()];
+    } else {
+        return [0, char.charCodeAt(0)]; // Special characters first
+    }
+  }
+
+  /**
+   * Function to sort a list of strings according to special rules defined in customSortKey.
+   */
+  customSort(strings: string[]): string[] {
+      return strings.sort((a, b) => {
+          const keyA = a.split('').map((char, index) => this.customSortKey(char, index, a.length));
+          const keyB = b.split('').map((char, index) => this.customSortKey(char, index, b.length));
+
+          for (let i = 0; i < Math.min(keyA.length, keyB.length); i++) {
+              const comp = keyA[i][0] - keyB[i][0] || keyA[i][1] - keyB[i][1] || (keyA[i][2] ? 1 : 0) - (keyB[i][2] ? 1 : 0);
+              if (comp !== 0) return comp;
+          }
+
+          return keyA.length - keyB.length;
+      });
   }
 
 }
