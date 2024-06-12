@@ -3,10 +3,11 @@ import { SelectedDimensionsService } from './selected-dimensions.service';
 import { SelectedFiltersService } from './selected-filters.service';
 import { Filter } from '../models/filter';
 import { Tagset } from '../models/tagset';
-import { BehaviorSubject, combineLatest, forkJoin, map } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, forkJoin, map } from 'rxjs';
 import { Cell } from '../models/cell';
 import { HttpClient } from '@angular/common/http';
 import { SelectedAxis } from '../models/selected-axis';
+import { response } from 'express';
 
 @Injectable({
   providedIn: 'root'
@@ -16,23 +17,33 @@ export class GetGraphService {
   
   selectedAxis : SelectedAxis = new SelectedAxis();
 
-  private AxisX = new BehaviorSubject<string[]>([]);      // Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort
+  private AxisX = new BehaviorSubject<string[]>([]);      
+  /** Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort*/
   AxisX$ = this.AxisX.asObservable();
 
-  private AxisY = new BehaviorSubject<string[]>([]);      // Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort
+  private AxisY = new BehaviorSubject<string[]>([]);      
+  /** Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort */
   AxisY$ = this.AxisY.asObservable();
 
   private cells = new BehaviorSubject<Cell[]>([]);
+  /** List of cells corresponding at the dimensions and filters selected */
   cells$ = this.cells.asObservable();
 
   CoordToNameX : string[]=[];     //All the names of the AxisX sort (we will used it to ge the name of the coordinate in getContent)
   CoordToNameY : string[]=[];     //All the names of the AxisY sort (we will used it to ge the name of the coordinate in getContent)
   
-  private contentUrl = new BehaviorSubject<{ [key: string]: string }>({});     //Content of the graph (coordXName-coordYname : img_url of corresponding cell)
+  private contentUrl = new BehaviorSubject<{ [key: string]: string }>({});     
+  /** Content of the graph (coordXName-coordYname : img_url of corresponding cell) */
   contentUrl$ = this.contentUrl.asObservable();
 
-  private contentCount = new BehaviorSubject<{ [key: string]: number }>({});     //Content of the graph (coordXName-coordYname : number of imgage of corresponding cell)
+  private contentCount = new BehaviorSubject<{ [key: string]: number }>({});     
+  /** Content of the graph (coordXName-coordYname : number of imgage of corresponding cell)  */
   contentCount$ = this.contentCount.asObservable();
+
+  
+  private allImagesURI = new BehaviorSubject<string[]>([]);
+  /** Images URI of of all images corresponding to the selected dimensions and filters  */
+  allImagesURI$ = this.allImagesURI.asObservable();
 
 
 
@@ -62,30 +73,46 @@ export class GetGraphService {
   /**
    * Function that manages the entire service. It is launched each time a dimension or filter is modified. 
    * 
-   * We'll create and access the url corresponding to the cell display according to the dimensions/filters chosen. 
+   * We'll create  the url corresponding to the cell display according to the dimensions/filters chosen. 
+   * If the selected dimension types are not tags, then this url will be accessed.  
    * With the result, we'll first reset most of the lists to 0, then update the cell list, then retrieve the list of axisX names (CoordToNameX & AxisX). 
    * Ditto for Y. Next, we'll retrieve the contents of our table cells.
+   * 
+   * If the chosen dimension types are not tagset, then we'll be able to retrieve the list of all images corresponding to the chosen dimensions.
    * 
    * The various unused constants are there to make sure that typescript will wait for the end of the function to which the constant is associated 
    * before moving on (because await alone isn't enough in some cases).
    */
-  private getCells(filters:Filter[],xid?: number, xtype?: 'node'|'tagset', yid?: number, ytype?: 'node'|'tagset'): void {
+  private getCells(filters:Filter[],xid?: number, xtype?: 'node'|'tagset' |'tag', yid?: number, ytype?: 'node'|'tagset'|'tag'): void {
     const cellUrl = this.createCellUrl(filters,xid, xtype, yid, ytype);
-    const rawListCell = this.http.get(`${cellUrl}`).subscribe(
-      async (response: any) => {
-        this.cells.next([]);
-        this.AxisX.next([]);
-        this.AxisY.next([]);
-        this.CoordToNameX = [];
-        this.CoordToNameY = [];
-        this.contentUrl.next({});
-        response.forEach((elt : any) => {
-          this.addCellToList(elt);
-        });
-        const r1 = await this.getAxisX(xid, xtype);
-        const r2 = await this.getAxisY(yid, ytype);
-        const r3 = this.getContent();
-      });
+
+    this.allImagesURI.next([]);
+
+    if(!(xtype==='tag' || ytype==='tag')){
+      const rawListCell = this.http.get(`${cellUrl}`).subscribe(
+        async (response: any) => {
+          this.cells.next([]);
+          this.AxisX.next([]);
+          this.AxisY.next([]);
+          this.CoordToNameX = [];
+          this.CoordToNameY = [];
+          this.contentUrl.next({});
+          this.contentCount.next({});
+  
+          response.forEach((elt : any) => {
+            this.addCellToList(elt);
+          });
+          
+          const r1 = await this.getAxisX(xid, xtype);
+          const r2 = await this.getAxisY(yid, ytype);
+          const r3 = this.getCellsContent();
+        }
+      );
+    }    
+
+    if ((xid && xtype && !(xtype==='tagset')) || (yid && ytype) && !(ytype==='tagset')) {
+      const r4 = this.getAllImages(cellUrl);
+    }
   }
 
   /**
@@ -105,7 +132,7 @@ export class GetGraphService {
    * but when it's a node it will be the strongest if the space is in the middle of a string, if it a start or end it's the weakest. 
    * Since we use the position of words in the sorted list to determine which name corresponds to a coordinate, we need to adapt the sorting to each case.
    */  
-  private async getAxisX(xid?: number, xtype?: 'node'|'tagset'): Promise<void> {
+  private async getAxisX(xid?: number, xtype?: 'node'|'tagset'|'tag'): Promise<void> {
     const NamesX: string[] = [];
   
     if (xid && xtype) {
@@ -131,12 +158,10 @@ export class GetGraphService {
              
           const uniqueNames = new Set<string>();
           let SortUniqueNames :string[] = [];
-          //console.log("NamesX : ", NamesX)
 
           if (xtype === 'node') { 
             const SortName = this.customSort(NamesX)
             this.CoordToNameX = SortName;
-            console.log("SortNameX : ", SortName)
             this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
               const name = SortName[x - 1];
               if (name !== undefined) {
@@ -144,7 +169,6 @@ export class GetGraphService {
               }
             });    
             SortUniqueNames = this.customSort(Array.from(uniqueNames));
-            //console.log(SortUniqueNames)
           } 
 
           else if (xtype === 'tagset') { 
@@ -187,7 +211,7 @@ export class GetGraphService {
    * but when it's a node it will be the strongest. Since we use the position of words in the sorted list to determine which name corresponds to a coordinate, 
    * we need to adapt the sorting to each case.
    */  
-  private async getAxisY(yid?: number, ytype?: 'node'|'tagset'): Promise<void> {
+  private async getAxisY(yid?: number, ytype?: 'node'|'tagset'|'tag'): Promise<void> {
     const NamesY: string[] = [];
   
     if (yid && ytype) {
@@ -224,7 +248,6 @@ export class GetGraphService {
               }
             });    
             SortUniqueNames = this.customSort(Array.from(uniqueNames));
-            console.log(SortUniqueNames)
           } 
 
           else if (ytype === 'tagset') { 
@@ -254,7 +277,7 @@ export class GetGraphService {
    * Function that allows you to set the correct content format for displaying the URLs and the number of images
    * of the cell images corresponding to the coordinates in the graph.component table.
    */  
-  private getContent(){
+  private getCellsContent(){
     const resUrl : { [key: string]: string } = {};
     const resCount : { [key: string]: number } = {};
     this.cells.value.forEach(cell => {
@@ -287,11 +310,28 @@ export class GetGraphService {
     this.contentUrl.next(resUrl);
     this.contentCount.next(resCount);
   }
-  
+
+  /**
+   * Function to retrieve all images that match the selected dimensions and filters.
+   */
+  private async getAllImages(initUrl: string) {
+    const urlAllImage: string = initUrl + '&all=[]';
+    let imagesURIs: string[] = [];
+    try {
+        const response: any = await this.http.get(`${urlAllImage}`).toPromise();
+        response.forEach((elt: any) => {
+            imagesURIs.push(elt.fileURI);
+        });
+        this.allImagesURI.next(imagesURIs);
+    } catch (error) {
+        console.error("Error in getAllImages:", error);
+    }
+  }
+
   /**
    * Function to create api/cell url corresponding to selected dimensions and filters.
    */ 
-  private createCellUrl( filters:Filter[],xid?: number, xtype?: 'node'|'tagset', yid?: number, ytype?: 'node'|'tagset') : string{
+  private createCellUrl( filters:Filter[],xid?: number, xtype?: 'node'|'tagset'|'tag', yid?: number, ytype?: 'node'|'tagset'|'tag') : string{
     let url:string = `api/cell/?`;
     
     if(xid && xtype){
@@ -313,7 +353,7 @@ export class GetGraphService {
 
     url = url.substring(0, url.length-1);
 
-    console.log("URL: ",url);
+    //console.log("URL: ",url);
     return url;
   }
   

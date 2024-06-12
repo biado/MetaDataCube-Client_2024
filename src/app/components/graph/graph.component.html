@@ -31,6 +31,7 @@
                   alt="Cell Image"
                   (load)="onLoad(x + '-' + y)"
                   (error)="onError(x + '-' + y)"
+                  (click)="viewAllImage(x,y)"
                 />
                 
                 <!-- Block error: When image loading fails -->
@@ -76,6 +77,7 @@
                 alt="Cell Image"
                 (load)="onLoad(x)"
                 (error)="onError(x)"
+                (click)="viewAllImage(x)"
               />
                     
               <!-- Block error: When image loading fails -->
@@ -125,6 +127,7 @@
                 alt="Cell Image"
                 (load)="onLoad(y)"
                 (error)="onError(y)"
+                (click)="viewAllImage(undefined,y)"
               />
               
               <!-- Block error: When image loading fails -->

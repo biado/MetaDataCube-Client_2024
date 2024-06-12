@@ -1,7 +1,7 @@
   .axis-container {
     display: flex;
     max-width: 95%;
-    max-height: 95%;
+    max-height: 90%;
     overflow: hidden;
     overflow-x: auto;
     overflow-y: auto;

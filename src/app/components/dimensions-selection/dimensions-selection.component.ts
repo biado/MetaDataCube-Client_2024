@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { GetTagsetListService } from '../../services/get-tagset-list.service';
 import { Tagset } from '../../models/tagset';
 import { Node } from '../../models/node';
@@ -17,6 +17,9 @@ export class DimensionsSelectionComponent {
   tagsetlist: Tagset[] = [];
 
   selectedAxis : SelectedAxis = new SelectedAxis();
+
+  /** If emit, warn app-component to display graph component and hide grid component. */
+  @Output() display_graph = new EventEmitter();
 
   constructor(
     private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
@@ -232,6 +235,7 @@ export class DimensionsSelectionComponent {
         this.selectedDimensionsService.xname = elt.name;
       }
     }
+    this.display_graph.emit();
   }
 
   /**
@@ -270,6 +274,7 @@ export class DimensionsSelectionComponent {
         this.selectedDimensionsService.yname = elt.name;
       }
     }    
+    this.display_graph.emit();
   }
 
   /**
@@ -319,8 +324,7 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.yname = null;
     this.selectedDimensionsService.ischeckedY = false;
 
-
-
+    this.display_graph.emit();
   }
 
   /**
@@ -328,7 +332,7 @@ export class DimensionsSelectionComponent {
    * 
    * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.
    */
-  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
+  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'|'tag'): Tagset | Node | null {
     let element: Tagset | Node | null = null;
 
     function findNodeById(node: Node, id: number): Node | null {

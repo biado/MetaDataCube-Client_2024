@@ -149,6 +149,27 @@ header {
 .select_filters_button button{
     border-radius: 50px 0 0 50px ;
 }
+
+.graph_buttons_div{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 0.8em;
+}
+
+.graph_button{
+    font-family: 'Shrikhand', serif;
+    margin: 0 0.8em 0 0.8em;
+    font-size: 1.4em;
+    color: var(--main-color);
+    background: var(--button-color);;
+    border: none;
+    border-radius: 50px;
+    height: min-content;
+    width: 10em; 
+    cursor: pointer;
+}
+
 /* ############################################## */
 
 /* ############### Component sizes ############## */
@@ -176,6 +197,16 @@ app-graph{
     width: 100%;
     height: 100%;
     padding: 0.1em 0.1em 0.1em 0.1em;
+    border-radius: 50px 50px 50px 50px;
+}
+
+app-grid{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    width: 100%;
+    height: 100%;
+    padding: 0.2em 0.3em 0.2em 0.3em;
     border-radius: 50px 50px 50px 50px;
 }
 /* ############################################## */

@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Filter } from '../../models/filter';
 import { SelectedFiltersService } from '../../services/selected-filters.service';
 import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
 import { GetGraphService } from '../../services/get-graph.service';
 import { SelectedAxis } from '../../models/selected-axis';
-import { HttpClient } from '@angular/common/http';
-import { Observable, combineLatest, map } from 'rxjs';
+import { combineLatest} from 'rxjs';
 import { Tagset } from '../../models/tagset';
 import { Node } from '../../models/node';
 import { GetTagsetListService } from '../../services/get-tagset-list.service';
+import { Tag } from '../../models/tag';
 
 @Component({
   selector: 'app-graph',
@@ -41,13 +41,15 @@ export class GraphComponent {
   /** For each x-y duo, If loading the image causes an error, set to true. False otherwise. */
   isError: { [key: string]: boolean } = {};
 
+  /** Send message to app-component to display grid instead of graph.  */
+  @Output() display_grid = new EventEmitter();
+
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
     private getGraphService : GetGraphService,
     private getTagsetListService : GetTagsetListService,
-    private http: HttpClient,
   ){}
 
 
@@ -171,7 +173,7 @@ export class GraphComponent {
    * 
    * If a node to be zoomed in on was not extended in the dimension list, then it is extended.
    */
-  zoomOnLabels(xname:string, axis:'X'|'Y'){
+  zoomOnLabels(name:string, axis:'X'|'Y'){
     let newElement : Node|Tagset|null;
     
     if(axis==='X'){
@@ -180,14 +182,14 @@ export class GraphComponent {
           const actualX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
           if(actualX?.type==='node'){
             //console.log(actualX);
-            newElement = getNewNode(actualX,xname);
+            newElement = this.getNewNode(actualX,name);
             if(newElement?.children && newElement.children.length>0){
               actualX.isCheckedX = false;
               newElement.isCheckedX = true;
               this.expandNodeParents(newElement.parentID);
               this.selectedAxis.xid = newElement.id;
               this.selectedAxis.xtype = newElement.type;
-              this.selectedDimensionsService.xname = xname;
+              this.selectedDimensionsService.xname = name;
               this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
             }          
           }
@@ -201,7 +203,7 @@ export class GraphComponent {
           const actualY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
           if(actualY?.type==='node'){
             //console.log(actualY);
-            newElement = getNewNode(actualY,xname);
+            newElement = this.getNewNode(actualY,name);
             if(newElement?.children && newElement.children.length>0){
               actualY.isCheckedY = false;
               actualY.isExpanded = false;
@@ -209,31 +211,31 @@ export class GraphComponent {
               this.expandNodeParents(newElement.parentID);
               this.selectedAxis.yid = newElement.id;
               this.selectedAxis.ytype = newElement.type;
-              this.selectedDimensionsService.yname = xname;
+              this.selectedDimensionsService.yname = name;
               this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
             }          
           }
         }    
       }
     }
+  }
 
-    /**
-     * Internal function to retrieve the new Axis node (the one clicked)
-     */
-    function getNewNode(node: Node, newNodeName: string): Node | null {
-      if (node.name === newNodeName) {
-        return node;
-      }
-      if (node.children && node.children.length > 0) {
-          for (let child of node.children) {
-              let res = getNewNode(child, newNodeName);
-              if (res) {
-                  return res;
-              }
+  /**
+   * Function to retrieve the new Axis node (the one clicked)
+   */
+  getNewNode(node: Node, newNodeName: string): Node | null {
+    if (node.name === newNodeName) {
+      return node;
+    }
+    if (node.children && node.children.length > 0) {
+      for (let child of node.children) {
+        let res = this.getNewNode(child, newNodeName);
+          if (res) {
+            return res;
           }
       }
-      return null;
     }
+    return null;
   }
 
   /**
@@ -249,6 +251,97 @@ export class GraphComponent {
     }
   }
 
+  /**
+   * Function to retrieve the tag in a tagset
+   */
+  getTag(tagset:Tagset, tagName:string): Tag|null {
+    for (const tag of tagset.tags) {
+      if(tag.name===tagName){
+        return tag;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Function for viewing all the images contained in a cell.
+   * 
+   * If one of the cell's labbels is a node, then, if this node has children, we zoom in on the corresponding child node. 
+   * If the node is a leaf, then in this case we'll replace the coordinate with the tag corresponding to the child node.
+   * 
+   * If the labbels is a tagset tag. In this case, we'll replace the coordinate with the corresponding tag.
+   * 
+   * Finally, we send a signal to app-component to display the grid component and hide the graph component.
+   */
+  viewAllImage(xname?: string, yname?: string): void {
+    let actualX, actualY, newElementX, newElementY;
+
+    if ((this.selectedAxis.xtype === 'node' || !xname || this.selectedAxis.xtype === 'tagset') && 
+        (this.selectedAxis.ytype === 'node' || !yname || this.selectedAxis.ytype === 'tagset') && 
+        (this.selectedAxis.xid || !xname) && 
+        (this.selectedAxis.yid || !yname)) {
+
+        if (xname && this.selectedAxis.xid && (this.selectedAxis.xtype === 'node' || this.selectedAxis.xtype==='tagset')) {
+            actualX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
+            if (actualX?.type === 'node') {
+                newElementX = this.getNewNode(actualX, xname);
+            } else if (actualX?.type === 'tagset') {
+                newElementX = this.getTag(actualX, xname);
+            }
+        }
+
+        if (yname && this.selectedAxis.yid && (this.selectedAxis.ytype === 'node' || this.selectedAxis.ytype==='tagset')) {
+            actualY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
+            if (actualY?.type === 'node') {
+                newElementY = this.getNewNode(actualY, yname);
+            } else if (actualY?.type === 'tagset') {
+                newElementY = this.getTag(actualY, yname);
+            }
+        }
+
+        if ((xname && newElementX ) || (yname && newElementY)) {
+            if (actualX) {
+              actualX.isCheckedX = false;
+              actualX.isExpanded = false;
+            }
+            if (actualY) {
+              actualY.isCheckedY = false;
+              actualY.isExpanded = false;
+            }
+
+            if (newElementX && newElementX.type==='node' && xname) {                
+                newElementX.isCheckedX = true;
+                this.expandNodeParents(newElementX.parentID);
+                this.selectedAxis.xid = (newElementX.children && newElementX.children.length >0) ? newElementX.id : newElementX.tagId;
+                this.selectedAxis.xtype = (newElementX.children && newElementX.children.length >0) ? 'node' : 'tag';
+                this.selectedDimensionsService.xname = xname;
+            }
+
+            if (newElementY && newElementY.type==='node' && yname) {
+                newElementY.isCheckedY = true;
+                this.expandNodeParents(newElementY.parentID);
+                this.selectedAxis.yid = (newElementY.children && newElementY.children.length >0) ? newElementY.id : newElementY.tagId;
+                this.selectedAxis.ytype = (newElementY.children && newElementY.children.length >0) ? 'node' : 'tag';
+                this.selectedDimensionsService.yname = yname;
+            }
+
+            if (newElementX && newElementX.type==='tag' && xname) {
+                this.selectedAxis.xid = newElementX.id;
+                this.selectedAxis.xtype = newElementX.type;
+                this.selectedDimensionsService.xname = xname;
+            }
+
+            if (newElementY && newElementY.type==='tag'  && yname) {
+              this.selectedAxis.yid = newElementY.id;
+              this.selectedAxis.ytype = newElementY.type;
+              this.selectedDimensionsService.yname = yname;
+            }
+
+            this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
+            this.display_grid.emit();
+        }
+    }
+  }
 
   /**
    * Retrieves a node or tagset using the type and id of the element. This will retrieve the exact object from the tagsetList.

@@ -10,7 +10,7 @@ import { SelectedDimensionsService } from '../../../services/selected-dimensions
 })
 export class DimensionsSelectionNodeComponent {
   list:Node[]=[];
-  @Input() node: Node = new Node("test",0,null,this.list);
+  @Input() node: Node = new Node("test",0,null,this.list,-1);
   @Input() nodegen: number=-1;
   @Output() checkX = new EventEmitter<Node>();
   @Output() checkY = new EventEmitter<Node>();

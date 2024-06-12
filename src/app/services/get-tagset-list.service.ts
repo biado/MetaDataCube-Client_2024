@@ -183,9 +183,11 @@ export class GetTagsetListService {
     let children: Node[] = [];
     let name = "";
     let id = rawnode.id;
+    let tagID = -1;
 
     try{
       name = rawnode.tag.name;
+      tagID = rawnode.tag.id;
 
       if (rawnode.children && rawnode.children.length > 0) {
         const childPromises = rawnode.children.map((element: any) => this.getNodeInformations(element, id));
@@ -195,7 +197,7 @@ export class GetTagsetListService {
       console.error('Error fetching node information:', error);
     }
 
-    return new Node(name, id, parents, children);
+    return new Node(name, id, parents, children, tagID);
   } 
 
   /**
