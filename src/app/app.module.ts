@@ -10,6 +10,7 @@ import { DimensionsSelectionNodeComponent } from './components/dimensions-select
 import { FiltersSelectionComponent } from './components/filters-selection/filters-selection.component';
 import { FiltersSelectionTagComponent } from './components/filters-selection/filters-selection-tag/filters-selection-tag.component';
 import { GraphComponent } from './components/graph/graph.component';
+import { GridComponent } from './components/grid/grid.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { GraphComponent } from './components/graph/graph.component';
     DimensionsSelectionNodeComponent,
     FiltersSelectionComponent,
     FiltersSelectionTagComponent,
-    GraphComponent
+    GraphComponent,
+    GridComponent
   ],
   imports: [
     BrowserModule,

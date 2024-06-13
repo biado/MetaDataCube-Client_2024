@@ -1,0 +1,36 @@
+.all_images_container {
+    display: flex;
+    justify-content:  space-around;
+    flex-wrap: wrap;
+    max-width: 95%;
+    max-height: 95%;
+    overflow: hidden;
+    overflow-y: auto;
+    margin : 1em 0 0 1em;
+    padding : 0 0.5em 0.5em 0;
+}
+
+/* ## Styles for hiding scrollbars (In this component) ## */
+    /* Specific styles for Chrome, Safari and other WebKit-based browsers */
+    .all_images_container::-webkit-scrollbar {
+        width: 0.5em;
+    }  
+    .all_images_container::-webkit-scrollbar-thumb {
+        background-color: var(--main-color); /* Scroll handle colour */
+    }  
+    .all_images_container::-webkit-scrollbar-track {
+        background-color: var(--main-color); /* Scroll track colour */
+    }
+  
+    /* Firefox */
+    .all_images_container {
+        scrollbar-width:thin;
+        scrollbar-color: var(--main-color) var(--main-color); /* Colour of the handle and scroll track */
+    }
+/* ############################################## */
+
+.grid-content_img {
+    max-width: 10em;
+    max-height: 10em;
+    margin: 0.3em 0.3em 0.3em 0.3em;
+}

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { GetTagsetListService } from '../../services/get-tagset-list.service';
 import { Tagset } from '../../models/tagset';
 import { Node } from '../../models/node';
@@ -17,6 +17,9 @@ export class DimensionsSelectionComponent {
   tagsetlist: Tagset[] = [];
 
   selectedAxis : SelectedAxis = new SelectedAxis();
+
+  /** If emit, warn app-component to display graph component and hide grid component. */
+  @Output() display_graph = new EventEmitter();
 
   constructor(
     private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
@@ -83,6 +86,19 @@ export class DimensionsSelectionComponent {
         }
     }
 
+    // Recursive function to mark children Visible
+    function childrenVisible(node:Node, toSearch : string){
+      if(node.children && node.children.length > 0){
+        node.children.forEach(child =>{
+          child.isVisible = true;
+          if (!(child.name.startsWith(toSearch))) {
+            child.isExpanded = false;
+          }
+          childrenVisible(child,toSearch);
+        })
+      }
+    }
+
     // Reset all nodes if nodestosearch is empty
     if (this.nodestosearch === '') {
         resetAllNodes(this.tagsetlist);
@@ -123,6 +139,7 @@ export class DimensionsSelectionComponent {
                   if (node.name.startsWith(this.nodestosearch)) {
                       node.isExpanded = true;
                       node.isVisible = true;
+                      childrenVisible(node, this.nodestosearch);
                       expandParents(node, allNodes);
 
                       // Display the hierarchy and tagset of the corresponding node
@@ -218,6 +235,7 @@ export class DimensionsSelectionComponent {
         this.selectedDimensionsService.xname = elt.name;
       }
     }
+    this.display_graph.emit();
   }
 
   /**
@@ -256,10 +274,13 @@ export class DimensionsSelectionComponent {
         this.selectedDimensionsService.yname = elt.name;
       }
     }    
+    this.display_graph.emit();
   }
 
   /**
    * Function to delete the selection made for X and Y
+   * 
+   * We uncheck and reduce as much as possible.
    */ 
   clearDimensionsSelection(){
     console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedAxis.xid, "\n", this.selectedAxis.xtype, "\n", this.selectedAxis.yid, "\n", this.selectedAxis.ytype, "\n")
@@ -278,6 +299,22 @@ export class DimensionsSelectionComponent {
       }
     }
 
+    this.tagsetlist.forEach(tagset => {
+      tagset.hierarchies.forEach(hierarchy => {
+          const nodesToProcess: Node[] = [hierarchy.firstNode];
+          const allNodes: Map<number, Node> = new Map();
+
+          while (nodesToProcess.length > 0) {
+              const currentNode = nodesToProcess.pop()!;
+              allNodes.set(currentNode.id, currentNode); 
+              if (currentNode.children) {
+                  nodesToProcess.push(...currentNode.children);
+              }
+          }
+
+          allNodes.forEach(node => node.isExpanded = false);
+      });
+    });
    
     const newSelectedAxis = new SelectedAxis(undefined,undefined,undefined,undefined);
     this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
@@ -287,6 +324,7 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.yname = null;
     this.selectedDimensionsService.ischeckedY = false;
 
+    this.display_graph.emit();
   }
 
   /**
@@ -294,7 +332,7 @@ export class DimensionsSelectionComponent {
    * 
    * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.
    */
-  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
+  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'|'tag'): Tagset | Node | null {
     let element: Tagset | Node | null = null;
 
     function findNodeById(node: Node, id: number): Node | null {
