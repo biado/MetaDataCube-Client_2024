@@ -12,7 +12,7 @@ import { response } from 'express';
 @Injectable({
   providedIn: 'root'
 })
-export class GetGraphService {
+export class GetCellsService {
   filters : Filter[] = [];
   
   selectedAxis : SelectedAxis = new SelectedAxis();

@@ -1,22 +1,22 @@
 import { Component } from '@angular/core';
-import { GetGraphService } from '../../services/get-graph.service';
+import { GetCellsService } from '../../services/get-cells.service';
 import { combineLatest } from 'rxjs';
 
 @Component({
-  selector: 'app-grid',
-  templateUrl: './grid.component.html',
-  styleUrl: './grid.component.css'
+  selector: 'app-cell-state',
+  templateUrl: './cell-state.component.html',
+  styleUrl: './cell-state.component.css'
 })
-export class GridComponent {
+export class CellStateComponent {
 
   imagesURI: string[] = [];
 
   constructor(
-    private getGraphService : GetGraphService,
+    private getCellsService : GetCellsService,
   ){}
 
   async ngOnInit(): Promise<void> {    
-    this.getGraphService.allImagesURI$.subscribe(data => {
+    this.getCellsService.allImagesURI$.subscribe(data => {
       this.imagesURI = this.getCompleteUrl(data);
     });
   }

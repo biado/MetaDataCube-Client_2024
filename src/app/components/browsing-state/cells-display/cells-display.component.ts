@@ -1,22 +1,22 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Filter } from '../../models/filter';
-import { SelectedFiltersService } from '../../services/selected-filters.service';
-import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
-import { GetGraphService } from '../../services/get-graph.service';
-import { SelectedAxis } from '../../models/selected-axis';
+import { Filter } from '../../../models/filter';
+import { SelectedFiltersService } from '../../../services/selected-filters.service';
+import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
+import { GetCellsService } from '../../../services/get-cells.service';
+import { SelectedAxis } from '../../../models/selected-axis';
 import { combineLatest} from 'rxjs';
-import { Tagset } from '../../models/tagset';
-import { Node } from '../../models/node';
-import { GetTagsetListService } from '../../services/get-tagset-list.service';
-import { Tag } from '../../models/tag';
+import { Tagset } from '../../../models/tagset';
+import { Node } from '../../../models/node';
+import { GetTagsetListService } from '../../../services/get-tagset-list.service';
+import { Tag } from '../../../models/tag';
 
 @Component({
-  selector: 'app-graph',
-  templateUrl: './graph.component.html',
-  styleUrl: './graph.component.css'
+  selector: 'app-cells-display',
+  templateUrl: './cells-display.component.html',
+  styleUrl: './cells-display.component.css'
 })
 
-export class GraphComponent {
+export class CellsDisplayComponent {
   filters:Filter[]=[];
 
   tagsetList:Tagset[] = [];
@@ -42,13 +42,13 @@ export class GraphComponent {
   isError: { [key: string]: boolean } = {};
 
   /** Send message to app-component to display grid instead of graph.  */
-  @Output() display_grid = new EventEmitter();
+  @Output() go_to_cellState_Page = new EventEmitter();
 
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
-    private getGraphService : GetGraphService,
+    private getCellsService : GetCellsService,
     private getTagsetListService : GetTagsetListService,
   ){}
 
@@ -63,24 +63,24 @@ export class GraphComponent {
     this.selectedDimensionsService.selectedAxis$.subscribe(data => {
       this.selectedAxis = data;
     });
-    this.getGraphService.AxisX$.subscribe(async data => {
+    this.getCellsService.AxisX$.subscribe(async data => {
       this.AxisX = data;
     });
-    this.getGraphService.AxisY$.subscribe(async data => {
+    this.getCellsService.AxisY$.subscribe(async data => {
       this.AxisY = data;
     });
-    this.getGraphService.contentUrl$.subscribe(async data => {
+    this.getCellsService.contentUrl$.subscribe(async data => {
       this.contentUrl = data;
     });
-    this.getGraphService.contentCount$.subscribe(async data => {
+    this.getCellsService.contentCount$.subscribe(async data => {
       this.contentCount = data;
     });
 
     // If AxixX, Y or contents get update, it will launch getImagesURL. That way we're sure to have the latest version.
     combineLatest([
-      this.getGraphService.AxisX$,
-      this.getGraphService.AxisY$,
-      this.getGraphService.contentUrl$,
+      this.getCellsService.AxisX$,
+      this.getCellsService.AxisY$,
+      this.getCellsService.contentUrl$,
     ]).subscribe(([x, y,contentUrl]) => {
       this.getImagesURL(x,y);
     });
@@ -338,7 +338,7 @@ export class GraphComponent {
             }
 
             this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
-            this.display_grid.emit();
+            this.go_to_cellState_Page.emit();
         }
     }
   }

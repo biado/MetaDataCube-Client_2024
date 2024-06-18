@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { GetTagsetListService } from '../../services/get-tagset-list.service';
-import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
-import { Tagset } from '../../models/tagset';
-import { Tag } from '../../models/tag';
-import { SelectedFiltersService } from '../../services/selected-filters.service';
+import { GetTagsetListService } from '../../../services/get-tagset-list.service';
+import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
+import { Tagset } from '../../../models/tagset';
+import { Tag } from '../../../models/tag';
+import { SelectedFiltersService } from '../../../services/selected-filters.service';
 
 @Component({
   selector: 'app-filters-selection',

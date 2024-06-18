@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GraphComponent } from './graph.component';
+import { CellStateComponent } from './cell-state.component';
 
-describe('GraphComponent', () => {
-  let component: GraphComponent;
-  let fixture: ComponentFixture<GraphComponent>;
+describe('GridComponent', () => {
+  let component: CellStateComponent;
+  let fixture: ComponentFixture<CellStateComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GraphComponent]
+      declarations: [CellStateComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(GraphComponent);
+    fixture = TestBed.createComponent(CellStateComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
