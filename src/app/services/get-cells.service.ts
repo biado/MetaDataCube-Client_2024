@@ -9,9 +9,18 @@ import { HttpClient } from '@angular/common/http';
 import { SelectedAxis } from '../models/selected-axis';
 import { response } from 'express';
 
+
+type SortKey = [number, number, boolean?];
+type SortOrder = 'asc' | 'desc';
+
+interface OrderByConfig {
+  order: SortOrder;
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class GetCellsService {
   filters : Filter[] = [];
   
@@ -41,12 +50,6 @@ export class GetCellsService {
   contentCount$ = this.contentCount.asObservable();
 
   
-  private allImagesURI = new BehaviorSubject<string[]>([]);
-  /** Images URI of of all images corresponding to the selected dimensions and filters  */
-  allImagesURI$ = this.allImagesURI.asObservable();
-
-
-
   constructor(
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
@@ -86,8 +89,6 @@ export class GetCellsService {
   private getCells(filters:Filter[],xid?: number, xtype?: 'node'|'tagset' |'tag', yid?: number, ytype?: 'node'|'tagset'|'tag'): void {
     const cellUrl = this.createCellUrl(filters,xid, xtype, yid, ytype);
 
-    this.allImagesURI.next([]);
-
     if(!(xtype==='tag' || ytype==='tag')){
       const rawListCell = this.http.get(`${cellUrl}`).subscribe(
         async (response: any) => {
@@ -109,10 +110,6 @@ export class GetCellsService {
         }
       );
     }    
-
-    if ((xid && xtype && !(xtype==='tagset')) || (yid && ytype) && !(ytype==='tagset')) {
-      const r4 = this.getAllImages(cellUrl);
-    }
   }
 
   /**
@@ -128,9 +125,9 @@ export class GetCellsService {
    * then we'll have an offset in our alphabetical list once we've passed the tag with the tagset name.
    * 
    * 2 different ways of sorting depending on whether you have a node or tagset type. 
-   * In fact, when the server assigns coordinates to cells, for a tagset it will make sure that “space” is the weakest, 
-   * but when it's a node it will be the strongest if the space is in the middle of a string, if it a start or end it's the weakest. 
-   * Since we use the position of words in the sorted list to determine which name corresponds to a coordinate, we need to adapt the sorting to each case.
+   * For tagsets, the Order By performed in the sql query brings us closer to a classic alphabetical sort (symbols < numbers < letters (aAbcDE...).
+   * For node, the request is a classic "Order By name". We're therefore using SQL's "Order by" sorting method, 
+   * which is a bit special (see the sql_OrderBy_sort() function for an explanation).
    */  
   private async getAxisX(xid?: number, xtype?: 'node'|'tagset'|'tag'): Promise<void> {
     const NamesX: string[] = [];
@@ -159,8 +156,25 @@ export class GetCellsService {
           const uniqueNames = new Set<string>();
           let SortUniqueNames :string[] = [];
 
+          /*try{
+            const items: string[] = [
+              "1a", "2b", "10Z", "A1", "a10", "Z2", "A2", "a1", " ", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "+", "=","$$$4", "10000 Hours","100 Years","€€1" ,"===","{", "}", "[", "]", ":", ";", '"', "'", "<", ">", ",", ".", "?", "/",
+              "1aA", "1aB", "1bA", "2aA", "2aB", "2bA", "A1a", "A1b", "A2a", "aA1", "aB1", "bA1", "10aA", "10aB", "10bA", "Z1a", "Z1b", "Z2a", "Z2A", "A2Z", "A2Y", "A2X", "Z2Y", "Z2X", "a2Z", "b2Z", "c2Z",
+              " 1", " 2", " 3", "!1", "@2", "#3", "$4", "%5", "^6", "&7", "*8", "(9", ")0", "-1", "_2", "+3", "=4", "{5", "}6", "[7", "]8", ":9", "$$0", "\"a", "\'b", "<c", ">d", ",e", ".f", "?g", "/h", "|i",
+              "A 1", "A 2", "A 25","ù","£",'§','é','e é','e e'
+            ];
+            const res = this.sql_OrderBy_Sort(items);
+            //const res = items.sort(((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })));
+            console.log ("Test Tri : ", res);
+          }
+          catch{
+            console.error("Erreur")
+          }*/
+          
+        
           if (xtype === 'node') { 
-            const SortName = this.customSort(NamesX)
+            const SortName = this.sql_OrderBy_Sort(NamesX)
+            console.log("SX : ",SortName)
             this.CoordToNameX = SortName;
             this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
               const name = SortName[x - 1];
@@ -168,12 +182,14 @@ export class GetCellsService {
                 uniqueNames.add(name);
               }
             });    
-            SortUniqueNames = this.customSort(Array.from(uniqueNames));
+            SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
+            console.log("SX2 : ",SortUniqueNames)
           } 
 
           else if (xtype === 'tagset') { 
             const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
             this.CoordToNameX = SortName;
+            console.log("SX : ",SortName)
       
             const uniqueNames = new Set<string>();
             this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
@@ -184,7 +200,6 @@ export class GetCellsService {
             });    
             SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
           }
-
           this.AxisX.next(SortUniqueNames);
 
         } catch (error) {
@@ -207,9 +222,9 @@ export class GetCellsService {
    * then we'll have an offset in our alphabetical list once we've passed the tag with the tagset name.
    * 
    * 2 different ways of sorting depending on whether you have a node or tagset type. 
-   * In fact, when the server assigns coordinates to cells, for a tagset it will make sure that “space” is the weakest, 
-   * but when it's a node it will be the strongest. Since we use the position of words in the sorted list to determine which name corresponds to a coordinate, 
-   * we need to adapt the sorting to each case.
+   * For tagsets, the Order By performed in the sql query brings us closer to a classic alphabetical sort (symbols < numbers < letters (aAbcDE...).
+   * For node, the request is a classic "Order By name". We're therefore using SQL's "Order by" sorting method, 
+   * which is a bit special (see the sql_OrderBy_sort() function for an explanation).
    */  
   private async getAxisY(yid?: number, ytype?: 'node'|'tagset'|'tag'): Promise<void> {
     const NamesY: string[] = [];
@@ -239,7 +254,7 @@ export class GetCellsService {
           let SortUniqueNames :string[] = [];
 
           if (ytype === 'node') { 
-            const SortName = this.customSort(NamesY)
+            const SortName = this.sql_OrderBy_Sort(NamesY)
             this.CoordToNameY = SortName;
             this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
               const name = SortName[y - 1];
@@ -247,7 +262,7 @@ export class GetCellsService {
                 uniqueNames.add(name);
               }
             });    
-            SortUniqueNames = this.customSort(Array.from(uniqueNames));
+            SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
           } 
 
           else if (ytype === 'tagset') { 
@@ -312,23 +327,6 @@ export class GetCellsService {
   }
 
   /**
-   * Function to retrieve all images that match the selected dimensions and filters.
-   */
-  private async getAllImages(initUrl: string) {
-    const urlAllImage: string = initUrl + '&all=[]';
-    let imagesURIs: string[] = [];
-    try {
-        const response: any = await this.http.get(`${urlAllImage}`).toPromise();
-        response.forEach((elt: any) => {
-            imagesURIs.push(elt.fileURI);
-        });
-        this.allImagesURI.next(imagesURIs);
-    } catch (error) {
-        console.error("Error in getAllImages:", error);
-    }
-  }
-
-  /**
    * Function to create api/cell url corresponding to selected dimensions and filters.
    */ 
   private createCellUrl( filters:Filter[],xid?: number, xtype?: 'node'|'tagset'|'tag', yid?: number, ytype?: 'node'|'tagset'|'tag') : string{
@@ -353,7 +351,7 @@ export class GetCellsService {
 
     url = url.substring(0, url.length-1);
 
-    //console.log("URL: ",url);
+    console.log("URL2: ",url);
     return url;
   }
   
@@ -374,44 +372,145 @@ export class GetCellsService {
     this.cells.next([...currentCells, cell]);
   }
 
-  /**
-   * Function to define which characters are the most powerful (for custom sorting). 
-   * 
-   * First we have special characters, then numbers, then letters without distinction, then for the same letter lowercase before uppercase. 
-   * And finally, space, which is last if it's in the middle of the word and first if it's at the beginning or end.
-   */
-  customSortKey(char: string, position: number, length: number): [number, number, boolean?] {
-    if (char === ' ') {
-        if (position === 0 || position === length - 1) {
-            return [0, char.charCodeAt(0)]; // Spaces at the beginning or end are considered special characters.
-        } else {
-            return [4, char.charCodeAt(0)]; // Spaces in the middle are strong.
-        }
-    } else if (/\d/.test(char)) {
-        return [1, char.charCodeAt(0)]; // Numbers after special characters.
-    } else if (/[a-zA-Z]/.test(char)) {
-        // Group letters case-insensitively, but lowercase before uppercase.
-        return [2, char.toLowerCase().charCodeAt(0), char === char.toUpperCase()];
-    } else {
-        return [0, char.charCodeAt(0)]; // Special characters first
-    }
-  }
 
   /**
-   * Function to sort a list of strings according to special rules defined in customSortKey.
-   */
-  customSort(strings: string[]): string[] {
-      return strings.sort((a, b) => {
-          const keyA = a.split('').map((char, index) => this.customSortKey(char, index, a.length));
-          const keyB = b.split('').map((char, index) => this.customSortKey(char, index, b.length));
+  * Function to sort a list in the same way as SQL's "Order By".
+  * 
+  * Order By de SQL sort in this way: delete the symbols and change everything to lower case. Once this is done, we perform a first sort.
+  * From this initial sorting, common groups emerge, which we'll retrieve, and then re-sort each groups, this time with upper case and Symbols.
+  * 
+  * Ex : ["A0","a1", "a 1", "A1", "A 1","A2"] --> First Sort --> ["a0","a1","a1","a1","a1","a2"] --> Second Sort --> ["A0","a 1","a1","A 1","A1","A2"]
+  */
+  sql_OrderBy_Sort(list: string[]): string[] {
 
-          for (let i = 0; i < Math.min(keyA.length, keyB.length); i++) {
-              const comp = keyA[i][0] - keyB[i][0] || keyA[i][1] - keyB[i][1] || (keyA[i][2] ? 1 : 0) - (keyB[i][2] ? 1 : 0);
-              if (comp !== 0) return comp;
+    /* Internal Functions  */    
+        /** 
+         * Arrow function for sort function. Compares two strings in a customized order (the aim is to resemble SQL's "Order By" order).
+         * 
+         * Here, we will only have chain without Symbols and UpperCase letters.
+         */
+        const customCompare_WithoutSymbolsAndUpperCaseLetters = (a: string, b: string): number =>{
+          const customOrder = [
+            '$','£','€',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'a', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ','b','c', 'ç','d', 'e', 'è', 'é', 'ê', 'ë', 'f', 'g', 'h', 'i', 'ì', 'í', 'î', 'ï', 'j', 
+            'k', 'l', 'm', 'n', 'ñ', 'o', 'ò', 'ó', 'ô', 'õ', 'ö', 'p', 'q', 'r', 's', 't','u', 'ù', 'ú', 'û', 'ü', 'v', 'w', 'x','y', 'ý', 'ÿ','z'
+          ]
+
+          const cleanA = removeSymbolsAndLowerCase(a);
+          const cleanB = removeSymbolsAndLowerCase(b);
+
+          const maxLength = Math.max(cleanA.length, cleanB.length);
+          
+          for (let i = 0; i < maxLength; i++) {
+            const charA = cleanA[i] || ''; // Si a est plus court, charA est ''
+            const charB = cleanB[i] || ''; // Si b est plus court, charB est ''
+            
+            const indexA = customOrder.indexOf(charA);
+            const indexB = customOrder.indexOf(charB);
+            
+            if (indexA !== indexB) {
+              return indexA - indexB;
+            }
           }
+          
+          return 0; // Les deux mots sont égaux
+        }
 
-          return keyA.length - keyB.length;
-      });
+        /**
+         * Arrow function for sort function. Compares two strings in a customized order (the aim is to resemble SQL's "Order By" order).
+         * 
+         * In this case, we take everything, symbols, numbers and letters.
+         */
+        const customCompare_WithUpperAndSymbol = (a: string, b: string): number =>{
+          const customOrder = [
+            ' ', '!', '"', '#', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '{', '|', '}','§',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '$','£','€',
+            'a', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'b', 'c', 'ç', 'd', 'e', 'è', 'é', 'ê', 'ë', 'f', 'g', 'h', 'i', 'ì', 'í', 'î', 'ï', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'ò', 'ó', 'ô', 'õ', 'ö', 'p', 'q', 'r', 's', 't', 'u', 'ù', 'ú', 'û', 'ü', 'v', 'w', 'x', 'y', 'ý', 'ÿ', 'z',
+            'A', 'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'B', 'C', 'Ç', 'D', 'E', 'È', 'É', 'Ê', 'Ë', 'F', 'G', 'H', 'I', 'Ì', 'Í', 'Î', 'Ï', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ù', 'Ú', 'Û', 'Ü', 'V', 'W', 'X', 'Y', 'Ý', 'Z'
+          ];
+
+          const maxLength = Math.max(a.length, b.length);
+          
+          for (let i = 0; i < maxLength; i++) {
+            const charA = a[i] || ''; // If a is shorter, charA is ''.
+            const charB = b[i] || ''; // If b is shorter, charB is ''.
+            
+            const indexA = customOrder.indexOf(charA);
+            const indexB = customOrder.indexOf(charB);
+            
+            if (indexA !== indexB) {
+              return indexA - indexB;
+            }
+          }
+          
+          return 0; // Both words are equal
+        }
+
+        /**
+         * Function to retrieve groups of identical names (without symbols and capital letters), 
+         * take their version with symbols and capital letters and then re-sort these groups and make modifications to the original list (if the order change).
+         */
+        function sortSameGroupsWithUpperAndSymbols(cleanAndSortedStrings: string[], originalList: string[]): string[] {
+          // Step 1: Group indices of identical strings from cleanAndSortedStrings
+          const indexMap: { [key: string]: number[] } = {};
+
+          cleanAndSortedStrings.forEach((str, index) => {
+              if (!indexMap[str]) {
+                  indexMap[str] = [];
+              }
+              indexMap[str].push(index);
+          });
+
+          // Step 2: Sort and rearrange originalList based on grouped indices    
+          Object.keys(indexMap).forEach(key => {
+              const indices = indexMap[key];
+              if (indices.length > 1) {
+                  // Collect original strings corresponding to these indices
+                  const stringsToSort = indices.map(idx => originalList[idx]);
+                  // Sort them with a personalized sort
+                  stringsToSort.sort(customCompare_WithUpperAndSymbol);
+                  // Replace originalList with sorted strings at their original indices
+                  indices.forEach((idx, i) => {
+                      originalList[idx] = stringsToSort[i];
+                  });
+              }
+          });
+          return originalList;    
+        }        
+
+        /**
+         * Remove all the symbols of a string and put it in lowercase
+         */
+        function removeSymbolsAndLowerCase(str: string): string {
+          const res = str.replace(/[\s!"#%&'()*+,-./:;<=>?@\[\\\]^_{|}]/g, '').toLowerCase();
+          return res;
+        }
+
+
+
+    /* Body of sql_OrderBy_sort function */
+
+    // Step 1 : Sort Without Symbols and UpperCase
+    const originalList = list.sort(customCompare_WithoutSymbolsAndUpperCaseLetters);
+
+    let listSortWithoutSymbolandUpper :string[]= []
+
+    originalList.forEach(elt =>{
+      listSortWithoutSymbolandUpper.push(removeSymbolsAndLowerCase(elt));
+    })
+
+    //Step 2  : Sort With Symbols and UpperCase
+    const newList = sortSameGroupsWithUpperAndSymbols(listSortWithoutSymbolandUpper, originalList);
+
+    console.log("Custom3 : ", newList ,"\n \n ")
+
+    return list;
   }
+
+  
+
+  
+
 
 }

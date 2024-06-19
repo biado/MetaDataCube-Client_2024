@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { GetCellsService } from '../../services/get-cells.service';
 import { combineLatest } from 'rxjs';
+import { GetCellStateService } from '../../services/get-cell-state.service';
 
 @Component({
   selector: 'app-cell-state',
@@ -12,11 +13,11 @@ export class CellStateComponent {
   imagesURI: string[] = [];
 
   constructor(
-    private getCellsService : GetCellsService,
+    private getCellStateService : GetCellStateService,
   ){}
 
   async ngOnInit(): Promise<void> {    
-    this.getCellsService.allImagesURI$.subscribe(data => {
+    this.getCellStateService.allImagesURI$.subscribe(data => {
       this.imagesURI = this.getCompleteUrl(data);
     });
   }
