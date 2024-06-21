@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
-import { GetTagsetListService } from '../../services/get-tagset-list.service';
-import { Tagset } from '../../models/tagset';
-import { Node } from '../../models/node';
-import { Hierarchy } from '../../models/hierarchy';
-import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
-import { SelectedAxis } from '../../models/selected-axis';
+import { GetTagsetListService } from '../../../services/get-tagset-list.service';
+import { Tagset } from '../../../models/tagset';
+import { Node } from '../../../models/node';
+import { Hierarchy } from '../../../models/hierarchy';
+import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
+import { SelectedAxis } from '../../../models/selected-axis';
 
 @Component({
   selector: 'app-dimensions-selection',
@@ -17,9 +17,6 @@ export class DimensionsSelectionComponent {
   tagsetlist: Tagset[] = [];
 
   selectedAxis : SelectedAxis = new SelectedAxis();
-
-  /** If emit, warn app-component to display graph component and hide grid component. */
-  @Output() display_graph = new EventEmitter();
 
   constructor(
     private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
@@ -235,7 +232,6 @@ export class DimensionsSelectionComponent {
         this.selectedDimensionsService.xname = elt.name;
       }
     }
-    this.display_graph.emit();
   }
 
   /**
@@ -274,7 +270,6 @@ export class DimensionsSelectionComponent {
         this.selectedDimensionsService.yname = elt.name;
       }
     }    
-    this.display_graph.emit();
   }
 
   /**
@@ -323,8 +318,6 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.ischeckedX = false;
     this.selectedDimensionsService.yname = null;
     this.selectedDimensionsService.ischeckedY = false;
-
-    this.display_graph.emit();
   }
 
   /**

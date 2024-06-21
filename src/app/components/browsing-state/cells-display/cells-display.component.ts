@@ -1,22 +1,23 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Filter } from '../../models/filter';
-import { SelectedFiltersService } from '../../services/selected-filters.service';
-import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
-import { GetGraphService } from '../../services/get-graph.service';
-import { SelectedAxis } from '../../models/selected-axis';
+import { Filter } from '../../../models/filter';
+import { SelectedFiltersService } from '../../../services/selected-filters.service';
+import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
+import { GetCellsService } from '../../../services/get-cells.service';
+import { SelectedAxis } from '../../../models/selected-axis';
 import { combineLatest} from 'rxjs';
-import { Tagset } from '../../models/tagset';
-import { Node } from '../../models/node';
-import { GetTagsetListService } from '../../services/get-tagset-list.service';
-import { Tag } from '../../models/tag';
+import { Tagset } from '../../../models/tagset';
+import { Node } from '../../../models/node';
+import { GetTagsetListService } from '../../../services/get-tagset-list.service';
+import { Tag } from '../../../models/tag';
+import { GetCellStateService } from '../../../services/get-cell-state.service';
 
 @Component({
-  selector: 'app-graph',
-  templateUrl: './graph.component.html',
-  styleUrl: './graph.component.css'
+  selector: 'app-cells-display',
+  templateUrl: './cells-display.component.html',
+  styleUrl: './cells-display.component.css'
 })
 
-export class GraphComponent {
+export class CellsDisplayComponent {
   filters:Filter[]=[];
 
   tagsetList:Tagset[] = [];
@@ -42,14 +43,15 @@ export class GraphComponent {
   isError: { [key: string]: boolean } = {};
 
   /** Send message to app-component to display grid instead of graph.  */
-  @Output() display_grid = new EventEmitter();
+  @Output() go_to_cellState_Page = new EventEmitter();
 
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
-    private getGraphService : GetGraphService,
+    private getCellsService : GetCellsService,
     private getTagsetListService : GetTagsetListService,
+    private getCellStateService : GetCellStateService,
   ){}
 
 
@@ -63,24 +65,24 @@ export class GraphComponent {
     this.selectedDimensionsService.selectedAxis$.subscribe(data => {
       this.selectedAxis = data;
     });
-    this.getGraphService.AxisX$.subscribe(async data => {
+    this.getCellsService.AxisX$.subscribe(async data => {
       this.AxisX = data;
     });
-    this.getGraphService.AxisY$.subscribe(async data => {
+    this.getCellsService.AxisY$.subscribe(async data => {
       this.AxisY = data;
     });
-    this.getGraphService.contentUrl$.subscribe(async data => {
+    this.getCellsService.contentUrl$.subscribe(async data => {
       this.contentUrl = data;
     });
-    this.getGraphService.contentCount$.subscribe(async data => {
+    this.getCellsService.contentCount$.subscribe(async data => {
       this.contentCount = data;
     });
 
     // If AxixX, Y or contents get update, it will launch getImagesURL. That way we're sure to have the latest version.
     combineLatest([
-      this.getGraphService.AxisX$,
-      this.getGraphService.AxisY$,
-      this.getGraphService.contentUrl$,
+      this.getCellsService.AxisX$,
+      this.getCellsService.AxisY$,
+      this.getCellsService.contentUrl$,
     ]).subscribe(([x, y,contentUrl]) => {
       this.getImagesURL(x,y);
     });
@@ -275,6 +277,7 @@ export class GraphComponent {
    */
   viewAllImage(xname?: string, yname?: string): void {
     let actualX, actualY, newElementX, newElementY;
+    let selectedCellAxis = new SelectedAxis();
 
     if ((this.selectedAxis.xtype === 'node' || !xname || this.selectedAxis.xtype === 'tagset') && 
         (this.selectedAxis.ytype === 'node' || !yname || this.selectedAxis.ytype === 'tagset') && 
@@ -300,45 +303,31 @@ export class GraphComponent {
         }
 
         if ((xname && newElementX ) || (yname && newElementY)) {
-            if (actualX) {
-              actualX.isCheckedX = false;
-              actualX.isExpanded = false;
-            }
-            if (actualY) {
-              actualY.isCheckedY = false;
-              actualY.isExpanded = false;
-            }
-
-            if (newElementX && newElementX.type==='node' && xname) {                
-                newElementX.isCheckedX = true;
-                this.expandNodeParents(newElementX.parentID);
-                this.selectedAxis.xid = (newElementX.children && newElementX.children.length >0) ? newElementX.id : newElementX.tagId;
-                this.selectedAxis.xtype = (newElementX.children && newElementX.children.length >0) ? 'node' : 'tag';
-                this.selectedDimensionsService.xname = xname;
+            if (newElementX && newElementX.type==='node' && xname) {  
+              this.expandNodeParents(newElementX.parentID);
+              selectedCellAxis.xid = (newElementX.children && newElementX.children.length >0) ? newElementX.id : newElementX.tagId;
+              selectedCellAxis.xtype = (newElementX.children && newElementX.children.length >0) ? 'node' : 'tag';
             }
 
             if (newElementY && newElementY.type==='node' && yname) {
-                newElementY.isCheckedY = true;
-                this.expandNodeParents(newElementY.parentID);
-                this.selectedAxis.yid = (newElementY.children && newElementY.children.length >0) ? newElementY.id : newElementY.tagId;
-                this.selectedAxis.ytype = (newElementY.children && newElementY.children.length >0) ? 'node' : 'tag';
-                this.selectedDimensionsService.yname = yname;
+              this.expandNodeParents(newElementY.parentID);
+              selectedCellAxis.yid = (newElementY.children && newElementY.children.length >0) ? newElementY.id : newElementY.tagId;
+              selectedCellAxis.ytype = (newElementY.children && newElementY.children.length >0) ? 'node' : 'tag';
             }
 
             if (newElementX && newElementX.type==='tag' && xname) {
-                this.selectedAxis.xid = newElementX.id;
-                this.selectedAxis.xtype = newElementX.type;
-                this.selectedDimensionsService.xname = xname;
+              selectedCellAxis.xid = newElementX.id;
+              selectedCellAxis.xtype = newElementX.type;
             }
 
             if (newElementY && newElementY.type==='tag'  && yname) {
-              this.selectedAxis.yid = newElementY.id;
-              this.selectedAxis.ytype = newElementY.type;
-              this.selectedDimensionsService.yname = yname;
+              selectedCellAxis.yid = newElementY.id;
+              selectedCellAxis.ytype = newElementY.type;
             }
-
-            this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
-            this.display_grid.emit();
+            
+            this.getCellStateService.selectedCellAxis.next(new SelectedAxis());
+            this.getCellStateService.selectedCellAxis.next(selectedCellAxis);
+            this.go_to_cellState_Page.emit();
         }
     }
   }

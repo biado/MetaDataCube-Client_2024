@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output  } from '@angular/core';
-import { Node } from '../../../models/node';
-import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
+import { Node } from '../../../../models/node';
+import { SelectedDimensionsService } from '../../../../services/selected-dimensions.service';
 
 
 @Component({

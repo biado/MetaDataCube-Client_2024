@@ -14,7 +14,7 @@
       <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
         <tr *ngFor="let y of AxisY">
           <td (click)="zoomOnLabels(y,'Y')">{{ y }}</td>
-          <td *ngFor="let x of AxisX">
+          <td *ngFor="let x of AxisX" (click)="viewAllImage(x,y)">
             <ng-container>
               <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
 
@@ -31,7 +31,6 @@
                   alt="Cell Image"
                   (load)="onLoad(x + '-' + y)"
                   (error)="onError(x + '-' + y)"
-                  (click)="viewAllImage(x,y)"
                 />
                 
                 <!-- Block error: When image loading fails -->
@@ -60,7 +59,7 @@
   <tbody>
     <tr>
         <td></td>
-        <td *ngFor="let x of AxisX">
+        <td *ngFor="let x of AxisX" (click)="viewAllImage(x)">
           <ng-container>
             <div *ngIf="imageUrls[x]; let imageUrl">
 
@@ -77,7 +76,6 @@
                 alt="Cell Image"
                 (load)="onLoad(x)"
                 (error)="onError(x)"
-                (click)="viewAllImage(x)"
               />
                     
               <!-- Block error: When image loading fails -->
@@ -110,7 +108,7 @@
     <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
       <tr *ngFor="let y of AxisY">
         <td (click)="zoomOnLabels(y,'Y')">{{ y }}</td>
-        <td>
+        <td (click)="viewAllImage(undefined,y)">
           <ng-container>
             <div *ngIf="imageUrls[y]; let imageUrl">
 
@@ -127,7 +125,6 @@
                 alt="Cell Image"
                 (load)="onLoad(y)"
                 (error)="onError(y)"
-                (click)="viewAllImage(undefined,y)"
               />
               
               <!-- Block error: When image loading fails -->

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Tag } from '../../../models/tag';
+import { Tag } from '../../../../models/tag';
 
 @Component({
   selector: 'app-filters-selection-tag',

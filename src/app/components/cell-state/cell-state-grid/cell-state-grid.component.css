@@ -1,0 +1,15 @@
+.all_images_container {
+    display: flex;
+    justify-content:  center;
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+
+.grid-content_img {
+    max-width: 10em;
+    max-height: 10em;
+    object-position: center; 
+    object-fit: contain;
+    margin: 0.3em 0.3em 0.3em 0.3em;
+}
