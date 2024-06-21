@@ -1,36 +1,80 @@
-.all_images_container {
+body{
     display: flex;
-    justify-content:  space-around;
-    flex-wrap: wrap;
-    max-width: 95%;
-    max-height: 95%;
+    justify-content: center;
+    align-items: center;
+}
+
+article {
+    min-width: 98vw;
+    max-width: 98vw;
+    min-height: 98vh;
+    max-height: 98vh;
+    width: 98vw;
+    height: 98vh;
+    background-color: var(--secondary-background-color);
+    border-radius: 50px 50px 50px 50px;
     overflow: hidden;
     overflow-y: auto;
-    margin : 1em 0 0 1em;
-    padding : 0 0.5em 0.5em 0;
+    padding : 0 0.5em 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+/* ################### Buttons ################## */
+.cell-state-buttons{
+    font-family: 'Shrikhand', serif;
+    font-size: 1.7em;
+    color: var(--main-color);
+    background: var(--button-color);;
+    border: none;
+    border-radius: 50px;
+    height: min-content;
+    width: min-content; 
+    margin: 0.5em 1em 0.5em 1em;
+    padding: 0em 0.5em 0em 0.5em ; 
+    cursor: pointer;
+}
+
+.cell-state-buttons-div{
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+}
+/* ############################################## */
+
+
+/* ################### Components ################## */
+app-cell-state-grid{
+    min-width: 100%;
+    width: 100%;
+    min-height: 92%;
+}
+
+app-cell-state-single{
+    min-width: 100%;
+    width: 100%;
+    min-height: 92%;
+}
+/* ############################################## */
+
 
 /* ## Styles for hiding scrollbars (In this component) ## */
     /* Specific styles for Chrome, Safari and other WebKit-based browsers */
-    .all_images_container::-webkit-scrollbar {
+    article::-webkit-scrollbar {
         width: 0.5em;
     }  
-    .all_images_container::-webkit-scrollbar-thumb {
+    article::-webkit-scrollbar-thumb {
         background-color: var(--main-color); /* Scroll handle colour */
     }  
-    .all_images_container::-webkit-scrollbar-track {
+    article::-webkit-scrollbar-track {
         background-color: var(--main-color); /* Scroll track colour */
     }
   
     /* Firefox */
-    .all_images_container {
+    article {
         scrollbar-width:thin;
         scrollbar-color: var(--main-color) var(--main-color); /* Colour of the handle and scroll track */
     }
 /* ############################################## */
 
-.grid-content_img {
-    max-width: 10em;
-    max-height: 10em;
-    margin: 0.3em 0.3em 0.3em 0.3em;
-}

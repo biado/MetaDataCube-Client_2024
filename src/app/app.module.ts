@@ -13,6 +13,8 @@ import { FiltersSelectionTagComponent } from './components/browsing-state/filter
 import { BrowsingStateComponent } from './components/browsing-state/browsing-state.component';
 import { CellStateComponent } from './components/cell-state/cell-state.component';
 import { AppRoutingModule } from './app-routing.module';
+import { CellStateGridComponent } from './components/cell-state/cell-state-grid/cell-state-grid.component';
+import { CellStateSingleComponent } from './components/cell-state/cell-state-single/cell-state-single.component';
 
 
 @NgModule({
@@ -25,6 +27,8 @@ import { AppRoutingModule } from './app-routing.module';
     CellStateComponent,
     CellsDisplayComponent,
     BrowsingStateComponent,
+    CellStateGridComponent,
+    CellStateSingleComponent,
     
   ],
   imports: [

@@ -9,14 +9,6 @@ import { HttpClient } from '@angular/common/http';
 import { SelectedAxis } from '../models/selected-axis';
 import { response } from 'express';
 
-
-type SortKey = [number, number, boolean?];
-type SortOrder = 'asc' | 'desc';
-
-interface OrderByConfig {
-  order: SortOrder;
-}
-
 @Injectable({
   providedIn: 'root'
 })

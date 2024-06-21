@@ -1,8 +1,26 @@
-<div class="all_images_container">
-    <img
-    *ngFor="let imageURI of imagesURI"
-    class="grid-content_img"
-    [src]="imageURI"
-    alt="Image Not Found"
-    />
-</div>
+<body>
+    <article>
+        <div class="cell-state-buttons-div">
+            <button class="cell-state-buttons" (click)="show_grid_component()">Grid</button>
+            <button class="cell-state-buttons" (click)="show_single_component(currentImage)">Single</button>
+            <button class="cell-state-buttons" (click)="test()">Test</button>
+        </div>
+
+        <!-- Component to display the grid if the boolean is true -->
+        <app-cell-state-grid 
+            *ngIf="display_grid" 
+            [imagesInfos]="imagesInfos" 
+            (show_single)="show_single_component($event)"
+        >
+        </app-cell-state-grid>
+
+        <!-- Component to display the view with a single image if the boolean is true -->
+        <app-cell-state-single 
+            *ngIf="display_single" 
+            [imagesInfos]="imagesInfos" 
+            [currentImage]="currentImage"
+            (change_current_img)="currentImage=$event"
+        >            
+        </app-cell-state-single>
+    </article>
+</body>
