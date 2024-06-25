@@ -1,4 +1,4 @@
-import { SelectedAxis } from './selected-axis';
+import { SelectedAxis } from './selected-dimensions';
 
 describe('SelectedAxis', () => {
   it('should create an instance', () => {

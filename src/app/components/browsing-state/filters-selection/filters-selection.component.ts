@@ -4,6 +4,8 @@ import { SelectedDimensionsService } from '../../../services/selected-dimensions
 import { Tagset } from '../../../models/tagset';
 import { Tag } from '../../../models/tag';
 import { SelectedFiltersService } from '../../../services/selected-filters.service';
+import { Filter } from '../../../models/filter';
+import { UndoRedoService } from '../../../services/undo-redo.service';
 
 @Component({
   selector: 'app-filters-selection',
@@ -14,10 +16,13 @@ export class FiltersSelectionComponent {
   filterstosearch = '';
   tagsetlist: Tagset[] = [];
 
+  filtersList : Filter[]=[];
+
   constructor(
     private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
     protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
-    private selectedFiltersService:SelectedFiltersService                  // Service containing information on selected filters
+    private selectedFiltersService:SelectedFiltersService,                 // Service containing information on selected filters
+    private undoredoService : UndoRedoService,
   ) 
   {}
 
@@ -28,6 +33,10 @@ export class FiltersSelectionComponent {
     this.getTagsetListService.tagsetList$.subscribe(data => {
       this.tagsetlist = data;
     });
+
+    this.selectedFiltersService.filters$.subscribe(data =>{
+      this.filtersList = data;
+    })
   }
 
   /**
@@ -38,9 +47,9 @@ export class FiltersSelectionComponent {
    */
   onTagFilterSelected(tag: Tag) {
     if (tag.ischecked) {
-      this.selectedFiltersService.addFilter(tag.id,tag.type);
+      this.addFilter(tag.id,tag.type,tag);
     } else {
-      this.selectedFiltersService.removeFilter(tag.id,tag.type);
+      this.removeFilter(tag.id,tag.type);
     }
   }
 
@@ -54,12 +63,12 @@ export class FiltersSelectionComponent {
     tagset.isCheckedFilters = !tagset.isCheckedFilters;
 
     if (tagset.isCheckedFilters) {
-      this.selectedFiltersService.addFilter(tagset.id,tagset.type);
+      this.addFilter(tagset.id,tagset.type,tagset);
     } else {
-      this.selectedFiltersService.removeFilter(tagset.id,tagset.type);
+      this.removeFilter(tagset.id,tagset.type);
     }
 
-    console.log(this.selectedFiltersService.getFiltersList());
+    console.log(this.filtersList);
   }
 
   //Search the tag we want 
@@ -106,7 +115,7 @@ export class FiltersSelectionComponent {
    * Function to delete the selection of filters made.
    */ 
   clearFiltersSelection():void{
-    this.selectedFiltersService.clearSelection();
+    this.clearSelection();
   }
 
   /**
@@ -131,4 +140,60 @@ export class FiltersSelectionComponent {
     tagset.isExpanded = !tagset.isExpanded;
   }
 
+  /**
+   * Add a filter to the filters List
+   */
+  addFilter(id: number, type: 'tagset' | 'tag',element:Tag|Tagset): void {
+    const filter = new Filter(id, type,element);
+
+    const newfiltersList : Filter[]=[];
+    this.filtersList.forEach(filter=>{
+      newfiltersList.push(filter);
+    });
+    newfiltersList.push(filter);
+    
+    this.filtersList = newfiltersList;
+
+    this.undoredoService.addFilterAction(this.filtersList);     //Add the Action to the UndoRedoService
+    this.selectedFiltersService.filtersSubject.next(this.filtersList);
+  }
+
+  /**
+   * Remove a filter from the filters List
+   */
+  removeFilter(id: number, type: 'tagset' | 'tag'): void {
+    let element: Filter | null = null;
+
+    const currentFilters = this.filtersList;
+    currentFilters.forEach(elt => {
+      if (elt.type === type && elt.id === id) {
+        element = elt;
+      }
+    });
+
+    if (element !== null) {
+      const updatedFilters = currentFilters.filter(f => f !== element);
+      this.filtersList = updatedFilters;
+      this.undoredoService.addFilterAction(updatedFilters);     //Add the Action to the UndoRedoService
+      this.selectedFiltersService.filtersSubject.next(updatedFilters);
+    }
+  }
+
+  /**
+   * Clear the filters List
+   */
+  clearSelection(): void {
+    console.log("\n ListFilters : ", this.filtersList);
+    this.filtersList.forEach(elt => {
+      if(elt.element.type==="tag"){
+        elt.element.ischecked = false;
+      }
+      else{
+        elt.element.isCheckedFilters = false;
+      }
+    });
+    this.filtersList = [];
+    this.undoredoService.addFilterAction([]);     //Add the Action to the UndoRedoService
+    this.selectedFiltersService.filtersSubject.next([]);
+  }
 }
