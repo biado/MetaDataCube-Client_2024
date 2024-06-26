@@ -12,6 +12,7 @@ import { Tag } from '../../../models/tag';
 import { UndoRedoService } from '../../../services/undo-redo.service';
 import { SelectedCellState } from '../../../models/selected-cell-state';
 import { SelectedCellStateService } from '../../../services/selected-cell-state.service';
+import { FindElement } from '../../../services/find-element.service';
 
 @Component({
   selector: 'app-cells-display',
@@ -55,6 +56,7 @@ export class CellsDisplayComponent {
     private getCellsService : GetCellsService,
     private getTagsetListService : GetTagsetListService,
     private undoredoService : UndoRedoService,
+    private findElementService : FindElement,
   ){}
 
 
@@ -89,9 +91,7 @@ export class CellsDisplayComponent {
     ]).subscribe(([x, y,contentUrl]) => {
       this.getImagesURL(x,y);
     });
-
   }
-
 
   /**
    * Each time a dimension changes or the content is updated, this function is called.
@@ -190,7 +190,7 @@ export class CellsDisplayComponent {
             if(newElement?.children && newElement.children.length>0){
               actualX.isCheckedX = false;
               newElement.isCheckedX = true;
-              this.expandNodeParents(newElement.parentID);
+              this.findElementService.expandNodeParents(newElement.parentID);
               const newSelectedDimensions : SelectedDimensions = new SelectedDimensions(name,newElement.id,newElement.type,newElement,this.selectedDimensions.yname,this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
               newSelectedDimensions.ischeckedX = newElement.isCheckedX;
               newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
@@ -212,7 +212,7 @@ export class CellsDisplayComponent {
               actualY.isCheckedY = false;
               actualY.isExpanded = false;
               newElement.isCheckedY = true;
-              this.expandNodeParents(newElement.parentID);
+              this.findElementService.expandNodeParents(newElement.parentID);
               const newSelectedDimensions : SelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype,this.selectedDimensions.elementX,name,newElement.id,newElement.type,newElement);
               newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
               newSelectedDimensions.ischeckedY = newElement.isCheckedY;
@@ -241,19 +241,6 @@ export class CellsDisplayComponent {
       }
     }
     return null;
-  }
-
-  /**
-   * Function that extends all the parents of a node.
-   */
-  expandNodeParents(parentid: number|null): void {
-    if(!(parentid===null)){
-      const parent = this.findElementinTagsetList(parentid,'node');
-      if(parent && parent.type==='node'){
-        parent.isExpanded = true;
-        this.expandNodeParents(parent.parentID);
-      }
-    }
   }
 
   /**
@@ -307,13 +294,13 @@ export class CellsDisplayComponent {
 
         if ((xname && newElementX ) || (yname && newElementY)) {
             if (newElementX && newElementX.type==='node' && xname) {  
-              this.expandNodeParents(newElementX.parentID);
+              this.findElementService.expandNodeParents(newElementX.parentID);
               selectedCellState.xid = (newElementX.children && newElementX.children.length >0) ? newElementX.id : newElementX.tagId;
               selectedCellState.xtype = (newElementX.children && newElementX.children.length >0) ? 'node' : 'tag';
             }
 
             if (newElementY && newElementY.type==='node' && yname) {
-              this.expandNodeParents(newElementY.parentID);
+              this.findElementService.expandNodeParents(newElementY.parentID);
               selectedCellState.yid = (newElementY.children && newElementY.children.length >0) ? newElementY.id : newElementY.tagId;
               selectedCellState.ytype = (newElementY.children && newElementY.children.length >0) ? 'node' : 'tag';
             }
@@ -334,56 +321,5 @@ export class CellsDisplayComponent {
         }
     }
   }
-
-  /**
-   * Retrieves a node or tagset using the type and id of the element. This will retrieve the exact object from the tagsetList.
-   * 
-   * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.
-   */
-  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
-    let element: Tagset | Node | null = null;
-    
-    for (const tagset of this.tagsetList) {
-        if (elementType === 'tagset') {
-            if (tagset.id ===  elementid) {
-                element = tagset;
-                break;
-            }
-        } 
-        else if (elementType === 'node') {
-            for (const hierarchy of tagset.hierarchies) {
-                if (hierarchy.firstNode.id === elementid) {
-                    element = hierarchy.firstNode;
-                    break;
-                } else {
-                    const foundNode = findNodeById(hierarchy.firstNode, elementid);
-                    if (foundNode) {
-                        element = foundNode;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    return element;
-    
-
-    function findNodeById(node: Node, id: number): Node | null {
-      if (node.id === id) {
-          return node;
-      }  
-      if (node.children) {
-          for (const childNode of node.children) {
-              const foundNode = findNodeById(childNode, id);
-              if (foundNode) {
-                  return foundNode;
-              }
-          }
-      }  
-      return null;
-    }
-  }
-
 }
 

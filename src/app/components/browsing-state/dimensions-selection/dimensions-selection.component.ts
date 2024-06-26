@@ -39,7 +39,11 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
       this.selectedDimensions = data;
     });
+  }
 
+
+  co(){
+    console.log("SelectionDime TagsetList : ", this.tagsetlist)
   }
 
 
