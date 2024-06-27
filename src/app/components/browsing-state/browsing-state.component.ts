@@ -1,9 +1,8 @@
-import { Component, Inject, OnInit, PLATFORM_ID, HostListener } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { GetTagsetListService } from '../../services/get-tagset-list.service';
-import { SelectedAxis } from '../../models/selected-axis';
-import { SelectedDimensionsService } from '../../services/selected-dimensions.service';
 import { Router } from '@angular/router';
+import { UndoRedoService } from '../../services/undo-redo.service';
 
 @Component({
   selector: 'app-browsing-state',
@@ -21,23 +20,18 @@ export class BrowsingStateComponent {
   /** If true, we use the small screen version of the article tag. Otherwise we use the first version, which is the large screen version */
   smallscreen: boolean = false;             
 
-  selectedAxis : SelectedAxis = new SelectedAxis();
 
   constructor(
       private router: Router,
       @Inject(PLATFORM_ID) private platformId: Object,
       private getTagsetListService: GetTagsetListService,
-      private selectedDimensionsService : SelectedDimensionsService,
+      private undoredoService : UndoRedoService,
     ) {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.smallscreen = window.innerWidth < 1101;
     }
-
-    this.selectedDimensionsService.selectedAxis$.subscribe(data => {
-      this.selectedAxis = data;
-    });
   }
 
   /**
@@ -62,7 +56,12 @@ export class BrowsingStateComponent {
     console.log("End of refresh");
   }
 
-  co(){
+  undo(){
+    this.undoredoService.undo();
+  }
+
+  redo(){
+    this.undoredoService.redo();
   }
 
   /** 

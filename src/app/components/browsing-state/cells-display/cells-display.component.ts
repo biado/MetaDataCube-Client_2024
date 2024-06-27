@@ -3,13 +3,15 @@ import { Filter } from '../../../models/filter';
 import { SelectedFiltersService } from '../../../services/selected-filters.service';
 import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
 import { GetCellsService } from '../../../services/get-cells.service';
-import { SelectedAxis } from '../../../models/selected-axis';
+import { SelectedDimensions } from '../../../models/selected-dimensions';
 import { combineLatest} from 'rxjs';
 import { Tagset } from '../../../models/tagset';
 import { Node } from '../../../models/node';
 import { GetTagsetListService } from '../../../services/get-tagset-list.service';
 import { Tag } from '../../../models/tag';
-import { GetCellStateService } from '../../../services/get-cell-state.service';
+import { UndoRedoService } from '../../../services/undo-redo.service';
+import { SelectedCellState } from '../../../models/selected-cell-state';
+import { SelectedCellStateService } from '../../../services/selected-cell-state.service';
 
 @Component({
   selector: 'app-cells-display',
@@ -22,7 +24,7 @@ export class CellsDisplayComponent {
 
   tagsetList:Tagset[] = [];
 
-  selectedAxis : SelectedAxis = new SelectedAxis();
+  selectedDimensions : SelectedDimensions = new SelectedDimensions();
 
   AxisX: string[] = [];
   AxisY: string[] = [];
@@ -49,9 +51,10 @@ export class CellsDisplayComponent {
   constructor(
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
+    private selectedCellStateService : SelectedCellStateService,
     private getCellsService : GetCellsService,
     private getTagsetListService : GetTagsetListService,
-    private getCellStateService : GetCellStateService,
+    private undoredoService : UndoRedoService,
   ){}
 
 
@@ -62,8 +65,8 @@ export class CellsDisplayComponent {
     this.getTagsetListService.tagsetList$.subscribe(data => {
       this.tagsetList = data;
     });
-    this.selectedDimensionsService.selectedAxis$.subscribe(data => {
-      this.selectedAxis = data;
+    this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
+      this.selectedDimensions = data;
     });
     this.getCellsService.AxisX$.subscribe(async data => {
       this.AxisX = data;
@@ -179,20 +182,20 @@ export class CellsDisplayComponent {
     let newElement : Node|Tagset|null;
     
     if(axis==='X'){
-      if(this.selectedAxis.xtype==='node'){
-        if(this.selectedAxis.xid && this.selectedAxis.xtype){
-          const actualX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
+      if(this.selectedDimensions.xtype==='node'){
+        if(this.selectedDimensions.xid && this.selectedDimensions.xtype){
+          const actualX = this.selectedDimensions.elementX;
           if(actualX?.type==='node'){
-            //console.log(actualX);
             newElement = this.getNewNode(actualX,name);
             if(newElement?.children && newElement.children.length>0){
               actualX.isCheckedX = false;
               newElement.isCheckedX = true;
               this.expandNodeParents(newElement.parentID);
-              this.selectedAxis.xid = newElement.id;
-              this.selectedAxis.xtype = newElement.type;
-              this.selectedDimensionsService.xname = name;
-              this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
+              const newSelectedDimensions : SelectedDimensions = new SelectedDimensions(name,newElement.id,newElement.type,newElement,this.selectedDimensions.yname,this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
+              newSelectedDimensions.ischeckedX = newElement.isCheckedX;
+              newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
+              this.undoredoService.addDimensionsAction(newSelectedDimensions);      //Add the Action to the UndoRedoService
+              this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);  
             }          
           }
         }    
@@ -200,21 +203,21 @@ export class CellsDisplayComponent {
     }
     
     else if (axis==='Y'){
-      if(this.selectedAxis.ytype==='node'){
-        if(this.selectedAxis.yid && this.selectedAxis.ytype){
-          const actualY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
+      if(this.selectedDimensions.ytype==='node'){
+        if(this.selectedDimensions.yid && this.selectedDimensions.ytype){
+          const actualY = this.selectedDimensions.elementY;
           if(actualY?.type==='node'){
-            //console.log(actualY);
             newElement = this.getNewNode(actualY,name);
             if(newElement?.children && newElement.children.length>0){
               actualY.isCheckedY = false;
               actualY.isExpanded = false;
               newElement.isCheckedY = true;
               this.expandNodeParents(newElement.parentID);
-              this.selectedAxis.yid = newElement.id;
-              this.selectedAxis.ytype = newElement.type;
-              this.selectedDimensionsService.yname = name;
-              this.selectedDimensionsService.selectedAxis.next(this.selectedAxis);
+              const newSelectedDimensions : SelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype,this.selectedDimensions.elementX,name,newElement.id,newElement.type,newElement);
+              newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
+              newSelectedDimensions.ischeckedY = newElement.isCheckedY;
+              this.undoredoService.addDimensionsAction(newSelectedDimensions);      //Add the Action to the UndoRedoService
+              this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
             }          
           }
         }    
@@ -277,15 +280,15 @@ export class CellsDisplayComponent {
    */
   viewAllImage(xname?: string, yname?: string): void {
     let actualX, actualY, newElementX, newElementY;
-    let selectedCellAxis = new SelectedAxis();
+    let selectedCellState = new SelectedCellState();
 
-    if ((this.selectedAxis.xtype === 'node' || !xname || this.selectedAxis.xtype === 'tagset') && 
-        (this.selectedAxis.ytype === 'node' || !yname || this.selectedAxis.ytype === 'tagset') && 
-        (this.selectedAxis.xid || !xname) && 
-        (this.selectedAxis.yid || !yname)) {
+    if ((this.selectedDimensions.xtype === 'node' || !xname || this.selectedDimensions.xtype === 'tagset') && 
+        (this.selectedDimensions.ytype === 'node' || !yname || this.selectedDimensions.ytype === 'tagset') && 
+        (this.selectedDimensions.xid || !xname) && 
+        (this.selectedDimensions.yid || !yname)) {
 
-        if (xname && this.selectedAxis.xid && (this.selectedAxis.xtype === 'node' || this.selectedAxis.xtype==='tagset')) {
-            actualX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
+        if (xname && this.selectedDimensions.xid && (this.selectedDimensions.xtype === 'node' || this.selectedDimensions.xtype==='tagset')) {
+            actualX = this.selectedDimensions.elementX;
             if (actualX?.type === 'node') {
                 newElementX = this.getNewNode(actualX, xname);
             } else if (actualX?.type === 'tagset') {
@@ -293,8 +296,8 @@ export class CellsDisplayComponent {
             }
         }
 
-        if (yname && this.selectedAxis.yid && (this.selectedAxis.ytype === 'node' || this.selectedAxis.ytype==='tagset')) {
-            actualY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
+        if (yname && this.selectedDimensions.yid && (this.selectedDimensions.ytype === 'node' || this.selectedDimensions.ytype==='tagset')) {
+            actualY = this.selectedDimensions.elementY;
             if (actualY?.type === 'node') {
                 newElementY = this.getNewNode(actualY, yname);
             } else if (actualY?.type === 'tagset') {
@@ -305,28 +308,28 @@ export class CellsDisplayComponent {
         if ((xname && newElementX ) || (yname && newElementY)) {
             if (newElementX && newElementX.type==='node' && xname) {  
               this.expandNodeParents(newElementX.parentID);
-              selectedCellAxis.xid = (newElementX.children && newElementX.children.length >0) ? newElementX.id : newElementX.tagId;
-              selectedCellAxis.xtype = (newElementX.children && newElementX.children.length >0) ? 'node' : 'tag';
+              selectedCellState.xid = (newElementX.children && newElementX.children.length >0) ? newElementX.id : newElementX.tagId;
+              selectedCellState.xtype = (newElementX.children && newElementX.children.length >0) ? 'node' : 'tag';
             }
 
             if (newElementY && newElementY.type==='node' && yname) {
               this.expandNodeParents(newElementY.parentID);
-              selectedCellAxis.yid = (newElementY.children && newElementY.children.length >0) ? newElementY.id : newElementY.tagId;
-              selectedCellAxis.ytype = (newElementY.children && newElementY.children.length >0) ? 'node' : 'tag';
+              selectedCellState.yid = (newElementY.children && newElementY.children.length >0) ? newElementY.id : newElementY.tagId;
+              selectedCellState.ytype = (newElementY.children && newElementY.children.length >0) ? 'node' : 'tag';
             }
 
             if (newElementX && newElementX.type==='tag' && xname) {
-              selectedCellAxis.xid = newElementX.id;
-              selectedCellAxis.xtype = newElementX.type;
+              selectedCellState.xid = newElementX.id;
+              selectedCellState.xtype = newElementX.type;
             }
 
             if (newElementY && newElementY.type==='tag'  && yname) {
-              selectedCellAxis.yid = newElementY.id;
-              selectedCellAxis.ytype = newElementY.type;
+              selectedCellState.yid = newElementY.id;
+              selectedCellState.ytype = newElementY.type;
             }
             
-            this.getCellStateService.selectedCellAxis.next(new SelectedAxis());
-            this.getCellStateService.selectedCellAxis.next(selectedCellAxis);
+            this.selectedCellStateService.selectedCellState.next(new SelectedCellState());
+            this.selectedCellStateService.selectedCellState.next(selectedCellState);
             this.go_to_cellState_Page.emit();
         }
     }

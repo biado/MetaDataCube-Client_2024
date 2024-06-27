@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
-import { SelectedDimensionsService } from './selected-dimensions.service';
 import { SelectedFiltersService } from './selected-filters.service';
 import { Filter } from '../models/filter';
-import { Tagset } from '../models/tagset';
 import { BehaviorSubject, catchError, combineLatest, forkJoin, map } from 'rxjs';
 import { Cell } from '../models/cell';
 import { HttpClient } from '@angular/common/http';
-import { SelectedAxis } from '../models/selected-axis';
-import { response } from 'express';
+import { SelectedDimensions } from '../models/selected-dimensions';
+import { GetUrlToSelectedDimensionsOrCellStateService } from './get-url-to-selected-dimensions-or-cell-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +14,7 @@ import { response } from 'express';
 export class GetCellsService {
   filters : Filter[] = [];
   
-  selectedAxis : SelectedAxis = new SelectedAxis();
+  selectedDimensions : SelectedDimensions = new SelectedDimensions();
 
   private AxisX = new BehaviorSubject<string[]>([]);      
   /** Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort*/
@@ -44,7 +42,7 @@ export class GetCellsService {
   
   constructor(
     private selectedFiltersService : SelectedFiltersService,
-    private selectedDimensionsService : SelectedDimensionsService,
+    private getUrlToSelectedDimensionsOrCellStateService : GetUrlToSelectedDimensionsOrCellStateService,
     private http: HttpClient,
   ) { 
     
@@ -52,16 +50,20 @@ export class GetCellsService {
       this.filters = data;
     });
 
-    this.selectedDimensionsService.selectedAxis$.subscribe(data => {
-      this.selectedAxis = data;
+    /**
+     * We retrieve the selectedDimensions from getUrlSelectedDimensionsService and not from selectedDimensionsService, 
+     * as the getUrl contains the url we need for the api/cell request (see the getUrl service to understand why we can't use selectedDimensions Service).
+     */
+    this.getUrlToSelectedDimensionsOrCellStateService.selectedDimensionsWithUrl$.subscribe(data => {
+      this.selectedDimensions = data;
     });
     
-    // If selectedAxis or filters get modification, it will launch getCells
+    // If selectedDimensions or filters get modification, it will launch getCells
     combineLatest([
-      this.selectedDimensionsService.selectedAxis$,
+      this.getUrlToSelectedDimensionsOrCellStateService.selectedDimensionsWithUrl$,
       this.selectedFiltersService.filters$
-    ]).subscribe(async ([selectedAxis, filters]) => {
-      this.getCells(filters,selectedAxis.xid, selectedAxis.xtype, selectedAxis.yid, selectedAxis.ytype);
+    ]).subscribe(async ([selectedDimensions, filters]) => {
+      this.getCells(filters,selectedDimensions.url,selectedDimensions.xid, selectedDimensions.xtype, selectedDimensions.yid, selectedDimensions.ytype);
     });
   }
 
@@ -78,11 +80,9 @@ export class GetCellsService {
    * The various unused constants are there to make sure that typescript will wait for the end of the function to which the constant is associated 
    * before moving on (because await alone isn't enough in some cases).
    */
-  private getCells(filters:Filter[],xid?: number, xtype?: 'node'|'tagset' |'tag', yid?: number, ytype?: 'node'|'tagset'|'tag'): void {
-    const cellUrl = this.createCellUrl(filters,xid, xtype, yid, ytype);
-
+  private getCells(filters:Filter[],url: string,xid?: number, xtype?: 'node'|'tagset' |'tag', yid?: number, ytype?: 'node'|'tagset'|'tag'): void {
     if(!(xtype==='tag' || ytype==='tag')){
-      const rawListCell = this.http.get(`${cellUrl}`).subscribe(
+      const rawListCell = this.http.get(`${url}`).subscribe(
         async (response: any) => {
           this.cells.next([]);
           this.AxisX.next([]);
@@ -166,7 +166,6 @@ export class GetCellsService {
         
           if (xtype === 'node') { 
             const SortName = this.sql_OrderBy_Sort(NamesX)
-            console.log("SX : ",SortName)
             this.CoordToNameX = SortName;
             this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
               const name = SortName[x - 1];
@@ -175,13 +174,11 @@ export class GetCellsService {
               }
             });    
             SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
-            console.log("SX2 : ",SortUniqueNames)
           } 
 
           else if (xtype === 'tagset') { 
             const SortName = NamesX.sort((a, b) => a.toString().localeCompare(b.toString()));
             this.CoordToNameX = SortName;
-            console.log("SX : ",SortName)
       
             const uniqueNames = new Set<string>();
             this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
@@ -317,35 +314,6 @@ export class GetCellsService {
     this.contentUrl.next(resUrl);
     this.contentCount.next(resCount);
   }
-
-  /**
-   * Function to create api/cell url corresponding to selected dimensions and filters.
-   */ 
-  private createCellUrl( filters:Filter[],xid?: number, xtype?: 'node'|'tagset'|'tag', yid?: number, ytype?: 'node'|'tagset'|'tag') : string{
-    let url:string = `api/cell/?`;
-    
-    if(xid && xtype){
-      url = url + `xAxis={\"type\":\"${xtype}\",\"id\":${xid}}&`;
-    }
-    
-    if( yid && ytype){
-      url = url + `yAxis={\"type\":\"${ytype}\",\"id\":${yid}}&`;
-    }
-
-    if(filters && filters.length>0){
-      url = url + `filters=[`
-      for(const filt of filters){
-        url = url + `{"type":"${filt.type}","ids":[${filt.id}]},`
-      }
-      url = url.substring(0, url.length-1);
-      url = url + `]&`
-    }
-
-    url = url.substring(0, url.length-1);
-
-    console.log("URL2: ",url);
-    return url;
-  }
   
   /**
    * Function to add a cell to the cell list depending on what we have received from the url api/cell/... (elt is one of the objects received from this url)
@@ -353,10 +321,10 @@ export class GetCellsService {
   addCellToList(elt : any): void {
     let xCo : undefined;
     let yCo : undefined;
-    if(this.selectedAxis.xid && this.selectedAxis.xtype){
+    if(this.selectedDimensions.xid && this.selectedDimensions.xtype){
       xCo = elt.x;
     }    
-    if(this.selectedAxis.yid && this.selectedAxis.ytype){
+    if(this.selectedDimensions.yid && this.selectedDimensions.ytype){
       yCo = elt.y;
     }
     const cell = new Cell(elt.count, elt.cubeObjects[0].fileURI,xCo,yCo);
@@ -494,8 +462,6 @@ export class GetCellsService {
 
     //Step 2  : Sort With Symbols and UpperCase
     const newList = sortSameGroupsWithUpperAndSymbols(listSortWithoutSymbolandUpper, originalList);
-
-    console.log("Custom3 : ", newList ,"\n \n ")
 
     return list;
   }

@@ -4,7 +4,8 @@ import { Tagset } from '../../../models/tagset';
 import { Node } from '../../../models/node';
 import { Hierarchy } from '../../../models/hierarchy';
 import { SelectedDimensionsService } from '../../../services/selected-dimensions.service';
-import { SelectedAxis } from '../../../models/selected-axis';
+import { SelectedDimensions } from '../../../models/selected-dimensions';
+import { UndoRedoService } from '../../../services/undo-redo.service';
 
 @Component({
   selector: 'app-dimensions-selection',
@@ -16,26 +17,27 @@ export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
 
-  selectedAxis : SelectedAxis = new SelectedAxis();
+  selectedDimensions : SelectedDimensions = new SelectedDimensions();
 
   constructor(
-    private getTagsetListService: GetTagsetListService,                   // Service that will obtain the list of tagset
-    protected selectedDimensionsService:SelectedDimensionsService,        // Service containing information on selected dimensions
+    private getTagsetListService: GetTagsetListService,                   
+    protected selectedDimensionsService:SelectedDimensionsService,        
+    private undoredoService : UndoRedoService,
   ) 
   {}
 
   /**
    * When the component is started, we get a list of all the tagset.
    * 
-   * Also we get the selected dimensions with selectedAxis
+   * Also we get the selected dimensions with selectedDimensions
    */
   async ngOnInit(): Promise<void> {
     this.getTagsetListService.tagsetList$.subscribe(data => {
       this.tagsetlist = data;
     });
 
-    this.selectedDimensionsService.selectedAxis$.subscribe(data => {
-      this.selectedAxis = data;
+    this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
+      this.selectedDimensions = data;
     });
 
   }
@@ -204,34 +206,39 @@ export class DimensionsSelectionComponent {
    * If an element was already checked, we'll uncheck it and then update the values. 
    */
   toggleCheckboxX(elt:Node|Tagset): void {
-    if(this.selectedDimensionsService.ischeckedX && !elt.isCheckedX){ 
-      if((this.selectedAxis.xid) && (this.selectedAxis.xtype)){
-        const actualElementX = this.findElementinTagsetList(this.selectedAxis.xid, this.selectedAxis.xtype);
-        if(!(actualElementX===null)){
+    let newSelectedDimensions: SelectedDimensions = new SelectedDimensions();
+
+    if(this.selectedDimensionsService.selectedDimensions.value.ischeckedX && !elt.isCheckedX){ 
+      if((this.selectedDimensions.xid) && (this.selectedDimensions.xtype)){
+        const actualElementX = this.selectedDimensions.elementX;
+        if(!(actualElementX===null) && (actualElementX?.type==="node"||actualElementX?.type==="tagset")){
           actualElementX.isCheckedX = false;
         }
       }
       elt.isCheckedX = !elt.isCheckedX ;
-      const newSelectedAxis = new SelectedAxis(elt.id,elt.type, this.selectedAxis.yid,this.selectedAxis.ytype);
-      this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-      this.selectedDimensionsService.xname = elt.name;
+      newSelectedDimensions = new SelectedDimensions(elt.name,elt.id,elt.type,elt,this.selectedDimensions.yname, this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
+      newSelectedDimensions.ischeckedX = this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
+      newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
     }
     else{
       elt.isCheckedX = !elt.isCheckedX ;
-      this.selectedDimensionsService.ischeckedX = !this.selectedDimensionsService.ischeckedX;
+      this.selectedDimensionsService.selectedDimensions.value.ischeckedX = !this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
 
-      if((!elt.isCheckedX)&&(!this.selectedDimensionsService.ischeckedX)){
-        const newSelectedAxis = new SelectedAxis(undefined,undefined, this.selectedAxis.yid,this.selectedAxis.ytype);
-        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-        this.selectedDimensionsService.xname = null;
+      if((!elt.isCheckedX)&&(!this.selectedDimensionsService.selectedDimensions.value.ischeckedX)){
+        newSelectedDimensions = new SelectedDimensions(undefined,undefined,undefined,undefined, this.selectedDimensions.yname,this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
+        newSelectedDimensions.ischeckedX = this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
+        newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
       }
 
-      if((elt.isCheckedX)&&(this.selectedDimensionsService.ischeckedX)){
-        const newSelectedAxis = new SelectedAxis(elt.id,elt.type, this.selectedAxis.yid,this.selectedAxis.ytype);
-        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-        this.selectedDimensionsService.xname = elt.name;
+      if((elt.isCheckedX)&&(this.selectedDimensionsService.selectedDimensions.value.ischeckedX)){
+        newSelectedDimensions = new SelectedDimensions(elt.name,elt.id,elt.type,elt,this.selectedDimensions.yname, this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
+        newSelectedDimensions.ischeckedX = this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
+        newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
       }
     }
+
+    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
+    this.undoredoService.addDimensionsAction(newSelectedDimensions);    //Add the Action to the UndoRedoService
   }
 
   /**
@@ -241,35 +248,40 @@ export class DimensionsSelectionComponent {
    * If an element was already checked, we'll uncheck it and then update the values.
    */
   toggleCheckboxY(elt:Node|Tagset): void {
-    if(this.selectedDimensionsService.ischeckedY && !elt.isCheckedY){ 
-      if(this.selectedAxis.yid && this.selectedAxis.ytype ){
-        const actualElementY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
-        if(!(actualElementY===null)){
+    let newSelectedDimensions:SelectedDimensions = new SelectedDimensions();
+
+    if(this.selectedDimensionsService.selectedDimensions.value.ischeckedY && !elt.isCheckedY){ 
+      if(this.selectedDimensions.yid && this.selectedDimensions.ytype ){
+        const actualElementY = this.selectedDimensions.elementY;
+        if(!(actualElementY===null) && (actualElementY?.type==="node"||actualElementY?.type==="tagset")){
           actualElementY.isCheckedY = false;
         }
       }
       elt.isCheckedY = !elt.isCheckedY ;
-      const newSelectedAxis = new SelectedAxis(this.selectedAxis.xid,this.selectedAxis.xtype, elt.id,elt.type);
-      this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-      this.selectedDimensionsService.yname = elt.name;
+      newSelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype,this.selectedDimensions.elementX,elt.name,elt.id,elt.type,elt);
+      newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
+      newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
     }
 
     else{
       elt.isCheckedY = !elt.isCheckedY ;
-      this.selectedDimensionsService.ischeckedY = !this.selectedDimensionsService.ischeckedY;
+      this.selectedDimensionsService.selectedDimensions.value.ischeckedY = !this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
 
-      if((!elt.isCheckedY)&&(!this.selectedDimensionsService.ischeckedY)){
-        const newSelectedAxis = new SelectedAxis(this.selectedAxis.xid,this.selectedAxis.xtype, undefined,undefined);
-        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-        this.selectedDimensionsService.yname = null;
+      if((!elt.isCheckedY)&&(!this.selectedDimensionsService.selectedDimensions.value.ischeckedY)){
+        newSelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype, this.selectedDimensions.elementX, undefined,undefined, undefined, undefined);
+        newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
+        newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
       }
 
-      if((elt.isCheckedY)&&(this.selectedDimensionsService.ischeckedY)){
-        const newSelectedAxis = new SelectedAxis(this.selectedAxis.xid,this.selectedAxis.xtype, elt.id,elt.type);
-        this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-        this.selectedDimensionsService.yname = elt.name;
+      if((elt.isCheckedY)&&(this.selectedDimensionsService.selectedDimensions.value.ischeckedY)){
+        newSelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype,this.selectedDimensions.elementX,elt.name,elt.id,elt.type,elt);
+        newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
+        newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
       }
     }    
+
+    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
+    this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
   }
 
   /**
@@ -278,18 +290,17 @@ export class DimensionsSelectionComponent {
    * We uncheck and reduce as much as possible.
    */ 
   clearDimensionsSelection(){
-    console.log( "\n",this.selectedDimensionsService.xname, "\n",this.selectedAxis.xid, "\n", this.selectedAxis.xtype, "\n", this.selectedAxis.yid, "\n", this.selectedAxis.ytype, "\n")
-    
-    if(this.selectedAxis.xid && this.selectedAxis.xtype){
-      const elementX = this.findElementinTagsetList(this.selectedAxis.xid , this.selectedAxis.xtype);
-      if(!(elementX===null)){
+
+    if(this.selectedDimensions.xid && this.selectedDimensions.xtype){
+      const elementX = this.selectedDimensions.elementX;
+      if(!(elementX===null) && (elementX?.type==="node"||elementX?.type==="tagset")){
         elementX.isCheckedX = false;
       }
     }
 
-    if(this.selectedAxis.yid && this.selectedAxis.ytype){
-      const elementY = this.findElementinTagsetList(this.selectedAxis.yid, this.selectedAxis.ytype);
-      if(!(elementY===null)){
+    if(this.selectedDimensions.yid && this.selectedDimensions.ytype){
+      const elementY = this.selectedDimensions.elementY;
+      if(!(elementY===null) && (elementY?.type==="node"||elementY?.type==="tagset")){
         elementY.isCheckedY = false;
       }
     }
@@ -311,64 +322,11 @@ export class DimensionsSelectionComponent {
       });
     });
    
-    const newSelectedAxis = new SelectedAxis(undefined,undefined,undefined,undefined);
-    this.selectedDimensionsService.selectedAxis.next(newSelectedAxis);
-
-    this.selectedDimensionsService.xname = null;
-    this.selectedDimensionsService.ischeckedX = false;
-    this.selectedDimensionsService.yname = null;
-    this.selectedDimensionsService.ischeckedY = false;
-  }
-
-  /**
-   * Retrieves a node or tagset using the type and id of the element. This will retrieve the exact object from the tagsetList.
-   * 
-   * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.
-   */
-  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'|'tag'): Tagset | Node | null {
-    let element: Tagset | Node | null = null;
-
-    function findNodeById(node: Node, id: number): Node | null {
-      if (node.id === id) {
-          return node;
-      }  
-      if (node.children) {
-          for (const childNode of node.children) {
-              const foundNode = findNodeById(childNode, id);
-              if (foundNode) {
-                  return foundNode;
-              }
-          }
-      }
-  
-      return null;
-    }
-    
-    for (const tagset of this.tagsetlist) {
-        if (elementType === 'tagset') {
-            if (tagset.id ===  elementid) {
-                element = tagset;
-                break;
-            }
-        } 
-        else if (elementType === 'node') {
-            for (const hierarchy of tagset.hierarchies) {
-                if (hierarchy.firstNode.id === elementid) {
-                    element = hierarchy.firstNode;
-                    break;
-                } else {
-                    const foundNode = findNodeById(hierarchy.firstNode, elementid);
-                    if (foundNode) {
-                        element = foundNode;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    return element;
-
+    const newSelectedDimensions = new SelectedDimensions();
+    newSelectedDimensions.ischeckedX = false;
+    newSelectedDimensions.ischeckedY = false;
+    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
+    this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
   }
   
 }
