@@ -16,7 +16,7 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
   selectedDimensions : SelectedDimensions = new SelectedDimensions();
   selectedCellState : SelectedCellState = new SelectedCellState();
 
-  private selectedDimensionsWithUrl = new BehaviorSubject<SelectedDimensions>(new SelectedDimensions());     
+  selectedDimensionsWithUrl = new BehaviorSubject<SelectedDimensions>(new SelectedDimensions());     
   /** SelectedDimensions with url corresponding to the selected Dimensions and Filters
    * 
    * (we can't modify the selectedDimensionsService selectedDimensions directly,otherwise we'd get a loop, as this service calls a function each time the selectedDimensionsService selectedDimensions changes)
@@ -24,7 +24,7 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
   selectedDimensionsWithUrl$ = this.selectedDimensionsWithUrl.asObservable();
 
 
-  private selectedCellStatesWithUrl = new BehaviorSubject<SelectedCellState>(new SelectedCellState());     
+  selectedCellStatesWithUrl = new BehaviorSubject<SelectedCellState>(new SelectedCellState());     
   /** SelectedCellState with url corresponding to the cell from whih we want to see all the photos
    * 
    * (we can't modify the selectedCellStateService selectedCellState directly,otherwise we'd get a loop, as this service calls a function each time the selectedCellStateService selectedCellState changes)
@@ -63,7 +63,7 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
       this.selectedCellStateService.selectedCellState$,
       this.selectedFiltersService.filters$
     ]).subscribe(async ([selectedCellState, filters]) => {
-      this.addUrlCorrespondToSelectedCellState(selectedCellState,filters);
+      this.addUrlCorrespondToSelectedCellState(this.selectedCellState,this.filters);
     });
    }
 
@@ -77,7 +77,7 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
    */ 
   private addUrlCorrespondToSelectedDimensions(selectedDimensions : SelectedDimensions,filters:Filter[]){
     selectedDimensions.url = this.createCellUrl(filters,selectedDimensions.xid, selectedDimensions.xtype, selectedDimensions.yid, selectedDimensions.ytype);       
-
+    console.log(selectedDimensions)
     this.selectedDimensionsWithUrl.next(selectedDimensions);
   }
 
@@ -122,7 +122,7 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
 
     url = url.substring(0, url.length-1);
 
-    console.log("URL: ",url);
+    console.log("URL2: ",url);
     return url;
   }
 

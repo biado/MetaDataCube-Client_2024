@@ -39,10 +39,7 @@ export class DimensionsSelectionComponent {
     this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
       this.selectedDimensions = data;
     });
-
   }
-
-
 
   /**
    * Function that, depending on what you type in the taskbar, displays tags / hierarchies / nodes starting with what you've typed. 

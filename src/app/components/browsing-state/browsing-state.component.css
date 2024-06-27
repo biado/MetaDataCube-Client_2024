@@ -31,11 +31,11 @@ header {
     font-family: 'Shrikhand', serif;
     font-size: 1.7em;
     color: var(--main-color);
-    background: var(--button-color);;
+    background: var(--button-color);
     border: none;
     border-radius: 50px;
     height: min-content;
-    width: min-content; 
+    width: auto; 
     margin: auto 1em auto 1em;
     cursor: pointer;
 }
