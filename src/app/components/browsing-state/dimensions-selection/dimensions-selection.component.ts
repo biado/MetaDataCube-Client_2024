@@ -41,13 +41,6 @@ export class DimensionsSelectionComponent {
     });
   }
 
-
-  co(){
-    console.log("SelectionDime TagsetList : ", this.tagsetlist)
-  }
-
-
-
   /**
    * Function that, depending on what you type in the taskbar, displays tags / hierarchies / nodes starting with what you've typed. 
    * It will then display only the corresponding elements and all its ancestors.

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Tagset } from '../models/tagset';
 import { Node } from '../models/node';
 import { GetTagsetListService } from './get-tagset-list.service';
+import { Tag } from '../models/tag';
 
 @Injectable({
   providedIn: 'root'
@@ -77,6 +78,44 @@ export class FindElement {
       if(parent && parent.type==='node'){
         parent.isExpanded = true;
         this.expandNodeParents(parent.parentID);
+      }
+    }
+  }
+
+  /**
+   * Function to find a filter (a tag) in the tagsetList.
+   */
+  findFilterinTagsetList(elementid: number, elementType: 'tagset' | 'tag'):Tag|Tagset|null{
+    let element: Tagset | Tag | null = null;
+    
+    for (const tagset of this.tagsetList) {
+        if (elementType === 'tagset') {
+            if (tagset.id ===  elementid) {
+                element = tagset;
+                break;
+            }
+        } 
+        else if (elementType === 'tag') {
+            for (const tag of tagset.tags) {
+                if (tag.id === elementid) {
+                    element = tag;
+                    break;
+                }
+            }
+        }
+    }
+
+    return element;
+  }
+
+  /**
+   * Function that extends all the parents of tag.
+   */
+  expandFitlerTagset(tag : Tag): void {
+    if(!(tag.tagsetid===null)){
+      const parentTagset = this.findElementinTagsetList(tag.tagsetid,'tagset');
+      if(parentTagset){
+        parentTagset.isExpanded=true;
       }
     }
   }

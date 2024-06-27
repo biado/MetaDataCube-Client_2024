@@ -76,7 +76,7 @@ export class BrowsingStateComponent {
   /**
    * Used to invert the value of display_filters, in order to display the filters pannel or not. 
    */ 
-  async refresh_selection_list(): Promise<void> {
+  async reload_tagset_list(): Promise<void> {
     await this.getTagsetListService.getTagsetList();
     console.log("End of refresh");
   }
@@ -106,7 +106,7 @@ export class BrowsingStateComponent {
     this.router.navigate(['/cell-state']);
   }
 
-  load() {
+  loadSearch() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'application/json';
@@ -123,6 +123,17 @@ export class BrowsingStateComponent {
               const json = JSON.parse(result);
               console.log('Import successful:', json);
 
+              //
+              if(this.selectedDimensions.elementX && !(this.selectedDimensions.elementX?.type==="tag")){
+                this.selectedDimensions.elementX.isCheckedX=false;
+                this.selectedDimensions.elementX.isExpanded=false;
+              }
+              if(this.selectedDimensions.elementY && !(this.selectedDimensions.elementY?.type==="tag")){
+                this.selectedDimensions.elementY.isCheckedY=false;
+                this.selectedDimensions.elementY.isExpanded=false;
+              }
+
+              //
               let actualX : Tagset | Node | null = this.findElementService.findElementinTagsetList(json.selectedDimensions.xid, json.selectedDimensions.xtype);
               if(actualX){
                 actualX.isCheckedX = json.selectedDimensions.elementX.isCheckedX; 
@@ -133,6 +144,7 @@ export class BrowsingStateComponent {
               }
               json.selectedDimensions.elementX = actualX;
 
+              //
               let actualY : Tagset | Node | null = this.findElementService.findElementinTagsetList(json.selectedDimensions.yid, json.selectedDimensions.ytype);
               if(actualY){
                 actualY.isCheckedY = json.selectedDimensions.elementY.isCheckedY; 
@@ -143,10 +155,25 @@ export class BrowsingStateComponent {
               }
               json.selectedDimensions.elementY = actualY;
 
-              console.log("2222",this.findElementService.tagsetList)
+              //
+              json.selectedFilters.forEach((filter:Filter) => {
+                let actualFilter = this.findElementService.findFilterinTagsetList(filter.id, filter.type);
+                if(actualFilter){
+                  if(actualFilter.type==="tag"&&filter.element.type==="tag"){
+                    actualFilter.ischecked=filter.element.ischecked;
+                    this.findElementService.expandFitlerTagset(actualFilter);
+                  }
+                  else if (actualFilter.type==="tagset"&&filter.element.type==="tagset"){
+                    actualFilter.isCheckedFilters=filter.element.isCheckedFilters;
+                     actualFilter.isExpanded=filter.element.isExpanded;
+                  }
+                  json.selectedFilters.element = actualFilter;
+                }
+              });
+
               this.selectedDimensionsService.selectedDimensions.next(json.selectedDimensions);
               this.selectedFiltersService.filtersSubject.next(json.selectedFilters);
-              this.undoredoService.addDimensionsAction(json.selectedDimensions);      //Add the Action to the UndoRedoService
+              this.undoredoService.addFileAction(json);      //Add the Action to the UndoRedoService
             } 
             catch (error) {
               console.error('Error parsing JSON:', error);
@@ -160,7 +187,7 @@ export class BrowsingStateComponent {
     input.click();
   }  
 
-  save(){
+  saveSearch(){
     let actualDimensions : SelectedDimensions = this.selectedDimensions;
     let actualFilters : Filter[] = this.selectedFilters;
     let actualSearch : ActualSearchFile = new ActualSearchFile(actualDimensions,actualFilters);
