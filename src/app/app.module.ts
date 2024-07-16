@@ -15,6 +15,7 @@ import { CellStateComponent } from './components/cell-state/cell-state.component
 import { AppRoutingModule } from './app-routing.module';
 import { CellStateGridComponent } from './components/cell-state/cell-state-grid/cell-state-grid.component';
 import { CellStateSingleComponent } from './components/cell-state/cell-state-single/cell-state-single.component';
+import { PreSelectionPopupComponent } from './components/browsing-state/pre-selection-popup/pre-selection-popup.component';
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import { CellStateSingleComponent } from './components/cell-state/cell-state-sin
     BrowsingStateComponent,
     CellStateGridComponent,
     CellStateSingleComponent,
+    PreSelectionPopupComponent,
     
   ],
   imports: [

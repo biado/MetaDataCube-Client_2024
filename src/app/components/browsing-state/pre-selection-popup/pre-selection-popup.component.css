@@ -1,0 +1,57 @@
+.pre-selection_popup{
+    width: 50%;
+    height: 50%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9;
+
+    border-radius: 50px 50px 50px 50px;
+    background-color: var(--popup-background-color);
+    padding : 0.8em 0.8em 0.8em 1.4em;
+    color : var(--main-color);
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.pre-selection_popup_dimensions{
+    width: 90%;
+    height: 100%;
+
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+.pre-selection_popup_tagset_labels{
+    margin: 0.8em 0 0.8em 0;
+}
+
+.pre-selection_popup_labels_title{
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+}
+
+.pre-selection_popup_labels_subtitle{
+    font-size: 1em;
+    margin-left: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.pre-selection_popup_close{
+    width: 7%;
+    width: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.pre-selection_popup_close_button{
+    width: min-content;
+    cursor: pointer;
+}

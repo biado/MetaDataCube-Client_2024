@@ -17,6 +17,7 @@
   --main-color: #FFFFFF;
   --button-color: linear-gradient(90deg, #000000, #737373);
   --background-color: #000000;
+  --popup-background-color: rgba(28, 70, 59, 0.9);
   --secondary-background-color:#276354;
 }
 

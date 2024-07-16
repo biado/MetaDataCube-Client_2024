@@ -3,6 +3,7 @@ import { Tagset } from '../models/tagset';
 import { Node } from '../models/node';
 import { GetTagsetListService } from './get-tagset-list.service';
 import { Tag } from '../models/tag';
+import { Hierarchy } from '../models/hierarchy';
 
 @Injectable({
   providedIn: 'root'
@@ -119,6 +120,31 @@ export class FindElement {
       }
     }
   }
-}
 
+  /**
+   * Function to find a taget or a hierarchy in the tagsetList.
+   */
+  findTagsetOrHerarchy(elementid: number, elementType: 'tagset' | 'hierarchy'):Hierarchy|Tagset|null{
+    let element: Tagset | Hierarchy | null = null;
+    
+    for (const tagset of this.tagsetList) {
+        if (elementType === 'tagset') {
+            if (tagset.id ===  elementid) {
+                element = tagset;
+                break;
+            }
+        } 
+        else if (elementType === 'hierarchy') {
+            for (const hier of tagset.hierarchies) {
+                if (hier.id === elementid) {
+                    element = hier;
+                    break;
+                }
+            }
+        }
+    }
+  
+    return element;
+  }
+}
 

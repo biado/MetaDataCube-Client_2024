@@ -3,6 +3,7 @@ export class Hierarchy {
     
     name: string;
     id: number;
+    type:'hierarchy';
     tagsetID: number;
     rootNodeID: number;
     firstNode: Node;
@@ -15,5 +16,6 @@ export class Hierarchy {
         this.rootNodeID = rootNodeID;
         this.firstNode = firstNode;
         this.isVisible = true;
+        this.type='hierarchy';
     }
 }

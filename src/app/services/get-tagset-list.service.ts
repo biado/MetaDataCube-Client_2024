@@ -13,7 +13,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export class GetTagsetListService {
   /** tagsetListSubject is an observable subject, storing a list of Tagsets.  */
-  private tagsetListSubject = new BehaviorSubject<Tagset[]>([]);
+  tagsetListSubject = new BehaviorSubject<Tagset[]>([]);
   /** tagset$ is a public observable, providing access to tagsetListSubject externally.  */
   tagsetList$ = this.tagsetListSubject.asObservable();
 
@@ -23,7 +23,9 @@ export class GetTagsetListService {
   constructor(
     private http: HttpClient,
     private indexedDbService: IndexedDbService,
-  ) {    this.loadTagsets();  }
+  ) {
+      this.loadTagsets(); 
+    }
 
   private baseUrl = '/api';
 

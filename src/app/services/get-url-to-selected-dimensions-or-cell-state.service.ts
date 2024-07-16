@@ -77,7 +77,6 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
    */ 
   private addUrlCorrespondToSelectedDimensions(selectedDimensions : SelectedDimensions,filters:Filter[]){
     selectedDimensions.url = this.createCellUrl(filters,selectedDimensions.xid, selectedDimensions.xtype, selectedDimensions.yid, selectedDimensions.ytype);       
-    console.log(selectedDimensions)
     this.selectedDimensionsWithUrl.next(selectedDimensions);
   }
 
