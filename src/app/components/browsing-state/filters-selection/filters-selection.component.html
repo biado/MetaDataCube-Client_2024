@@ -9,6 +9,20 @@
 <button class="clear_selection_component" (click)="clearFiltersSelection()"> Clear Selection </button>
 
 <div class="selection_component_labels">
+
+    <!-- Checked items will be displayed at the top (double) to make them easier to find and uncheck. -->
+    <div class="filters_checked_all_element" [style.border-bottom]="!(filtersList.length===0) ? 'solid var(--main-color)' : 'none'">
+      <div class="filters_checked_element" *ngFor="let element of filtersList">
+        <ng-container *ngIf="element.element.type==='tagset'">
+          <input type="checkbox" [checked]="element.element.isCheckedFilters" (change)="toggleCheckboxTagsetFilters(element.element)" [style.margin-right]="'50px'" />
+        </ng-container>
+        <ng-container *ngIf="element.element.type==='tag'">
+          <input type="checkbox" [checked]="element.element.ischecked" (change)="onTagFilterSelected(element.element)" [style.margin-right]="'50px'" />
+        </ng-container>
+        {{element.element.name}}
+      </div>
+    </div>
+
     <div class="filters_tagset_labels" *ngFor="let tagset of tagsetlist" >
       <div *ngIf="tagset.isVisibleFilters">
         <div class="filters_labels_title">

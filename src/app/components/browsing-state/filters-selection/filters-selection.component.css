@@ -63,6 +63,15 @@
     white-space: nowrap;
 }
 
+.filters_checked_all_element{
+    margin : 0.8em 0 1.4em 0;
+}
+
+.filters_checked_element{
+    display: flex;
+    align-items: center;
+}
+
 .filters_tagset_labels{
     height: auto;
     font-size: 1.2em ;

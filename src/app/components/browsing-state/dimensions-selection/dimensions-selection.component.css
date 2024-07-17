@@ -64,6 +64,15 @@
     white-space: nowrap;
 }
 
+.dimensions_checked_all_element{
+    margin : 0.8em 0 1.4em 0;
+}
+
+.dimensions_checked_element{
+    display: flex;
+    align-items: center;
+}
+
 .dimensions_column_title{
     display: flex;
     flex-direction: row;

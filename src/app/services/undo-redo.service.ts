@@ -406,8 +406,7 @@ export class UndoRedoService {
       element.forEach(elt=>{
         if(elt.type==="hierarchy"){
           elt.isVisible = !elt.isVisible;
-        }
-  
+        }  
         else{
           elt.isVisibleDimensions = !elt.isVisibleDimensions;
         }
@@ -581,8 +580,6 @@ export class UndoRedoService {
     //Increment position
     this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
     this.positionDo = this.positionDo + 1;
-
-    console.log(this.AllPreSelectionDo)
   }
 
 

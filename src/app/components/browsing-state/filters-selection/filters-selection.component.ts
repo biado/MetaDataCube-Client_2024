@@ -46,6 +46,7 @@ export class FiltersSelectionComponent {
    * Depending on whether the tag has been selected or deselected, we will call the add function of the service or the remove function.
    */
   onTagFilterSelected(tag: Tag) {
+    tag.ischecked = !tag.ischecked;
     if (tag.ischecked) {
       this.addFilter(tag.id,tag.type,tag);
     } else {

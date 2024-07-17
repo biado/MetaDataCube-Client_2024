@@ -17,6 +17,8 @@ export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
 
+  checked_elements : (Tagset|Node)[] = [];     //
+
   selectedDimensions : SelectedDimensions = new SelectedDimensions();
 
   constructor(
@@ -201,6 +203,8 @@ export class DimensionsSelectionComponent {
    * 
    * If ticked, the variables for X are defined with the data the element that has been ticked. If we uncheck, we set the variables to null.
    * If an element was already checked, we'll uncheck it and then update the values. 
+   * 
+   * We'll update the list of checked items depending on whether we're checking or dechecking.
    */
   toggleCheckboxX(elt:Node|Tagset): void {
     let newSelectedDimensions: SelectedDimensions = new SelectedDimensions();
@@ -210,6 +214,11 @@ export class DimensionsSelectionComponent {
         const actualElementX = this.selectedDimensions.elementX;
         if(!(actualElementX===null) && (actualElementX?.type==="node"||actualElementX?.type==="tagset")){
           actualElementX.isCheckedX = false;
+          // Remove the item from the list of checked items
+          let checked_element_index = this.checked_elements.indexOf(actualElementX);
+          if (checked_element_index !== -1) {
+            this.checked_elements.splice(checked_element_index, 1);
+          }
         }
       }
       elt.isCheckedX = !elt.isCheckedX ;
@@ -234,6 +243,17 @@ export class DimensionsSelectionComponent {
       }
     }
 
+    // If the item is checked, it is added to the list of checked items, otherwise it is removed.
+    if(elt.isCheckedX){
+      this.checked_elements.push(elt);
+    }
+    else{
+      let checked_element_index = this.checked_elements.indexOf(elt);
+      if (checked_element_index !== -1) {
+        this.checked_elements.splice(checked_element_index, 1);
+      }
+    }
+
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);    //Add the Action to the UndoRedoService
   }
@@ -243,6 +263,8 @@ export class DimensionsSelectionComponent {
    * 
    * If ticked, the variables for Y are defined with the data of the element that has been ticked. If we uncheck, we set the variables to null.
    * If an element was already checked, we'll uncheck it and then update the values.
+   * 
+   * We'll update the list of checked items depending on whether we're checking or dechecking.
    */
   toggleCheckboxY(elt:Node|Tagset): void {
     let newSelectedDimensions:SelectedDimensions = new SelectedDimensions();
@@ -252,6 +274,11 @@ export class DimensionsSelectionComponent {
         const actualElementY = this.selectedDimensions.elementY;
         if(!(actualElementY===null) && (actualElementY?.type==="node"||actualElementY?.type==="tagset")){
           actualElementY.isCheckedY = false;
+          // Remove the item from the list of checked items
+          let checked_element_index = this.checked_elements.indexOf(actualElementY);
+          if (checked_element_index !== -1) {
+            this.checked_elements.splice(checked_element_index, 1);
+          }
         }
       }
       elt.isCheckedY = !elt.isCheckedY ;
@@ -276,6 +303,17 @@ export class DimensionsSelectionComponent {
         newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
       }
     }    
+
+    // If the item is checked, it is added to the list of checked items, otherwise it is removed.
+    if(elt.isCheckedY){
+      this.checked_elements.push(elt);
+    }
+    else{
+      let checked_element_index = this.checked_elements.indexOf(elt);
+      if (checked_element_index !== -1) {
+        this.checked_elements.splice(checked_element_index, 1);
+      }
+    }
 
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
@@ -324,6 +362,8 @@ export class DimensionsSelectionComponent {
     newSelectedDimensions.ischeckedY = false;
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
+
+    this.checked_elements = [];
   }
   
 }

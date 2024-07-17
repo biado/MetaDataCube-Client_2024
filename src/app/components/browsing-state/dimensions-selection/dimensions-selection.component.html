@@ -9,9 +9,20 @@
 <button class="clear_selection_component" (click)="clearDimensionsSelection()"> Clear Selection </button>
 
 <div class="selection_component_labels">
+
+    <!-- Checked items will be displayed at the top (double) to make them easier to find and uncheck. -->
+    <div class="dimensions_checked_all_element" [style.border-bottom]="!(checked_elements.length===0) ? 'solid var(--main-color)' : 'none'">
+      <div class="dimensions_checked_element" *ngFor="let element of checked_elements">
+        <input type="checkbox" [checked]="element.isCheckedX" (change)="toggleCheckboxX(element)" />
+        <input type="checkbox" [checked]="element.isCheckedY" (change)="toggleCheckboxY(element)" [style.margin-right]="'50px'"/>
+        {{element.name}}
+      </div>
+    </div>
+
     <div class="dimensions_column_title">
       <div>X</div><div>Y</div>
     </div>
+
     <div class="dimensions_tagset_labels" *ngFor="let tagset of tagsetlist" >
       <div *ngIf="tagset.isVisibleDimensions">
         <div class="dimensions_labels_title">
@@ -36,4 +47,5 @@
         </div>
       </div>    
     </div>
+
 </div>
