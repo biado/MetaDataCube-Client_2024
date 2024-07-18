@@ -6,6 +6,7 @@ import { SelectedFiltersService } from './selected-filters.service';
 import { ActualSearchFile } from '../models/actual-search-file';
 import { Tagset } from '../models/tagset';
 import { Hierarchy } from '../models/hierarchy';
+import { FindElement } from './find-element.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,7 @@ export class UndoRedoService {
   constructor( 
     private selectedDimensionsService : SelectedDimensionsService,
     private selectedFiltersService : SelectedFiltersService,
+    private findElement : FindElement,
   ) 
   {}
 
@@ -51,6 +53,10 @@ export class UndoRedoService {
     }
     else if (!(this.positionDo===0) && this.Do[this.positionDo]==="PreSelection"){
       this.undoPreSelection();
+    }
+
+    if(!(this.positionDo===0)){
+      this.positionDo = this.positionDo - 1;
     }
   }
 
@@ -71,7 +77,6 @@ export class UndoRedoService {
 
     //Modify position and get previous element
     this.positionAllSelectedDimensionsDid = this.positionAllSelectedDimensionsDid - 1;
-    this.positionDo = this.positionDo - 1;
     const newSelectedDimensions = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid];
 
     //Update the checkbox of the previous element
@@ -104,7 +109,6 @@ export class UndoRedoService {
 
     //Modify position to get previous element
     this.positionAllFiltersAdd = this.positionAllFiltersAdd - 1;
-    this.positionDo = this.positionDo - 1;
 
     // Get previous FilterList : for filters, you need to recreate the lists every time (and not just do a list1 = list2), otherwise the objects are the same and there's no difference.
     let newListFilters : Filter[] = [];
@@ -124,87 +128,6 @@ export class UndoRedoService {
 
     //Update in the corresponding service
     this.selectedFiltersService.filtersSubject.next(newListFilters);    
-  }
-
-  /**
-   * To undo a ActualSearchFile, we'll retrieve  the previous SelectedDimensions from the AllSelectedDimensionsDid list
-   * and the previous list of filters from the AllFiltersAdd filter list. We will also retrieve the previous PreSelection from AllPreSelectionDo.
-   * We'll then send them to selectedDimensionService and selectedFiltersService to change it throughout the application. 
-   * For PreSelection, we'll just invert the isVisible/isVisibleDimensions boolean of an element if it has been modified.
-   * We'll also change the necessary positions.
-   */
-  async undoFile(){
-    //Get the actual SelectedDimensions and update the checkbox
-    const ActualX = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid].elementX;
-    const ActualY = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid].elementY;
-    if(ActualX?.type==="node" || ActualX?.type==="tagset"){
-      ActualX.isCheckedX = false;
-    }
-    if(ActualY?.type==="node" || ActualY?.type==="tagset"){
-      ActualY.isCheckedY = false;
-    }
-
-    //Get the actual FilterList and update the checkbox
-    const ActualFilterList = this.AllFiltersAdd[this.positionAllFiltersAdd];
-    ActualFilterList.forEach(filter=>{
-      if(filter.element.type==="tag"){
-        filter.element.ischecked = false;
-      }
-      else{
-        filter.element.isCheckedFilters = false;
-      }
-    })
-
-    //Get previous PreSelection - We want to modify the current element, not replace it with the previous one. That's why we do this before changing the position.
-    let newPreSelection = this.AllPreSelectionDo[this.positionAllPreSelectionDo];
-    if(Array.isArray(newPreSelection)){
-      newPreSelection.forEach(elt=>{
-        if(elt.type==="hierarchy"){
-          elt.isVisible = !elt.isVisible;
-        }  
-        else{
-          elt.isVisibleDimensions = !elt.isVisibleDimensions;
-        }
-      })
-    }
-
-    //Modify position to get previous element
-    this.positionAllSelectedDimensionsDid = this.positionAllSelectedDimensionsDid - 1;
-    this.positionAllFiltersAdd = this.positionAllFiltersAdd - 1; 
-    this.positionAllPreSelectionDo = this.positionAllPreSelectionDo - 1; 
-    this.positionDo = this.positionDo - 1;
-    
-    //Get previous SelectedDimensions
-    const newSelectedDimensions = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid];
-
-    //Get previous FilterList
-    let newListFilters : Filter[] = [];
-    this.AllFiltersAdd[this.positionAllFiltersAdd].forEach(filter=>{
-      newListFilters.push(filter);
-    })
-    
-    //Update the checkbox of the previous element
-    if(newSelectedDimensions.elementX?.type==="node" || newSelectedDimensions.elementX?.type==="tagset"){
-      newSelectedDimensions.elementX.isCheckedX = true;
-    }
-    if(newSelectedDimensions.elementY?.type==="node" || newSelectedDimensions.elementY?.type==="tagset"){
-      newSelectedDimensions.elementY.isCheckedY = true;
-    }
-
-    //Update the checkbox of the previous Filter
-    newListFilters.forEach(filter=>{
-      if(filter.element.type==="tag"){
-        filter.element.ischecked = true;
-      }
-      else{
-        filter.element.isCheckedFilters = true;
-      }
-    })
-
-    //Change FilterLsit and SelectedDimensions in the corresponding service
-    this.selectedFiltersService.filtersSubject.next(newListFilters);    
-    await this.wait(100);       //Wait, because otherwise the elements won't wait and there's a chance that the display will be incorrect.
-    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);  
   }
 
   /**
@@ -233,8 +156,20 @@ export class UndoRedoService {
 
     //Modify position
     this.positionAllPreSelectionDo = this.positionAllPreSelectionDo - 1;
-    this.positionDo = this.positionDo - 1;
   }
+
+  /**
+   * To undo a ActualSearchFile, we will undo at the same time dimensions, filters and pre-selectiob
+   */
+  async undoFile(){
+    this.undoFilter();   
+    await this.wait(100);       //Wait, because otherwise the elements won't wait and there's a chance that the display will be incorrect.
+    this.undoDim();
+    await this.wait(100); 
+    this.undoPreSelection()
+  }
+
+
 
   /**
    * Redo Function, four cases if you want to redo a Dimension, a Filter or a ActualSearchFile or a PreSelection.
@@ -251,6 +186,10 @@ export class UndoRedoService {
     }
     else if (!(this.positionDo===this.Do.length-1) && (this.Do[this.positionDo+1]==="PreSelection")){          
       this.redoPreSelection();
+    }
+
+    if(!(this.positionDo===this.Do.length-1)){
+      this.positionDo = this.positionDo + 1;
     }
   }
 
@@ -269,15 +208,17 @@ export class UndoRedoService {
     }
 
     this.positionAllSelectedDimensionsDid = this.positionAllSelectedDimensionsDid + 1;
-    this.positionDo = this.positionDo + 1;
     const newSelectedDimensions = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid];
 
     if(newSelectedDimensions.elementX?.type==="node" || newSelectedDimensions.elementX?.type==="tagset"){
       newSelectedDimensions.elementX.isCheckedX = true;
+      if(newSelectedDimensions.elementX.type==='node'){this.findElement.expandDimNodeParents(newSelectedDimensions.elementX.parentID)}
     }
     if(newSelectedDimensions.elementY?.type==="node" || newSelectedDimensions.elementY?.type==="tagset"){
       newSelectedDimensions.elementY.isCheckedY = true;
+      if(newSelectedDimensions.elementY.type==='node'){this.findElement.expandDimNodeParents(newSelectedDimensions.elementY.parentID)}
     }
+
 
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions); 
   }
@@ -298,7 +239,6 @@ export class UndoRedoService {
     })
    
     this.positionAllFiltersAdd = this.positionAllFiltersAdd + 1;
-    this.positionDo = this.positionDo + 1;
     const newListFilters = this.AllFiltersAdd[this.positionAllFiltersAdd];
 
     newListFilters.forEach(filter=>{
@@ -307,89 +247,14 @@ export class UndoRedoService {
       }
       else{
         filter.element.isCheckedFilters = true;
+        if(filter.element.type==='node'){
+          this.findElement.expandFilterNodeParents(filter.element.parentID);
+          this.findElement.expandFitlerTagset(filter.element);
+        }
       }
     })
 
     this.selectedFiltersService.filtersSubject.next(newListFilters);
-  }
-
-  /**
-   * To undo a ActualSearchFile, we'll retrieve  the next SelectedDimensions from the AllSelectedDimensionsDid list
-   * and the next list of filters from the AllFiltersAdd filter list . 
-   * We'll then send them to selectedDimensionService and selectedFiltersService to change it throughout the application. We'll also change the necessary positions.
-   * 
-   * We'll also retrieve the next PreSelection(tagsetList) from the AllPreSelectionDo preSelection(tagsetList) list.
-   * We'll then invert the isVisible/isVisibleDimensions values of the elements present in the new PreSelection so that this PreSelection is the current one.
-   */
-  async redoFile(){
-    // Dim - Everything at initial state
-    const ActualX = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid].elementX;
-    const ActualY = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid].elementY;
-    if(ActualX?.type==="node" || ActualX?.type==="tagset"){
-      ActualX.isCheckedX = false;
-    }
-    if(ActualY?.type==="node" || ActualY?.type==="tagset"){
-      ActualY.isCheckedY = false;
-    }
-
-    // Filter - Everything at initial state
-    const ActualFilterList = this.AllFiltersAdd[this.positionAllFiltersAdd];
-    ActualFilterList.forEach(filter=>{
-      if(filter.element.type==="tag"){
-        filter.element.ischecked = false;
-      }
-      else{
-        filter.element.isCheckedFilters = false;
-      }
-    })
-
-    // Go to the new position
-    this.positionAllSelectedDimensionsDid = this.positionAllSelectedDimensionsDid + 1;
-    this.positionAllFiltersAdd = this.positionAllFiltersAdd + 1;
-    this.positionDo = this.positionDo + 1;
-
-    // We get the new Dimensions and List of Filter List
-    const newSelectedDimensions = this.AllSelectedDimensionsDid[this.positionAllSelectedDimensionsDid];
-    const newListFilters = this.AllFiltersAdd[this.positionAllFiltersAdd];
-    
-    // Dim - Modify the values of the newly selected items (checkbox)
-    if(newSelectedDimensions.elementX?.type==="node" || newSelectedDimensions.elementX?.type==="tagset"){
-      newSelectedDimensions.elementX.isCheckedX = true;
-    }
-    if(newSelectedDimensions.elementY?.type==="node" || newSelectedDimensions.elementY?.type==="tagset"){
-      newSelectedDimensions.elementY.isCheckedY = true;
-    }
-
-    // Filters - Modify the values (checkbox)
-    newListFilters.forEach(filter=>{
-      if(filter.element.type==="tag"){
-        filter.element.ischecked = true;
-      }
-      else{
-        filter.element.isCheckedFilters = true;
-      }
-    })
-
-    // We update the corresponding service value
-    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions); 
-    await this.wait(100);       //Wait, because otherwise the elements won't wait and there's a chance that the display will be incorrect.
-    this.selectedFiltersService.filtersSubject.next(newListFilters);
-
-
-    // Pre-Selection
-    this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
-    const newPreSelection = this.AllPreSelectionDo[this.positionAllPreSelectionDo];
-    if(Array.isArray(newPreSelection)){
-      newPreSelection.forEach(elt=>{
-        if(elt.type==="hierarchy"){
-          elt.isVisible = !elt.isVisible;
-        }
-  
-        else{
-          elt.isVisibleDimensions = !elt.isVisibleDimensions;
-        }
-      })
-    }
   }
 
   /**
@@ -398,7 +263,6 @@ export class UndoRedoService {
    */
   redoPreSelection(){
     this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
-    this.positionDo = this.positionDo + 1;
 
     let element = this.AllPreSelectionDo[this.positionAllPreSelectionDo];
 
@@ -413,6 +277,19 @@ export class UndoRedoService {
       })
     }
   }
+
+  /**
+   * To redo a File, we redo at the same time Dimension, Filter and Pre-Selection
+   */
+  async redoFile(){
+    this.redoDim();
+    await this.wait(100); 
+    this.redoFilter();
+    await this.wait(100); 
+    this.redoPreSelection();
+  }
+
+
 
   /**
    * Function to add a filters list to the undo/redo list of filters list.
@@ -497,7 +374,7 @@ export class UndoRedoService {
    * 
    * We'll add the "File" action to Do and increment all the positions with 1.
    */
-  addFileAction(actualSearchFile:ActualSearchFile,modified_elements:(Hierarchy|Tagset)[]){
+  addFileAction(actualSearchFile:ActualSearchFile,modified_elements:(Hierarchy|Tagset)[],jsonFiltersList:Filter[]){
     let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
       newDoList.push(this.Do[i]);
@@ -528,7 +405,7 @@ export class UndoRedoService {
 
 
     let newFiltersToAdd : Filter[] = []
-    actualSearchFile.selectedFilters.forEach(filter=>{
+    jsonFiltersList.forEach(filter=>{
       newFiltersToAdd.push(filter);
     })
     newAllFiltersAdd.push(newFiltersToAdd)
@@ -583,6 +460,11 @@ export class UndoRedoService {
   }
 
 
+
+
+  /**
+   * Wait function (take milliseconds in parameter)
+   */
   wait(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }

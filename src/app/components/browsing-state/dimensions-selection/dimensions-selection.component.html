@@ -40,7 +40,7 @@
                 <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="toggleNode(hierarchy.firstNode)">{{toggleButton(hierarchy.firstNode)}}</span> 
                 {{hierarchy.firstNode.name}}
             </div>
-            <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded">
+            <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpandedDimensions">
                 <app-dimensions-selection-node *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode"  [nodegen]="1" (checkX)="toggleCheckboxX($event)" (checkY)="toggleCheckboxY($event)"></app-dimensions-selection-node>
             </ng-container>        
           </div> 

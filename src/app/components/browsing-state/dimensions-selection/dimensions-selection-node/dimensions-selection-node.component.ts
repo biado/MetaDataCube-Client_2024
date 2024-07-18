@@ -49,14 +49,14 @@ export class DimensionsSelectionNodeComponent {
    * (- if the list is scrolled, + otherwise)
    */
   toggleButton(node:Node): string {
-    return node.isExpanded ? '-' : '+';
+    return node.isExpandedDimensions ? '-' : '+';
   }
   
   /***
    * Applies to the node whether it is scrolled down or not
    */
   toggleNode(node:Node): void {
-    node.isExpanded = !node.isExpanded;
+    node.isExpandedDimensions = !node.isExpandedDimensions;
   }
 
   /***
