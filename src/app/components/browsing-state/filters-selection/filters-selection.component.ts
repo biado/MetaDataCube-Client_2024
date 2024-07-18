@@ -88,8 +88,6 @@ export class FiltersSelectionComponent {
     } else {
       this.removeFilter(tagset.id,tagset.type);
     }
-
-    console.log(this.filtersList);
   }
 
   /**
@@ -196,10 +194,10 @@ export class FiltersSelectionComponent {
               }
           }
 
-          allNodes.forEach(node => node.isExpanded = false);
+          allNodes.forEach(node => node.isExpandedFilters = false);
       });
       tagset.isTagListExpanded = false;
-      tagset.isExpanded = false;
+      tagset.isExpandedFilters = false;
     });
 
     this.filtersList = [];
@@ -244,7 +242,7 @@ export class FiltersSelectionComponent {
     function resetSearch(tagsets: Tagset[]):void{
       tagsets.forEach(tagset => {
         tagset.isVisibleFilters = true;
-        tagset.isExpanded = false;
+        tagset.isExpandedFilters = false;
         tagset.tags.forEach(tag=>{
           tag.isVisible = true;
         });
@@ -253,7 +251,7 @@ export class FiltersSelectionComponent {
           const nodesToProcess: Node[] = [hierarchy.firstNode];
           while (nodesToProcess.length > 0) {
             const currentNode = nodesToProcess.pop()!;
-            currentNode.isExpanded = false;
+            currentNode.isExpandedFilters = false;
             currentNode.isVisibleFilters = true;
             if (currentNode.children) {
               nodesToProcess.push(...currentNode.children);
@@ -268,7 +266,7 @@ export class FiltersSelectionComponent {
         if (node.parentID !== null) {
             const parent = allNodes.get(node.parentID);
             if (parent) {
-                parent.isExpanded = true;
+                parent.isExpandedFilters = true;
                 parent.isVisibleFilters = true;
                 expandParents(parent, allNodes);
             }
@@ -281,7 +279,7 @@ export class FiltersSelectionComponent {
         node.children.forEach(child =>{
           child.isVisibleFilters = true;
           if (!(child.name.startsWith(toSearch))) {
-            child.isExpanded = false;
+            child.isExpandedFilters = false;
           }
           childrenVisible(child,toSearch);
         })
@@ -307,7 +305,7 @@ export class FiltersSelectionComponent {
             tag.isVisible = true;
   
             // Display the tagset of the corresponding tag
-            tagset.isExpanded = true;
+            tagset.isExpandedFilters = true;
             tagset.isVisibleFilters = true;
           }
       });
@@ -338,7 +336,7 @@ export class FiltersSelectionComponent {
         // If there is a match, we display the node and its parent nodes (and hierarchy and tagset)
         allNodes.forEach(node => {
           if (node.name.startsWith(this.filterstosearch)) {
-            node.isExpanded = true;
+            node.isExpandedFilters = true;
             node.isVisibleFilters = true;
             childrenVisible(node, this.filterstosearch);
             expandParents(node, allNodes);
@@ -346,7 +344,7 @@ export class FiltersSelectionComponent {
             // Display the hierarchy and tagset of the corresponding node
             hierarchy.isVisible = true;
             tagset.isVisibleFilters = true;
-            tagset.isExpanded = true;
+            tagset.isExpandedFilters = true;
           }          
         });
       });

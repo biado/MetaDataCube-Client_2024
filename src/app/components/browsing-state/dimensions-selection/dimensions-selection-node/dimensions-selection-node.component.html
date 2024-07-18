@@ -13,7 +13,7 @@ For a node, we'll display the node and its children, and if its children have ch
     </div>
 
     <!-- Here, we'll treat each child of the node and, depending on whether a child has children of its own, it will go into the first or second div.  -->
-    <ng-container class="dimensions_childnodes_labels" *ngIf="node.isExpanded">
+    <ng-container class="dimensions_childnodes_labels" *ngIf="node.isExpandedDimensions">
       <ng-container *ngFor="let childNode of sortNodes(node.children)">
 
         <!-- If a child of the node has children  -->
@@ -24,7 +24,7 @@ For a node, we'll display the node and its children, and if its children have ch
                 <span class="toggle-button" (click)="toggleNode(childNode)">{{toggleButton(childNode)}}</span> 
                 {{childNode.name}}
             </div>
-            <ng-container class="dimensions_childnodes_labels" *ngIf="childNode.isExpanded">
+            <ng-container class="dimensions_childnodes_labels" *ngIf="childNode.isExpandedDimensions">
                 <app-dimensions-selection-node *ngFor="let grandChildNode of sortNodes(childNode.children)" [node]="grandChildNode" [nodegen]="nodegen+1" (checkX)="toggleCheckboxX($event)" (checkY)="toggleCheckboxY($event)"></app-dimensions-selection-node>
             </ng-container>          
         </div>

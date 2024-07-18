@@ -33,11 +33,11 @@
         <!-- Tagset Display -->
         <div class="filters_labels_title">
           <input type="checkbox" [checked]="tagset.isCheckedFilters" (change)="toggleCheckboxTagsetFilters(tagset)" [style.margin-right]="'50px'" />
-          <span  class="toggle-button" (click)="tagset.isExpanded = !tagset.isExpanded">{{tagset.isExpanded ? '-' : '+'}}</span>
+          <span  class="toggle-button" (click)="tagset.isExpandedFilters = !tagset.isExpandedFilters">{{tagset.isExpandedFilters ? '-' : '+'}}</span>
           {{tagset.name}}
         </div>
 
-        <div *ngIf="tagset.isExpanded">
+        <div *ngIf="tagset.isExpandedFilters">
           <!-- Display tags not present in tagset hierarchy nodes -->
           <div class="filters_tags_labels_div">
             <div class="filters_labels_title" *ngIf="tagset.hierarchies && tagset.hierarchies.length>0">
@@ -53,10 +53,10 @@
           <div class="filters_hierarchies_labels" *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)">            
             <div class="filters_labels_title" *ngIf="hierarchy.isVisible">
               <input type="checkbox" [checked]="hierarchy.firstNode.isCheckedFilters" (change)="onNodeFilterSelected(hierarchy.firstNode)" [style.margin-right]="'50px'" />
-              <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="hierarchy.firstNode.isExpanded = !hierarchy.firstNode.isExpanded">{{hierarchy.firstNode.isExpanded ? '-' : '+'}}</span> 
+              <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="hierarchy.firstNode.isExpandedFilters = !hierarchy.firstNode.isExpandedFilters">{{hierarchy.firstNode.isExpandedFilters ? '-' : '+'}}</span> 
               {{hierarchy.firstNode.name}}
             </div>
-            <div class="filters_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded && hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0 && hierarchy.firstNode.isVisibleFilters">
+            <div class="filters_childnodes_labels" *ngIf="hierarchy.firstNode.isExpandedFilters && hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0 && hierarchy.firstNode.isVisibleFilters">
               <app-filters-selection-nodes *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode" (idchecked)="onNodeFilterSelected($event)"></app-filters-selection-nodes>
             </div>     
           </div>

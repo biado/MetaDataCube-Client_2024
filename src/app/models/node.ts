@@ -6,7 +6,8 @@ export class Node {
     children: Node[] | null;
     tagId : number;
 
-    isExpanded : boolean; 
+    isExpandedDimensions : boolean;
+    isExpandedFilters : boolean;
     isCheckedX : boolean; 
     isCheckedY : boolean; 
     isCheckedFilters:boolean;
@@ -20,7 +21,8 @@ export class Node {
         this.children = children;
         this.tagId = tagID;
 
-        this.isExpanded = false;
+        this.isExpandedDimensions = false;
+        this.isExpandedFilters = false;
         this.isCheckedX = false;
         this.isCheckedY = false;
         this.isCheckedFilters = false;

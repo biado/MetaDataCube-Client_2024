@@ -40,6 +40,13 @@ export class DimensionsSelectionComponent {
 
     this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
       this.selectedDimensions = data;
+      this.checked_elements = [];
+      if(data.elementX && !(data.elementX.type==='tag')){
+        this.checked_elements.push(data.elementX);
+      }
+      if(data.elementY && !(data.elementY.type==='tag')){
+        this.checked_elements.push(data.elementY);
+      }
     });
   }
 
@@ -62,7 +69,7 @@ export class DimensionsSelectionComponent {
                 const nodesToProcess: Node[] = [hierarchy.firstNode];
                 while (nodesToProcess.length > 0) {
                     const currentNode = nodesToProcess.pop()!;
-                    currentNode.isExpanded = false;
+                    currentNode.isExpandedDimensions = false;
                     currentNode.isVisibleDimensions = true;
                     if (currentNode.children) {
                         nodesToProcess.push(...currentNode.children);
@@ -77,7 +84,7 @@ export class DimensionsSelectionComponent {
         if (node.parentID !== null) {
             const parent = allNodes.get(node.parentID);
             if (parent) {
-                parent.isExpanded = true;
+                parent.isExpandedDimensions = true;
                 parent.isVisibleDimensions = true;
                 expandParents(parent, allNodes);
             }
@@ -90,7 +97,7 @@ export class DimensionsSelectionComponent {
         node.children.forEach(child =>{
           child.isVisibleDimensions = true;
           if (!(child.name.startsWith(toSearch))) {
-            child.isExpanded = false;
+            child.isExpandedDimensions = false;
           }
           childrenVisible(child,toSearch);
         })
@@ -135,7 +142,7 @@ export class DimensionsSelectionComponent {
             allNodes.forEach(node => {
               if(node.children && node.children.length > 0){
                   if (node.name.startsWith(this.nodestosearch)) {
-                      node.isExpanded = true;
+                      node.isExpandedDimensions = true;
                       node.isVisibleDimensions = true;
                       childrenVisible(node, this.nodestosearch);
                       expandParents(node, allNodes);
@@ -178,14 +185,14 @@ export class DimensionsSelectionComponent {
    * (- if the list is scrolled, + otherwise)
    */
   toggleButton(node:Node): string {
-    return node.isExpanded ? '-' : '+';
+    return node.isExpandedDimensions ? '-' : '+';
   }
 
   /**
    * Applies to the node whether it is scrolled down or not
    */
   toggleNode(node:Node): void {
-    node.isExpanded = !node.isExpanded;
+    node.isExpandedDimensions = !node.isExpandedDimensions;
   }
 
   /**
@@ -214,11 +221,6 @@ export class DimensionsSelectionComponent {
         const actualElementX = this.selectedDimensions.elementX;
         if(!(actualElementX===null) && (actualElementX?.type==="node"||actualElementX?.type==="tagset")){
           actualElementX.isCheckedX = false;
-          // Remove the item from the list of checked items
-          let checked_element_index = this.checked_elements.indexOf(actualElementX);
-          if (checked_element_index !== -1) {
-            this.checked_elements.splice(checked_element_index, 1);
-          }
         }
       }
       elt.isCheckedX = !elt.isCheckedX ;
@@ -243,17 +245,6 @@ export class DimensionsSelectionComponent {
       }
     }
 
-    // If the item is checked, it is added to the list of checked items, otherwise it is removed.
-    if(elt.isCheckedX){
-      this.checked_elements.push(elt);
-    }
-    else{
-      let checked_element_index = this.checked_elements.indexOf(elt);
-      if (checked_element_index !== -1) {
-        this.checked_elements.splice(checked_element_index, 1);
-      }
-    }
-
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);    //Add the Action to the UndoRedoService
   }
@@ -274,11 +265,6 @@ export class DimensionsSelectionComponent {
         const actualElementY = this.selectedDimensions.elementY;
         if(!(actualElementY===null) && (actualElementY?.type==="node"||actualElementY?.type==="tagset")){
           actualElementY.isCheckedY = false;
-          // Remove the item from the list of checked items
-          let checked_element_index = this.checked_elements.indexOf(actualElementY);
-          if (checked_element_index !== -1) {
-            this.checked_elements.splice(checked_element_index, 1);
-          }
         }
       }
       elt.isCheckedY = !elt.isCheckedY ;
@@ -302,18 +288,7 @@ export class DimensionsSelectionComponent {
         newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
         newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
       }
-    }    
-
-    // If the item is checked, it is added to the list of checked items, otherwise it is removed.
-    if(elt.isCheckedY){
-      this.checked_elements.push(elt);
-    }
-    else{
-      let checked_element_index = this.checked_elements.indexOf(elt);
-      if (checked_element_index !== -1) {
-        this.checked_elements.splice(checked_element_index, 1);
-      }
-    }
+    } 
 
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
@@ -353,7 +328,7 @@ export class DimensionsSelectionComponent {
               }
           }
 
-          allNodes.forEach(node => node.isExpanded = false);
+          allNodes.forEach(node => node.isExpandedDimensions = false);
       });
     });
    
