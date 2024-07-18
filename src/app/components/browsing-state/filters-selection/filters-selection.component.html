@@ -8,6 +8,7 @@
 
 <button class="clear_selection_component" (click)="clearFiltersSelection()"> Clear Selection </button>
 
+
 <div class="selection_component_labels">
 
     <!-- Checked items will be displayed at the top (double) to make them easier to find and uncheck. -->
@@ -19,23 +20,46 @@
         <ng-container *ngIf="element.element.type==='tag'">
           <input type="checkbox" [checked]="element.element.ischecked" (change)="onTagFilterSelected(element.element)" [style.margin-right]="'50px'" />
         </ng-container>
+        <ng-container *ngIf="element.element.type==='node'">
+          <input type="checkbox" [checked]="element.element.isCheckedFilters" (change)="onNodeFilterSelected(element.element)" [style.margin-right]="'50px'" />
+        </ng-container>
         {{element.element.name}}
       </div>
     </div>
 
+
     <div class="filters_tagset_labels" *ngFor="let tagset of tagsetlist" >
       <div *ngIf="tagset.isVisibleFilters">
+        <!-- Tagset Display -->
         <div class="filters_labels_title">
-          <!-- An input can be deactivated if a box in its column (X or Y) has already been ticked elsewhere. Whether or not it will be checked is defined by the node's isChecked variable. Each time this is changed, the corresponding toggleCheckbox function is called. -->  
           <input type="checkbox" [checked]="tagset.isCheckedFilters" (change)="toggleCheckboxTagsetFilters(tagset)" [style.margin-right]="'50px'" />
-          <span  class="toggle-button" (click)="toggleTagset(tagset)">{{toggleButton(tagset)}}</span>
+          <span  class="toggle-button" (click)="tagset.isExpanded = !tagset.isExpanded">{{tagset.isExpanded ? '-' : '+'}}</span>
           {{tagset.name}}
         </div>
 
         <div *ngIf="tagset.isExpanded">
-            <ng-container class="filters_tags_labels" *ngFor="let tag of sortTags(tagset.tags)">
-                <app-filters-selection-tag [tag]="tag" (idchecked)="onTagFilterSelected($event)"></app-filters-selection-tag>
-            </ng-container>  
+          <!-- Display tags not present in tagset hierarchy nodes -->
+          <div class="filters_tags_labels_div">
+            <div class="filters_labels_title" *ngIf="tagset.hierarchies && tagset.hierarchies.length>0">
+              <span class="toggle-button" (click)="tagset.isTagListExpanded= !tagset.isTagListExpanded">{{tagset.isTagListExpanded ? '-' : '+'}}</span>  
+              Tags
+            </div>
+            <div class="filters_tags_labels" *ngIf="tagset.isTagListExpanded || !(tagset.hierarchies.length>0)">
+                <app-filters-selection-tag *ngFor="let tag of sortTags(getTagsetTagList(tagset))" [tag]="tag" (idchecked)="onTagFilterSelected($event)"></app-filters-selection-tag>
+            </div>  
+          </div>
+
+          <!-- Display tagset hierarchies and nodes -->
+          <div class="filters_hierarchies_labels" *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)">            
+            <div class="filters_labels_title" *ngIf="hierarchy.isVisible">
+              <input type="checkbox" [checked]="hierarchy.firstNode.isCheckedFilters" (change)="onNodeFilterSelected(hierarchy.firstNode)" [style.margin-right]="'50px'" />
+              <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="hierarchy.firstNode.isExpanded = !hierarchy.firstNode.isExpanded">{{hierarchy.firstNode.isExpanded ? '-' : '+'}}</span> 
+              {{hierarchy.firstNode.name}}
+            </div>
+            <div class="filters_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded && hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0 && hierarchy.firstNode.isVisibleFilters">
+              <app-filters-selection-nodes *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode" (idchecked)="onNodeFilterSelected($event)"></app-filters-selection-nodes>
+            </div>     
+          </div>
         </div>
         
       </div>    

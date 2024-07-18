@@ -13,6 +13,7 @@ export class Tagset {
     isVisibleDimensions : boolean;
     isVisibleFilters : boolean;
     isExpanded : boolean;
+    isTagListExpanded : boolean;
 
 
     constructor(name: string, id: number,hierarchies: Hierarchy[],tags:Tag[] ) {
@@ -27,6 +28,7 @@ export class Tagset {
         this.isVisibleDimensions = true;
         this.isVisibleFilters = true;
         this.isExpanded = false;
+        this.isTagListExpanded = false;
 
         this.type = 'tagset';
     }

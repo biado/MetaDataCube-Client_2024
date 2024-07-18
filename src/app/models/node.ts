@@ -9,7 +9,9 @@ export class Node {
     isExpanded : boolean; 
     isCheckedX : boolean; 
     isCheckedY : boolean; 
-    isVisible : boolean; 
+    isCheckedFilters:boolean;
+    isVisibleDimensions : boolean;
+    isVisibleFilters : boolean;
 
     constructor(name: string, id: number, parents: number | null = null, children: Node[] | null = null, tagID:number) {
         this.name = name;
@@ -21,7 +23,9 @@ export class Node {
         this.isExpanded = false;
         this.isCheckedX = false;
         this.isCheckedY = false;
-        this.isVisible = true;
+        this.isCheckedFilters = false;
+        this.isVisibleDimensions = true;
+        this.isVisibleFilters = true;
         
         this.type = 'node';
     }

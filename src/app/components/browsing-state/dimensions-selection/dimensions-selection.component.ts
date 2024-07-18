@@ -63,7 +63,7 @@ export class DimensionsSelectionComponent {
                 while (nodesToProcess.length > 0) {
                     const currentNode = nodesToProcess.pop()!;
                     currentNode.isExpanded = false;
-                    currentNode.isVisible = true;
+                    currentNode.isVisibleDimensions = true;
                     if (currentNode.children) {
                         nodesToProcess.push(...currentNode.children);
                     }
@@ -78,7 +78,7 @@ export class DimensionsSelectionComponent {
             const parent = allNodes.get(node.parentID);
             if (parent) {
                 parent.isExpanded = true;
-                parent.isVisible = true;
+                parent.isVisibleDimensions = true;
                 expandParents(parent, allNodes);
             }
         }
@@ -88,7 +88,7 @@ export class DimensionsSelectionComponent {
     function childrenVisible(node:Node, toSearch : string){
       if(node.children && node.children.length > 0){
         node.children.forEach(child =>{
-          child.isVisible = true;
+          child.isVisibleDimensions = true;
           if (!(child.name.startsWith(toSearch))) {
             child.isExpanded = false;
           }
@@ -128,7 +128,7 @@ export class DimensionsSelectionComponent {
             }
 
             // Hide all nodes 
-            allNodes.forEach(node => node.isVisible = false);
+            allNodes.forEach(node => node.isVisibleDimensions = false);
 
             // Search for nodes that are parents and whose name begins with nodestosearch
             // If there is a match, we display the node and its parent nodes (and hierarchy and tagset)
@@ -136,7 +136,7 @@ export class DimensionsSelectionComponent {
               if(node.children && node.children.length > 0){
                   if (node.name.startsWith(this.nodestosearch)) {
                       node.isExpanded = true;
-                      node.isVisible = true;
+                      node.isVisibleDimensions = true;
                       childrenVisible(node, this.nodestosearch);
                       expandParents(node, allNodes);
 

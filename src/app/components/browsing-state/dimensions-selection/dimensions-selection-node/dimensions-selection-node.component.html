@@ -2,7 +2,7 @@
 For a node, we'll display the node and its children, and if its children have children, we'll call up a new node component.-->
 
 <!-- We check whether the node has children and whether we accept that it is visible (in connection with the search bar, if the node is not in what we are looking for, we don't display it). -->
-<div *ngIf="node.children && node.children.length > 0 && node.isVisible" class="dimensions_nodes_labels" [style.margin-left.em]="marginLeft" [style.fontSize.em]="getFontSize()">
+<div *ngIf="node.children && node.children.length > 0 && node.isVisibleDimensions" class="dimensions_nodes_labels" [style.margin-left.em]="marginLeft" [style.fontSize.em]="getFontSize()">
 
     <!-- div corresponding to the title + checkbox + button if necessary. -->
     <div class="dimensions_labels_title">
@@ -17,7 +17,7 @@ For a node, we'll display the node and its children, and if its children have ch
       <ng-container *ngFor="let childNode of sortNodes(node.children)">
 
         <!-- If a child of the node has children  -->
-        <div *ngIf="hasNonLeafChildren(childNode) && childNode.children && childNode.children.length > 0 && childNode.isVisible" class="dimensions_nodes_labels">
+        <div *ngIf="hasNonLeafChildren(childNode) && childNode.children && childNode.children.length > 0 && childNode.isVisibleDimensions" class="dimensions_nodes_labels">
             <div class="dimensions_labels_title">
                 <input type="checkbox" [checked]="childNode.isCheckedX" (change)="toggleCheckboxX(childNode)"/>
                 <input type="checkbox" [checked]="childNode.isCheckedY" (change)="toggleCheckboxY(childNode)" [style.margin-right]="'50px'"/>
@@ -30,7 +30,7 @@ For a node, we'll display the node and its children, and if its children have ch
         </div>
 
         <!-- If a child of the node has no children  -->
-        <div *ngIf="(!hasNonLeafChildren(childNode)) && childNode.children && childNode.children.length > 0 && childNode.isVisible" class="dimensions_nodes_labels">
+        <div *ngIf="(!hasNonLeafChildren(childNode)) && childNode.children && childNode.children.length > 0 && childNode.isVisibleDimensions" class="dimensions_nodes_labels">
             <div class="dimensions_labels_title">
                 <input type="checkbox" [checked]="childNode.isCheckedX" (change)="toggleCheckboxX(childNode)"/>
                 <input type="checkbox" [checked]="childNode.isCheckedY" (change)="toggleCheckboxY(childNode)" [style.margin-right]="'50px'"/>

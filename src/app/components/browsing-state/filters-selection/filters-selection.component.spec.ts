@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FiltersSelectionComponent } from './filters-selection.component';
 
-describe('FiltersSelectionComponent', () => {
+describe('NewFiltersSelectionComponent', () => {
   let component: FiltersSelectionComponent;
   let fixture: ComponentFixture<FiltersSelectionComponent>;
 

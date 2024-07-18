@@ -86,8 +86,8 @@ export class FindElement {
   /**
    * Function to find a filter (a tag) in the tagsetList.
    */
-  findFilterinTagsetList(elementid: number, elementType: 'tagset' | 'tag'):Tag|Tagset|null{
-    let element: Tagset | Tag | null = null;
+  findFilterinTagsetList(elementid: number, elementType: 'tagset' | 'tag' | 'node'):Tag|Tagset|Node|null{
+    let element: Tagset | Tag | Node | null = null;
     
     for (const tagset of this.tagsetList) {
         if (elementType === 'tagset') {
@@ -103,6 +103,9 @@ export class FindElement {
                     break;
                 }
             }
+        }
+        else if (elementType === 'node') {
+            element = this.findElementinTagsetList(elementid,elementType);
         }
     }
 
