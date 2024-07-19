@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "PhotoCube-Client": {
+    "MediaCube-Client": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -75,10 +75,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "PhotoCube-Client:build:production"
+              "buildTarget": "MediaCube-Client:build:production"
             },
             "development": {
-              "buildTarget": "PhotoCube-Client:build:development"
+              "buildTarget": "MediaCube-Client:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -86,7 +86,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "PhotoCube-Client:build"
+            "buildTarget": "MediaCube-Client:build"
           }
         },
         "test": {

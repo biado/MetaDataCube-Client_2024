@@ -2,12 +2,13 @@
 
     <!-- Header Tag (small and large screen) -->
     <header>
-      <div class="header_title">PhotoCube</div>
+      <div class="header_title">MediaCube</div>
       <div class="header_undoredo_div">
         <img class="header_undoredo_img" src="../assets/icons/undo.svg" (click)="undo()">
         <img class="header_undoredo_img" src="../assets/icons/redo.svg" (click)="redo()">
       </div>
       <div class="header_buttons_div">
+        <button class="header_buttons" (click)="display_dimensions_preselection()">Pre-Selection</button>
         <button class="header_buttons" (click)="reload_tagset_list()">Reload Data</button>
         <button class="header_buttons" (click)="saveSearch()">Save</button>
         <button class="header_buttons" (click)="loadSearch()">Load</button>
@@ -37,6 +38,8 @@
           <app-filters-selection></app-filters-selection>
         </div>
       </section>
+
+      <app-pre-selection-popup *ngIf="display_popup_preselection" (close_popup_event)="display_dimensions_preselection()"></app-pre-selection-popup>      
     </article>
   
     <!-- Article Tag for small screen -->
@@ -63,8 +66,12 @@
             <app-filters-selection></app-filters-selection>
           </div>
         </section>
+
+        <app-pre-selection-popup *ngIf="display_popup_preselection" (close_popup_event)="display_dimensions_preselection()"></app-pre-selection-popup>
       </article>
     </ng-template>
+
+    
   
   
   </body>

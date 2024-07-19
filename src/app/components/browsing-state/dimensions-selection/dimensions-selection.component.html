@@ -9,9 +9,20 @@
 <button class="clear_selection_component" (click)="clearDimensionsSelection()"> Clear Selection </button>
 
 <div class="selection_component_labels">
+
+    <!-- Checked items will be displayed at the top (double) to make them easier to find and uncheck. -->
+    <div class="dimensions_checked_all_element" [style.border-bottom]="!(checked_elements.length===0) ? 'solid var(--main-color)' : 'none'">
+      <div class="dimensions_checked_element" *ngFor="let element of checked_elements">
+        <input type="checkbox" [checked]="element.isCheckedX" (change)="toggleCheckboxX(element)" />
+        <input type="checkbox" [checked]="element.isCheckedY" (change)="toggleCheckboxY(element)" [style.margin-right]="'50px'"/>
+        {{element.name}}
+      </div>
+    </div>
+
     <div class="dimensions_column_title">
       <div>X</div><div>Y</div>
     </div>
+
     <div class="dimensions_tagset_labels" *ngFor="let tagset of tagsetlist" >
       <div *ngIf="tagset.isVisibleDimensions">
         <div class="dimensions_labels_title">
@@ -29,11 +40,12 @@
                 <span *ngIf="hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0" class="toggle-button" (click)="toggleNode(hierarchy.firstNode)">{{toggleButton(hierarchy.firstNode)}}</span> 
                 {{hierarchy.firstNode.name}}
             </div>
-            <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpanded">
+            <ng-container class="dimensions_childnodes_labels" *ngIf="hierarchy.firstNode.isExpandedDimensions">
                 <app-dimensions-selection-node *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode"  [nodegen]="1" (checkX)="toggleCheckboxX($event)" (checkY)="toggleCheckboxY($event)"></app-dimensions-selection-node>
             </ng-container>        
           </div> 
         </div>
       </div>    
     </div>
+
 </div>

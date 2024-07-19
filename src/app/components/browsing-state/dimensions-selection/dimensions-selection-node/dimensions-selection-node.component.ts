@@ -10,7 +10,7 @@ import { SelectedDimensionsService } from '../../../../services/selected-dimensi
 })
 export class DimensionsSelectionNodeComponent {
   list:Node[]=[];
-  @Input() node: Node = new Node("test",0,null,this.list,-1);
+  @Input() node: Node = new Node("test",0,null,this.list,-1,-1);
   @Input() nodegen: number=-1;
   @Output() checkX = new EventEmitter<Node>();
   @Output() checkY = new EventEmitter<Node>();
@@ -49,14 +49,14 @@ export class DimensionsSelectionNodeComponent {
    * (- if the list is scrolled, + otherwise)
    */
   toggleButton(node:Node): string {
-    return node.isExpanded ? '-' : '+';
+    return node.isExpandedDimensions ? '-' : '+';
   }
   
   /***
    * Applies to the node whether it is scrolled down or not
    */
   toggleNode(node:Node): void {
-    node.isExpanded = !node.isExpanded;
+    node.isExpandedDimensions = !node.isExpandedDimensions;
   }
 
   /***

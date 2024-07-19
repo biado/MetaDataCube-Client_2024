@@ -10,6 +10,7 @@ import { SelectedCellStateService } from './selected-cell-state.service';
 @Injectable({
   providedIn: 'root'
 })
+
 export class GetUrlToSelectedDimensionsOrCellStateService {
   filters : Filter[] = [];
   
@@ -77,7 +78,6 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
    */ 
   private addUrlCorrespondToSelectedDimensions(selectedDimensions : SelectedDimensions,filters:Filter[]){
     selectedDimensions.url = this.createCellUrl(filters,selectedDimensions.xid, selectedDimensions.xtype, selectedDimensions.yid, selectedDimensions.ytype);       
-    console.log(selectedDimensions)
     this.selectedDimensionsWithUrl.next(selectedDimensions);
   }
 
@@ -99,30 +99,68 @@ export class GetUrlToSelectedDimensionsOrCellStateService {
 
   /**
    * Function to create api/cell url corresponding to selected dimensions and filters.
+   * 
+   * If two filters of the same type have the same tagset, then in this case we'll put them in the same set in the url to create an OR. Otherwise, we'll use AND.
+   * 
+   * OR : filters=[{"type":"type","ids":[id1,id2]}]
+   * AND : filters=[{"type":"type","ids":[id1]},{"type":"type","ids":[id2]}]
    */ 
   private createCellUrl(filters:Filter[],xid?: number, xtype?: 'node'|'tagset'|'tag', yid?: number, ytype?: 'node'|'tagset'|'tag'):string{
     let url:string = `api/cell/?`;
     
+    // xAxis
     if(xid && xtype){
       url = url + `xAxis={\"type\":\"${xtype}\",\"id\":${xid}}&`;
     }
     
+    // yAxis
     if( yid && ytype){
       url = url + `yAxis={\"type\":\"${ytype}\",\"id\":${yid}}&`;
     }
 
+    // Filters
     if(filters && filters.length>0){
       url = url + `filters=[`
-      for(const filt of filters){
-        url = url + `{"type":"${filt.type}","ids":[${filt.id}]},`
+
+      let sameTagsetFilters: { [key: string]: Filter[] } = {};
+
+      // We group the filter with the same type and tagsetID
+      for (const filt of filters) {
+        let key: string;
+        if (filt.element.type === 'tagset') {
+          key = `${filt.element.id}_${filt.element.type}`;
+        } else {
+          key = `${filt.element.tagsetID}_${filt.element.type}`;
+        }
+        if (!sameTagsetFilters[key]) {
+          sameTagsetFilters[key] = [];
+        }
+        sameTagsetFilters[key].push(filt);
       }
+
+      // We create the corresponding URL
+      for (const key in sameTagsetFilters) {
+        if (sameTagsetFilters.hasOwnProperty(key)) {
+          const [tagsetID, type] = key.split('_');
+          const filters = sameTagsetFilters[key];
+          url = url + `{"type":"${type}","ids":[`;
+          
+          for (const filter of filters) {
+            url = url + `${filter.id},`
+          }
+          url = url.substring(0, url.length-1);
+          url = url + `]},`
+        }
+      }
+
       url = url.substring(0, url.length-1);
       url = url + `]&`
     }
 
+    // End of the URL (we delete the last "&")
     url = url.substring(0, url.length-1);
 
-    console.log("URL2: ",url);
+    console.log("URL: ",url);
     return url;
   }
 

@@ -13,7 +13,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export class GetTagsetListService {
   /** tagsetListSubject is an observable subject, storing a list of Tagsets.  */
-  private tagsetListSubject = new BehaviorSubject<Tagset[]>([]);
+  tagsetListSubject = new BehaviorSubject<Tagset[]>([]);
   /** tagset$ is a public observable, providing access to tagsetListSubject externally.  */
   tagsetList$ = this.tagsetListSubject.asObservable();
 
@@ -23,7 +23,9 @@ export class GetTagsetListService {
   constructor(
     private http: HttpClient,
     private indexedDbService: IndexedDbService,
-  ) {    this.loadTagsets();  }
+  ) {
+      this.loadTagsets(); 
+    }
 
   private baseUrl = '/api';
 
@@ -164,7 +166,7 @@ export class GetTagsetListService {
 
     for (const hierarchy of hierarchies) {
         const hierarchyInformations : any = await this.http.get(`${this.baseUrl}/hierarchy/${hierarchy.id}`).toPromise()
-        const firstNode = await this.getNodeInformations(hierarchyInformations.nodes[0], null);
+        const firstNode = await this.getNodeInformations(hierarchyInformations.nodes[0], hierarchy.tagsetId ,null);
         const newHierarchy = new Hierarchy(hierarchy.name, hierarchy.id, hierarchy.tagsetId, hierarchy.rootNodeId, firstNode);
         res.push(newHierarchy);
     }
@@ -178,11 +180,12 @@ export class GetTagsetListService {
    * For the list of children, for each child of the actual node, we'll send each child to the function (recursivity). 
    * We therefore have a recursion that stops as soon as a node has no children.
    */
-  async getNodeInformations(rawnode: any, parentID: number | null = null): Promise<Node> {
+  async getNodeInformations(rawnode: any, tagsetId: number, parentID: number | null = null): Promise<Node> {
     let parents: number | null = parentID;
     let children: Node[] = [];
     let name = "";
     let id = rawnode.id;
+    let tagsetID = tagsetId;
     let tagID = -1;
 
     try{
@@ -190,14 +193,14 @@ export class GetTagsetListService {
       tagID = rawnode.tag.id;
 
       if (rawnode.children && rawnode.children.length > 0) {
-        const childPromises = rawnode.children.map((element: any) => this.getNodeInformations(element, id));
+        const childPromises = rawnode.children.map((element: any) => this.getNodeInformations(element, tagsetId, id));
         children = await Promise.all(childPromises);
       }      
     } catch (error) {
       console.error('Error fetching node information:', error);
     }
 
-    return new Node(name, id, parents, children, tagID);
+    return new Node(name, id, parents, children, tagID, tagsetID);
   } 
 
   /**

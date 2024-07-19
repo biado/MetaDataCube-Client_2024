@@ -17,7 +17,6 @@ export class FiltersSelectionTagComponent {
  * filter-selection.component to call its onTagFilterSelected function.
  */
   toggleCheckboxTagFiltersSelected(tag:Tag) {
-    tag.ischecked = !tag.ischecked;
     this.idchecked.emit(tag);
   }
   

@@ -3,6 +3,7 @@ import { Tagset } from '../models/tagset';
 import { Node } from '../models/node';
 import { GetTagsetListService } from './get-tagset-list.service';
 import { Tag } from '../models/tag';
+import { Hierarchy } from '../models/hierarchy';
 
 @Injectable({
   providedIn: 'root'
@@ -20,12 +21,12 @@ export class FindElement {
    }
 
   /**
-   * Retrieves a node or tagset using the type and id of the element. This will retrieve the exact object from the tagsetList.
+   * Retrieves a node, tagset, tag or hierarchy using the type and id of the element. This will retrieve the exact object from the tagsetList.
    * 
    * Contains an internal function  "findNodeById" which searches for the node (if the component is a node) in depth.
    */
-  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset'): Tagset | Node | null {
-    let element: Tagset | Node | null = null;
+  findElementinTagsetList(elementid: number, elementType: 'node' | 'tagset' | 'tag' | 'hierarchy'): Tagset | Node | Tag | Hierarchy| null {
+    let element: Tagset | Node | Tag | Hierarchy| null = null;
     
     for (const tagset of this.tagsetList) {
         if (elementType === 'tagset') {
@@ -45,6 +46,22 @@ export class FindElement {
                         element = foundNode;
                         break;
                     }
+                }
+            }
+        }
+        else if (elementType === 'tag') {
+            for (const tag of tagset.tags) {
+                if (tag.id === elementid) {
+                    element = tag;
+                    break;
+                }
+            }
+        }
+        else if (elementType === 'hierarchy') {
+            for (const hier of tagset.hierarchies) {
+                if (hier.id === elementid) {
+                    element = hier;
+                    break;
                 }
             }
         }
@@ -69,56 +86,43 @@ export class FindElement {
     }
   }
 
+
   /**
-   * Function that extends all the parents of a node.
+   * Function that extends all the parents of a node in Dimensions Case.
    */
-  expandNodeParents(parentid: number|null): void {
+  expandDimNodeParents(parentid: number|null): void {
     if(!(parentid===null)){
       const parent = this.findElementinTagsetList(parentid,'node');
       if(parent && parent.type==='node'){
-        parent.isExpanded = true;
-        this.expandNodeParents(parent.parentID);
+        parent.isExpandedDimensions = true;
+        this.expandDimNodeParents(parent.parentID);
       }
     }
   }
 
   /**
-   * Function to find a filter (a tag) in the tagsetList.
+   * Function that extends all the parents of a node in Filters Case.
    */
-  findFilterinTagsetList(elementid: number, elementType: 'tagset' | 'tag'):Tag|Tagset|null{
-    let element: Tagset | Tag | null = null;
-    
-    for (const tagset of this.tagsetList) {
-        if (elementType === 'tagset') {
-            if (tagset.id ===  elementid) {
-                element = tagset;
-                break;
-            }
-        } 
-        else if (elementType === 'tag') {
-            for (const tag of tagset.tags) {
-                if (tag.id === elementid) {
-                    element = tag;
-                    break;
-                }
-            }
-        }
+  expandFilterNodeParents(parentid: number|null): void {
+    if(!(parentid===null)){
+      const parent = this.findElementinTagsetList(parentid,'node');
+      if(parent && parent.type==='node'){
+        parent.isExpandedFilters = true;
+        this.expandFilterNodeParents(parent.parentID);
+      }
     }
-
-    return element;
-  }
+  } 
 
   /**
-   * Function that extends all the parents of tag.
+   * Function that extends the tagset of the element
    */
-  expandFitlerTagset(tag : Tag): void {
-    if(!(tag.tagsetid===null)){
-      const parentTagset = this.findElementinTagsetList(tag.tagsetid,'tagset');
-      if(parentTagset){
-        parentTagset.isExpanded=true;
+  expandFitlerTagset(elt : Tag|Node): void {
+    if(!(elt.tagsetID===null)){
+      const parentTagset = this.findElementinTagsetList(elt.tagsetID,'tagset');
+      if(parentTagset && parentTagset.type==='tagset'){
+        parentTagset.isExpandedFilters=true;
       }
     }
   }
 }
-
 

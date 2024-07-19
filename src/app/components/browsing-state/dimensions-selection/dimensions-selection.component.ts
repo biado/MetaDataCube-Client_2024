@@ -17,6 +17,8 @@ export class DimensionsSelectionComponent {
   nodestosearch = '';
   tagsetlist: Tagset[] = [];
 
+  checked_elements : (Tagset|Node)[] = [];     //
+
   selectedDimensions : SelectedDimensions = new SelectedDimensions();
 
   constructor(
@@ -38,6 +40,13 @@ export class DimensionsSelectionComponent {
 
     this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
       this.selectedDimensions = data;
+      this.checked_elements = [];
+      if(data.elementX && !(data.elementX.type==='tag')){
+        this.checked_elements.push(data.elementX);
+      }
+      if(data.elementY && !(data.elementY.type==='tag')){
+        this.checked_elements.push(data.elementY);
+      }
     });
   }
 
@@ -60,8 +69,8 @@ export class DimensionsSelectionComponent {
                 const nodesToProcess: Node[] = [hierarchy.firstNode];
                 while (nodesToProcess.length > 0) {
                     const currentNode = nodesToProcess.pop()!;
-                    currentNode.isExpanded = false;
-                    currentNode.isVisible = true;
+                    currentNode.isExpandedDimensions = false;
+                    currentNode.isVisibleDimensions = true;
                     if (currentNode.children) {
                         nodesToProcess.push(...currentNode.children);
                     }
@@ -75,8 +84,8 @@ export class DimensionsSelectionComponent {
         if (node.parentID !== null) {
             const parent = allNodes.get(node.parentID);
             if (parent) {
-                parent.isExpanded = true;
-                parent.isVisible = true;
+                parent.isExpandedDimensions = true;
+                parent.isVisibleDimensions = true;
                 expandParents(parent, allNodes);
             }
         }
@@ -86,9 +95,9 @@ export class DimensionsSelectionComponent {
     function childrenVisible(node:Node, toSearch : string){
       if(node.children && node.children.length > 0){
         node.children.forEach(child =>{
-          child.isVisible = true;
+          child.isVisibleDimensions = true;
           if (!(child.name.startsWith(toSearch))) {
-            child.isExpanded = false;
+            child.isExpandedDimensions = false;
           }
           childrenVisible(child,toSearch);
         })
@@ -126,15 +135,15 @@ export class DimensionsSelectionComponent {
             }
 
             // Hide all nodes 
-            allNodes.forEach(node => node.isVisible = false);
+            allNodes.forEach(node => node.isVisibleDimensions = false);
 
             // Search for nodes that are parents and whose name begins with nodestosearch
             // If there is a match, we display the node and its parent nodes (and hierarchy and tagset)
             allNodes.forEach(node => {
               if(node.children && node.children.length > 0){
                   if (node.name.startsWith(this.nodestosearch)) {
-                      node.isExpanded = true;
-                      node.isVisible = true;
+                      node.isExpandedDimensions = true;
+                      node.isVisibleDimensions = true;
                       childrenVisible(node, this.nodestosearch);
                       expandParents(node, allNodes);
 
@@ -176,14 +185,14 @@ export class DimensionsSelectionComponent {
    * (- if the list is scrolled, + otherwise)
    */
   toggleButton(node:Node): string {
-    return node.isExpanded ? '-' : '+';
+    return node.isExpandedDimensions ? '-' : '+';
   }
 
   /**
    * Applies to the node whether it is scrolled down or not
    */
   toggleNode(node:Node): void {
-    node.isExpanded = !node.isExpanded;
+    node.isExpandedDimensions = !node.isExpandedDimensions;
   }
 
   /**
@@ -201,6 +210,8 @@ export class DimensionsSelectionComponent {
    * 
    * If ticked, the variables for X are defined with the data the element that has been ticked. If we uncheck, we set the variables to null.
    * If an element was already checked, we'll uncheck it and then update the values. 
+   * 
+   * We'll update the list of checked items depending on whether we're checking or dechecking.
    */
   toggleCheckboxX(elt:Node|Tagset): void {
     let newSelectedDimensions: SelectedDimensions = new SelectedDimensions();
@@ -243,6 +254,8 @@ export class DimensionsSelectionComponent {
    * 
    * If ticked, the variables for Y are defined with the data of the element that has been ticked. If we uncheck, we set the variables to null.
    * If an element was already checked, we'll uncheck it and then update the values.
+   * 
+   * We'll update the list of checked items depending on whether we're checking or dechecking.
    */
   toggleCheckboxY(elt:Node|Tagset): void {
     let newSelectedDimensions:SelectedDimensions = new SelectedDimensions();
@@ -275,7 +288,7 @@ export class DimensionsSelectionComponent {
         newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
         newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
       }
-    }    
+    } 
 
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
@@ -315,7 +328,7 @@ export class DimensionsSelectionComponent {
               }
           }
 
-          allNodes.forEach(node => node.isExpanded = false);
+          allNodes.forEach(node => node.isExpandedDimensions = false);
       });
     });
    
@@ -324,6 +337,8 @@ export class DimensionsSelectionComponent {
     newSelectedDimensions.ischeckedY = false;
     this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
     this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
+
+    this.checked_elements = [];
   }
   
 }

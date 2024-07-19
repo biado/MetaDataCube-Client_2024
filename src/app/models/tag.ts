@@ -1,7 +1,7 @@
 export class Tag {    
     name: string;
     id: number;
-    tagsetid : number;
+    tagsetID : number;
     type:'tag';
 
     ischecked : boolean;
@@ -10,7 +10,7 @@ export class Tag {
     constructor(name: string, id: number,tagsetid : number ) {
         this.name = name;
         this.id = id;
-        this.tagsetid = tagsetid;
+        this.tagsetID = tagsetid;
 
         this.ischecked=false;
         this.isVisible=true;
