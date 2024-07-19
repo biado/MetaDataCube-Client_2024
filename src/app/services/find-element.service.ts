@@ -117,19 +117,10 @@ export class FindElement {
    * Function that extends the tagset of the element
    */
   expandFitlerTagset(elt : Tag|Node): void {
-    if(elt.type==='tag' && !(elt.tagsetid===null)){
-      const parentTagset = this.findElementinTagsetList(elt.tagsetid,'tagset');
+    if(!(elt.tagsetID===null)){
+      const parentTagset = this.findElementinTagsetList(elt.tagsetID,'tagset');
       if(parentTagset && parentTagset.type==='tagset'){
         parentTagset.isExpandedFilters=true;
-      }
-    }
-    else if(elt.type==='node'){
-      const tagOfNode = this.findElementinTagsetList(elt.tagId,'tag');
-      if(tagOfNode?.type==='tag'){
-        const parentTagset = this.findElementinTagsetList(tagOfNode.tagsetid,'tagset');
-        if(parentTagset && parentTagset.type==='tagset'){
-          parentTagset.isExpandedFilters=true;
-        }
       }
     }
   }
