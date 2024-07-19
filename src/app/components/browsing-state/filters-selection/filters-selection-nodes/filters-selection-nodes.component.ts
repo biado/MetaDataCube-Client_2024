@@ -7,7 +7,7 @@ import { Node } from '../../../../models/node';
   styleUrl: '../filters-selection.component.css'
 })
 export class FiltersSelectionNodesComponent {
-  @Input() node: Node = new Node("init",-1,undefined,undefined,-1);
+  @Input() node: Node = new Node("init",-1,undefined,undefined,-1,-1);
   @Output() idchecked = new EventEmitter<Node>();
 
   /**

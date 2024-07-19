@@ -3,6 +3,7 @@ export class Node {
     id: number;
     type:'node';
     parentID: number | null;
+    tagsetID : number;
     children: Node[] | null;
     tagId : number;
 
@@ -14,10 +15,11 @@ export class Node {
     isVisibleDimensions : boolean;
     isVisibleFilters : boolean;
 
-    constructor(name: string, id: number, parents: number | null = null, children: Node[] | null = null, tagID:number) {
+    constructor(name: string, id: number, parents: number | null = null, children: Node[] | null = null, tagID:number, tagsetID : number) {
         this.name = name;
         this.id = id;
         this.parentID = parents;
+        this.tagsetID = tagsetID;
         this.children = children;
         this.tagId = tagID;
 
