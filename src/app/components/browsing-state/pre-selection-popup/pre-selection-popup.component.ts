@@ -56,12 +56,12 @@ export class PreSelectionPopupComponent {
     let modified_elements : (Tagset|Hierarchy)[] = [];
 
     tagset.hierarchies.forEach(hierarchy => {
-      if((hierarchy.isVisible === tagset.isVisibleDimensions)){
+      if((hierarchy.isVisible === tagset.isVisible)){
         hierarchy.isVisible = !hierarchy.isVisible;
         modified_elements.push(hierarchy);
       }
     })
-    tagset.isVisibleDimensions = !tagset.isVisibleDimensions;
+    tagset.isVisible = !tagset.isVisible;
     modified_elements.push(tagset);
 
     this.undoRedoService.addPreSelectionAction(modified_elements);
@@ -77,7 +77,7 @@ export class PreSelectionPopupComponent {
     modified_elements.push(hierarchy);
 
     if(hierarchy.isVisible){
-      tagset.isVisibleDimensions = true;
+      tagset.isVisible = true;
       modified_elements.push(tagset);
     }
 

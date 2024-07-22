@@ -149,13 +149,11 @@ export class BrowsingStateComponent {
               // We reduce and uncheck the elements previously selected.
               if(this.selectedDimensions.elementX && !(this.selectedDimensions.elementX?.type==="tag")){
                 this.selectedDimensions.elementX.isCheckedX=false;
-                this.selectedDimensions.elementX.isExpandedDimensions=false;
-                this.selectedDimensions.elementX.isExpandedFilters=false;
+                this.selectedDimensions.elementX.isExpanded=false;
               }
               if(this.selectedDimensions.elementY && !(this.selectedDimensions.elementY?.type==="tag")){
                 this.selectedDimensions.elementY.isCheckedY=false;
-                this.selectedDimensions.elementY.isExpandedDimensions=false;
-                this.selectedDimensions.elementY.isExpandedFilters=false;
+                this.selectedDimensions.elementY.isExpanded=false;
               }
               this.selectedFilters.forEach(filter=>{
                 if(filter.element.type==='tag'){
@@ -171,10 +169,8 @@ export class BrowsingStateComponent {
               if(actualX && !(actualX.type==='tag' || actualX.type==='hierarchy')){
                 actualX.isCheckedX = json.selectedDimensions.elementX.isCheckedX; 
                 if(actualX.type==="node"){
-                  this.findElementService.expandDimNodeParents(actualX.id);
+                  this.findElementService.expandNodeParents(actualX.parentID);
                 }
-                actualX.isExpandedDimensions = json.selectedDimensions.elementX.isExpandedDimensions;
-                actualX.isVisibleFilters = json.selectedDimensions.elementX.isExpandedFilters;
               }
               json.selectedDimensions.elementX = actualX;
 
@@ -183,10 +179,8 @@ export class BrowsingStateComponent {
               if(actualY && !(actualY.type==='tag' || actualY.type==='hierarchy')){
                 actualY.isCheckedY = json.selectedDimensions.elementY.isCheckedY; 
                 if(actualY.type==="node"){
-                  this.findElementService.expandDimNodeParents(actualY.id);
+                  this.findElementService.expandNodeParents(actualY.parentID);
                 }
-                actualY.isExpandedDimensions = json.selectedDimensions.elementY.isExpandedDimensions;
-                actualY.isVisibleFilters = json.selectedDimensions.elementY.isVisibleFilters;
               }
               json.selectedDimensions.elementY = actualY;
 
@@ -197,19 +191,17 @@ export class BrowsingStateComponent {
                 if(actualFilter && !(actualFilter.type==='hierarchy')){
                   if(actualFilter.type==="tag"&&filter.element.type==="tag"){
                     actualFilter.ischecked=filter.element.ischecked;
-                    this.findElementService.expandFitlerTagset(actualFilter);
+                    this.findElementService.expandParentTagset(actualFilter);
                   }
                   else if (actualFilter.type==="tagset"&&filter.element.type==="tagset"){
                     actualFilter.isCheckedFilters=filter.element.isCheckedFilters;
-                    actualFilter.isExpandedDimensions=filter.element.isExpandedDimensions;
-                    actualFilter.isExpandedFilters=filter.element.isExpandedFilters;
+                    actualFilter.isExpanded=filter.element.isExpanded;
                   }
                   else if (actualFilter.type==="node"&&filter.element.type==="node"){
                     actualFilter.isCheckedFilters=filter.element.isCheckedFilters;
-                    actualFilter.isExpandedDimensions=filter.element.isExpandedDimensions;
-                    actualFilter.isExpandedFilters=filter.element.isExpandedFilters;
-                    this.findElementService.expandFitlerTagset(actualFilter);
-                    this.findElementService.expandFilterNodeParents(actualFilter.parentID);
+                    actualFilter.isExpanded=filter.element.isExpanded;
+                    this.findElementService.expandParentTagset(actualFilter);
+                    this.findElementService.expandNodeParents(actualFilter.parentID);
                   }
                   newFiltersList.push(new Filter(actualFilter.id,actualFilter.type,actualFilter))
                 }
@@ -224,8 +216,8 @@ export class BrowsingStateComponent {
                     modified_elements.push(hierarchy);
                   }
                 })
-                if(tagset.isVisibleDimensions===false){
-                  tagset.isVisibleDimensions = true;
+                if(tagset.isVisible===false){
+                  tagset.isVisible = true;
                   modified_elements.push(tagset);
                 }
               });
@@ -235,7 +227,7 @@ export class BrowsingStateComponent {
                 list.forEach(elt =>{
                   let element = this.findElementService.findElementinTagsetList(elt.id, elt.type);
                   if(element && element.type ==="tagset" && elt.type==="tagset"){
-                    element.isVisibleDimensions = elt.isVisibleDimensions;
+                    element.isVisible = elt.isVisible;
                     modified_elements.push(element);
                   }
                   else if (element && element.type ==="hierarchy" && elt.type==="hierarchy") {

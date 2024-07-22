@@ -90,37 +90,24 @@ export class FindElement {
   /**
    * Function that extends all the parents of a node in Dimensions Case.
    */
-  expandDimNodeParents(parentid: number|null): void {
+  expandNodeParents(parentid: number|null): void {
     if(!(parentid===null)){
       const parent = this.findElementinTagsetList(parentid,'node');
       if(parent && parent.type==='node'){
-        parent.isExpandedDimensions = true;
-        this.expandDimNodeParents(parent.parentID);
+        parent.isExpanded = true;
+        this.expandNodeParents(parent.parentID);
       }
     }
   }
 
   /**
-   * Function that extends all the parents of a node in Filters Case.
-   */
-  expandFilterNodeParents(parentid: number|null): void {
-    if(!(parentid===null)){
-      const parent = this.findElementinTagsetList(parentid,'node');
-      if(parent && parent.type==='node'){
-        parent.isExpandedFilters = true;
-        this.expandFilterNodeParents(parent.parentID);
-      }
-    }
-  } 
-
-  /**
    * Function that extends the tagset of the element
    */
-  expandFitlerTagset(elt : Tag|Node): void {
+  expandParentTagset(elt : Tag|Node): void {
     if(!(elt.tagsetID===null)){
       const parentTagset = this.findElementinTagsetList(elt.tagsetID,'tagset');
       if(parentTagset && parentTagset.type==='tagset'){
-        parentTagset.isExpandedFilters=true;
+        parentTagset.isExpanded=true;
       }
     }
   }

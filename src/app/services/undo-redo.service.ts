@@ -149,7 +149,7 @@ export class UndoRedoService {
         }
   
         else{
-          elt.isVisibleDimensions = !elt.isVisibleDimensions;
+          elt.isVisible = !elt.isVisible;
         }
       })
     }
@@ -212,11 +212,11 @@ export class UndoRedoService {
 
     if(newSelectedDimensions.elementX?.type==="node" || newSelectedDimensions.elementX?.type==="tagset"){
       newSelectedDimensions.elementX.isCheckedX = true;
-      if(newSelectedDimensions.elementX.type==='node'){this.findElement.expandDimNodeParents(newSelectedDimensions.elementX.parentID)}
+      if(newSelectedDimensions.elementX.type==='node'){this.findElement.expandNodeParents(newSelectedDimensions.elementX.parentID)}
     }
     if(newSelectedDimensions.elementY?.type==="node" || newSelectedDimensions.elementY?.type==="tagset"){
       newSelectedDimensions.elementY.isCheckedY = true;
-      if(newSelectedDimensions.elementY.type==='node'){this.findElement.expandDimNodeParents(newSelectedDimensions.elementY.parentID)}
+      if(newSelectedDimensions.elementY.type==='node'){this.findElement.expandNodeParents(newSelectedDimensions.elementY.parentID)}
     }
 
 
@@ -248,8 +248,8 @@ export class UndoRedoService {
       else{
         filter.element.isCheckedFilters = true;
         if(filter.element.type==='node'){
-          this.findElement.expandFilterNodeParents(filter.element.parentID);
-          this.findElement.expandFitlerTagset(filter.element);
+          this.findElement.expandNodeParents(filter.element.parentID);
+          this.findElement.expandParentTagset(filter.element);
         }
       }
     })
@@ -272,7 +272,7 @@ export class UndoRedoService {
           elt.isVisible = !elt.isVisible;
         }  
         else{
-          elt.isVisibleDimensions = !elt.isVisibleDimensions;
+          elt.isVisible = !elt.isVisible;
         }
       })
     }

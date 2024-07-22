@@ -1,0 +1,34 @@
+<div *ngIf="node.isVisible" class="selection_nodes_labels" [style.margin-left.em]="marginLeft" [style.fontSize.em]="getFontSize()">
+
+    <div class="selection_labels_title">
+        <input type="checkbox" [checked]="node.isCheckedX" [disabled]="!(node.children) || !(node.children.length>0)" (change)="toggleCheckboxX(node)"/>
+        <input type="checkbox" [checked]="node.isCheckedY" [disabled]="!(node.children) || !(node.children.length>0)" (change)="toggleCheckboxY(node)" />
+        <input type="checkbox" [checked]="node.isCheckedFilters" (change)="toggleCheckboxNodeFiltersSelected(node)" [style.margin-right]="'50px'"/>
+        
+        <div *ngIf="node.children && node.children.length>0">
+            <span class="toggle-button" (click)="toggleNode(node)">{{toggleButton(node)}}</span> 
+        </div>
+        {{node.name}}
+    </div>
+
+    <ng-container class="selection_childnodes_labels" *ngIf="node.isExpanded">
+      <ng-container *ngFor="let childNode of sortNodes(node.children)">
+        <div class="selection_nodes_labels" *ngIf="childNode.isVisible">
+            <div class="selection_labels_title">
+                <input type="checkbox" [checked]="childNode.isCheckedX" [disabled]="!(childNode.children) || !(childNode.children.length>0)" (change)="toggleCheckboxX(childNode)"/>
+                <input type="checkbox" [checked]="childNode.isCheckedY" [disabled]="!(childNode.children) || !(childNode.children.length>0)" (change)="toggleCheckboxY(childNode)" />
+                <input type="checkbox" [checked]="childNode.isCheckedFilters" (change)="toggleCheckboxNodeFiltersSelected(childNode)" [style.margin-right]="'50px'"/>
+                
+                <div *ngIf="childNode.children && childNode.children.length>0">
+                    <span class="toggle-button" (click)="toggleNode(childNode)">{{toggleButton(childNode)}}</span> 
+                </div>
+                {{childNode.name}}
+            </div>
+            <ng-container class="selection_childnodes_labels" *ngIf="childNode.isExpanded">
+                <app-selection-node *ngFor="let grandChildNode of sortNodes(childNode.children)" [node]="grandChildNode" [nodegen]="nodegen+1" (checkX)="toggleCheckboxX($event)" (checkY)="toggleCheckboxY($event)" (checkfilter)="toggleCheckboxNodeFiltersSelected($event)"></app-selection-node>
+            </ng-container>          
+        </div>
+      </ng-container>
+    </ng-container>
+
+</div>

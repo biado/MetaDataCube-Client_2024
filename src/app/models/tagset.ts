@@ -10,10 +10,11 @@ export class Tagset {
     isCheckedX:boolean;
     isCheckedY:boolean;
     isCheckedFilters:boolean;
-    isVisibleDimensions : boolean;
-    isVisibleFilters : boolean;
-    isExpandedDimensions : boolean;
-    isExpandedFilters : boolean;
+    isVisible : boolean;
+    isExpanded : boolean;
+
+    // Variable to show/expand or not the list of tag contain in the tagset
+    isTagListVisible : boolean; 
     isTagListExpanded : boolean;
 
 
@@ -26,10 +27,10 @@ export class Tagset {
         this.isCheckedX = false;
         this.isCheckedY = false;
         this.isCheckedFilters = false;
-        this.isVisibleDimensions = true;
-        this.isVisibleFilters = true;
-        this.isExpandedDimensions = false;
-        this.isExpandedFilters = false;
+        this.isVisible = true;
+        this.isExpanded = false;
+
+        this.isTagListVisible = true;
         this.isTagListExpanded = false;
 
         this.type = 'tagset';

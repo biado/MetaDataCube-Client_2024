@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Tag } from '../../../../models/tag';
 
 @Component({
-  selector: 'app-filters-selection-tag',
-  templateUrl: './filters-selection-tag.component.html',
-  styleUrl: '../filters-selection.component.css'
+  selector: 'app-selection-tag',
+  templateUrl: './selection-tag.component.html',
+  styleUrl: '../selection.component.css'
 })
-export class FiltersSelectionTagComponent {
+export class SelectionTagComponent {
   @Input() tag: Tag = new Tag("test",0,0);
-  @Output() idchecked = new EventEmitter<Tag>();
+  @Output() isChecked = new EventEmitter<Tag>();
 
 /**
  * Function launched when a tagset is selected or deselected as a filter.
@@ -17,7 +17,7 @@ export class FiltersSelectionTagComponent {
  * filter-selection.component to call its onTagFilterSelected function.
  */
   toggleCheckboxTagFiltersSelected(tag:Tag) {
-    this.idchecked.emit(tag);
+    this.isChecked.emit(tag);
   }
   
 }
