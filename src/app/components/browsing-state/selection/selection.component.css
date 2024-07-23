@@ -53,7 +53,7 @@
 }
 
 
-/* ############# List of Dimensions ############# */
+/* ############# List ############# */
 .selection_component_labels{
     margin: 1em 0 1em 0.5em;
     color:var(--main-color);
@@ -62,15 +62,6 @@
     overflow-x: auto;
     overflow-y: auto;
     white-space: nowrap;
-}
-
-.checked_all_element{
-    margin : 0.8em 0 1.4em 0;
-}
-
-.checked_element{
-    display: flex;
-    align-items: center;
 }
 
 .column_title{

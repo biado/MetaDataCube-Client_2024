@@ -9,6 +9,7 @@ import { UndoRedoService } from '../../../services/undo-redo.service';
 import { Filter } from '../../../models/filter';
 import { SelectedFiltersService } from '../../../services/selected-filters.service';
 import { Tag } from '../../../models/tag';
+import { SelectionFunctionsService } from '../../../services/selection-functions.service';
 
 @Component({
   selector: 'app-selection',
@@ -22,10 +23,7 @@ export class SelectionComponent {
   elementToSearch = '';
 
   /** List of all tag ids linked to each tagsetList node (allows you to see which tags are not linked to any nodes). */
-  nodesTagIDList : number[] = [];
-
-  /** Set of all selected elements, either as dimensions or filters */
-  checked_elements : Set<Tagset|Node|Tag> = new Set<Tagset|Node|Tag> ();     
+  nodesTagIDList : number[] = []; 
 
   // Initialization of variables which will then be linked to the various desired observables (see constructor && ngOnInit).
   tagsetlist: Tagset[] = [];
@@ -37,6 +35,7 @@ export class SelectionComponent {
     protected selectedDimensionsService:SelectedDimensionsService,  
     private selectedFiltersService:SelectedFiltersService,                 // Service containing information on selected filters      
     private undoredoService : UndoRedoService,
+    private selectionFunctionsService : SelectionFunctionsService,
   ) {}
 
   /**
@@ -52,30 +51,10 @@ export class SelectionComponent {
 
     this.selectedDimensionsService.selectedDimensions$.subscribe(data => {
       this.selectedDimensions = data;
-      this.checked_elements = new Set<Tagset|Node|Tag> ();
-      if(data.elementX && !(data.elementX.type==='tag')){
-        this.checked_elements.add(data.elementX);
-      }
-      if(data.elementY && !(data.elementY.type==='tag')){
-        this.checked_elements.add(data.elementY);
-      }
-      this.filtersList.forEach(filter=>{
-        this.checked_elements.add(filter.element);
-      })
     });
 
     this.selectedFiltersService.filters$.subscribe(data =>{
       this.filtersList = data;
-      this.checked_elements = new Set<Tagset|Node|Tag> ();
-      if(this.selectedDimensions.elementX && !(this.selectedDimensions.elementX.type==='tag')){
-        this.checked_elements.add(this.selectedDimensions.elementX);
-      }
-      if(this.selectedDimensions.elementY && !(this.selectedDimensions.elementY.type==='tag')){
-        this.checked_elements.add(this.selectedDimensions.elementY);
-      }
-      data.forEach(filter=>{
-        this.checked_elements.add(filter.element);
-      })
     })
   }
 
@@ -113,131 +92,37 @@ export class SelectionComponent {
 
   /**
    * Function that will be launched if you click to check or uncheck one of the X boxes. 
-   * 
-   * If ticked, the variables for X are defined with the data the element that has been ticked. If we uncheck, we set the variables to null.
-   * If an element was already checked, we'll uncheck it and then update the values. 
    */
-  toggleCheckboxX(elt:Node|Tagset): void {
-    let newSelectedDimensions: SelectedDimensions = new SelectedDimensions();
-
-    if(this.selectedDimensionsService.selectedDimensions.value.ischeckedX && !elt.isCheckedX){ 
-      if((this.selectedDimensions.xid) && (this.selectedDimensions.xtype)){
-        const actualElementX = this.selectedDimensions.elementX;
-        if(!(actualElementX===null) && (actualElementX?.type==="node"||actualElementX?.type==="tagset")){
-          actualElementX.isCheckedX = false;
-        }
-      }
-      elt.isCheckedX = !elt.isCheckedX ;
-      newSelectedDimensions = new SelectedDimensions(elt.name,elt.id,elt.type,elt,this.selectedDimensions.yname, this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
-      newSelectedDimensions.ischeckedX = this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
-      newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
-    }
-    else{
-      elt.isCheckedX = !elt.isCheckedX ;
-      this.selectedDimensionsService.selectedDimensions.value.ischeckedX = !this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
-
-      if((!elt.isCheckedX)&&(!this.selectedDimensionsService.selectedDimensions.value.ischeckedX)){
-        newSelectedDimensions = new SelectedDimensions(undefined,undefined,undefined,undefined, this.selectedDimensions.yname,this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
-        newSelectedDimensions.ischeckedX = this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
-        newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
-      }
-
-      if((elt.isCheckedX)&&(this.selectedDimensionsService.selectedDimensions.value.ischeckedX)){
-        newSelectedDimensions = new SelectedDimensions(elt.name,elt.id,elt.type,elt,this.selectedDimensions.yname, this.selectedDimensions.yid,this.selectedDimensions.ytype,this.selectedDimensions.elementY);
-        newSelectedDimensions.ischeckedX = this.selectedDimensionsService.selectedDimensions.value.ischeckedX;
-        newSelectedDimensions.ischeckedY = this.selectedDimensions.ischeckedY;
-      }
-    }
-
-    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
-    this.undoredoService.addDimensionsAction(newSelectedDimensions);    //Add the Action to the UndoRedoService
+  dimXSelected(elt:Node|Tagset): void {
+    this.selectionFunctionsService.dimXSelected(elt);
   }
 
   /**
    * Function that will be launched if you click to check or uncheck one of the Y boxes. 
-   * 
-   * If ticked, the variables for Y are defined with the data of the element that has been ticked. If we uncheck, we set the variables to null.
-   * If an element was already checked, we'll uncheck it and then update the values.
    */
-  toggleCheckboxY(elt:Node|Tagset): void {
-    let newSelectedDimensions:SelectedDimensions = new SelectedDimensions();
-
-    if(this.selectedDimensionsService.selectedDimensions.value.ischeckedY && !elt.isCheckedY){ 
-      if(this.selectedDimensions.yid && this.selectedDimensions.ytype ){
-        const actualElementY = this.selectedDimensions.elementY;
-        if(!(actualElementY===null) && (actualElementY?.type==="node"||actualElementY?.type==="tagset")){
-          actualElementY.isCheckedY = false;
-        }
-      }
-      elt.isCheckedY = !elt.isCheckedY ;
-      newSelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype,this.selectedDimensions.elementX,elt.name,elt.id,elt.type,elt);
-      newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
-      newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
-    }
-
-    else{
-      elt.isCheckedY = !elt.isCheckedY ;
-      this.selectedDimensionsService.selectedDimensions.value.ischeckedY = !this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
-
-      if((!elt.isCheckedY)&&(!this.selectedDimensionsService.selectedDimensions.value.ischeckedY)){
-        newSelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype, this.selectedDimensions.elementX, undefined,undefined, undefined, undefined);
-        newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
-        newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
-      }
-
-      if((elt.isCheckedY)&&(this.selectedDimensionsService.selectedDimensions.value.ischeckedY)){
-        newSelectedDimensions = new SelectedDimensions(this.selectedDimensions.xname,this.selectedDimensions.xid,this.selectedDimensions.xtype,this.selectedDimensions.elementX,elt.name,elt.id,elt.type,elt);
-        newSelectedDimensions.ischeckedX = this.selectedDimensions.ischeckedX;
-        newSelectedDimensions.ischeckedY = this.selectedDimensionsService.selectedDimensions.value.ischeckedY;
-      }
-    } 
-
-    this.selectedDimensionsService.selectedDimensions.next(newSelectedDimensions);
-    this.undoredoService.addDimensionsAction(newSelectedDimensions);          //Add the Action to the UndoRedoService
+  dimYSelected(elt:Node|Tagset): void {
+    this.selectionFunctionsService.dimYSelected(elt);
   }
 
   /**
    * Function launched when a tag is selected or deselected.
-   * 
-   * Depending on whether the tag has been selected or deselected, we will call the add function of the service or the remove function.
    */
-  onTagFilterSelected(tag: Tag) {
-    tag.ischecked = !tag.ischecked;
-    if (tag.ischecked) {
-      this.addFilter(tag.id,tag.type,tag);
-    } else {
-      this.removeFilter(tag.id,tag.type);
-    }
+  tagFilterSelected(tag: Tag) {
+    this.selectionFunctionsService.tagFilterSelected(tag);
   }
   
   /**
    * Function launched when a nodes is selected or deselected as a filter.
-   * 
-   * Depending on whether the node has been selected or deselected, we will call the add function of the service or the remove function.
    */
-  onNodeFilterSelected(node: Node) {
-    node.isCheckedFilters = !node.isCheckedFilters;
-    if (node.isCheckedFilters) {
-      this.addFilter(node.id,node.type,node);
-    } else {
-      this.removeFilter(node.id,node.type);
-    }
+  nodeFilterSelected(node: Node) {
+    this.selectionFunctionsService.nodeFilterSelected(node);
   }
 
   /**
    * Function launched when a tagset is selected or deselected as a filter.
-   * 
-   * If the tagset is selected, we call add function of the service, 
-   * if it is deselected, it is the remove function.
    */
-  onTagsetFilterSelected(tagset:Tagset): void {
-    tagset.isCheckedFilters = !tagset.isCheckedFilters;
-
-    if (tagset.isCheckedFilters) {
-      this.addFilter(tagset.id,tagset.type,tagset);
-    } else {
-      this.removeFilter(tagset.id,tagset.type);
-    }
+  tagsetFilterSelected(tagset:Tagset): void {
+    this.selectionFunctionsService.tagsetFilterSelected(tagset);
   }
 
 
@@ -278,47 +163,6 @@ export class SelectionComponent {
     })
 
     return tags;
-  }
-
-
-
-  /**
-   * Add a filter to the filters List
-   */
-  addFilter(id: number, type: 'tagset'|'tag'|'node',element:Tag|Tagset|Node): void {
-    const filter = new Filter(id, type,element);
-
-    const newfiltersList : Filter[]=[];
-    this.filtersList.forEach(filter=>{
-      newfiltersList.push(filter);
-    });
-    newfiltersList.push(filter);
-    
-    this.filtersList = newfiltersList;
-
-    this.undoredoService.addFilterAction(this.filtersList);     //Add the Action to the UndoRedoService
-    this.selectedFiltersService.filtersSubject.next(this.filtersList);
-  }
-
-  /**
-   * Remove a filter from the filters List
-   */
-  removeFilter(id: number, type: 'tagset'|'tag'|'node'): void {
-    let element: Filter | null = null;
-
-    const currentFilters = this.filtersList;
-    currentFilters.forEach(elt => {
-      if (elt.type === type && elt.id === id) {
-        element = elt;
-      }
-    });
-
-    if (element !== null) {
-      const updatedFilters = currentFilters.filter(f => f !== element);
-      this.filtersList = updatedFilters;
-      this.undoredoService.addFilterAction(updatedFilters);     //Add the Action to the UndoRedoService
-      this.selectedFiltersService.filtersSubject.next(updatedFilters);
-    }
   }
 
 
@@ -369,6 +213,7 @@ export class SelectionComponent {
           allNodes.forEach(node => node.isExpanded = false);
           allNodes.forEach(node => node.isExpanded = false);
       });
+      tagset.tagList.isExpanded = false;
     });
    
     const newSelectedDimensions = new SelectedDimensions();
@@ -381,7 +226,7 @@ export class SelectionComponent {
     this.undoredoService.addDimensionsAction(newSelectedDimensions);          
     this.undoredoService.addFilterAction([]);
 
-    this.checked_elements = new Set<Tagset|Tag|Node> ();
+    //this.selectionFunctionsService.checked_elements.next(new Set<Tagset|Tag|Node> ());
   }
 
 

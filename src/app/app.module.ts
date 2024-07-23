@@ -14,6 +14,7 @@ import { CellStateGridComponent } from './components/cell-state/cell-state-grid/
 import { CellStateSingleComponent } from './components/cell-state/cell-state-single/cell-state-single.component';
 import { PreSelectionPopupComponent } from './components/browsing-state/pre-selection-popup/pre-selection-popup.component';
 import { SelectionTagComponent } from './components/browsing-state/selection/selection-tag/selection-tag.component';
+import { CheckedElementsComponent } from './components/browsing-state/checked-elements/checked-elements.component';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import { SelectionTagComponent } from './components/browsing-state/selection/sel
     CellStateGridComponent,
     CellStateSingleComponent,
     PreSelectionPopupComponent,
-    SelectionTagComponent,    
+    SelectionTagComponent,
+    CheckedElementsComponent,    
   ],
   imports: [
     BrowserModule,
