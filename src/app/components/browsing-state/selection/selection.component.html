@@ -44,12 +44,12 @@
         </div>
 
         <!-- Display tags not present in tagset hierarchy nodes -->
-        <div class="selection_tags_labels_div"  *ngIf="tagset.isTagListVisible">
+        <div class="selection_tags_labels_div"  *ngIf="tagset.tagList.isVisible">
           <div class="selection_labels_title">
-            <span class="toggle-button" (click)="tagset.isTagListExpanded= !tagset.isTagListExpanded">{{tagset.isTagListExpanded ? '-' : '+'}}</span>  
+            <span class="toggle-button" (click)="tagset.tagList.isExpanded= !tagset.tagList.isExpanded">{{tagset.tagList.isExpanded ? '-' : '+'}}</span>  
             Tags
           </div>
-          <div class="selection_tags_labels" *ngIf="tagset.isTagListExpanded">
+          <div class="selection_tags_labels" *ngIf="tagset.tagList.isExpanded">
               <app-selection-tag *ngFor="let tag of sortTags(getTagsetTagList(tagset))" [tag]="tag" (isChecked)="onTagFilterSelected($event)"></app-selection-tag>
           </div>  
         </div>

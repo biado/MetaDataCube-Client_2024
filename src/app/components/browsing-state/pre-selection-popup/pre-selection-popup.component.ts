@@ -5,6 +5,7 @@ import { SelectedDimensions } from '../../../models/selected-dimensions';
 import { GetTagsetListService } from '../../../services/get-tagset-list.service';
 import { Hierarchy } from '../../../models/hierarchy';
 import { UndoRedoService } from '../../../services/undo-redo.service';
+import { TagList } from '../../../models/tag-list';
 
 @Component({
   selector: 'app-pre-selection-popup',
@@ -53,7 +54,7 @@ export class PreSelectionPopupComponent {
    * Function launched when a tagset checkbox is updated
    */
   check_tagset(tagset : Tagset){
-    let modified_elements : (Tagset|Hierarchy)[] = [];
+    let modified_elements : (Tagset|Hierarchy|TagList)[] = [];
 
     tagset.hierarchies.forEach(hierarchy => {
       if((hierarchy.isVisible === tagset.isVisible)){
@@ -61,8 +62,31 @@ export class PreSelectionPopupComponent {
         modified_elements.push(hierarchy);
       }
     })
+
+    if(tagset.tagList.isVisible === tagset.isVisible){
+      tagset.tagList.isVisible = !tagset.tagList.isVisible;
+      modified_elements.push(tagset.tagList)
+    }
+
     tagset.isVisible = !tagset.isVisible;
     modified_elements.push(tagset);
+
+    this.undoRedoService.addPreSelectionAction(modified_elements);
+  }
+
+  /**
+   * Function launched when a tagset checkbox is updated
+   */
+  check_tagsList(tagsList : TagList,tagset : Tagset){
+    let modified_elements : (Tagset|Hierarchy|TagList)[] = [];
+    
+    tagsList.isVisible = !tagsList.isVisible;
+    modified_elements.push(tagsList);
+
+    if(tagsList.isVisible){
+      tagset.isVisible = true;
+      modified_elements.push(tagset);
+    }
 
     this.undoRedoService.addPreSelectionAction(modified_elements);
   }
@@ -71,7 +95,7 @@ export class PreSelectionPopupComponent {
    * Function launched when a hierarchy checkbox is updated
    */
   check_hierarchy(hierarchy: Hierarchy,tagset : Tagset){
-    let modified_elements : (Tagset|Hierarchy)[] = [];
+    let modified_elements : (Tagset|Hierarchy|TagList)[] = [];
     
     hierarchy.isVisible = !hierarchy.isVisible;
     modified_elements.push(hierarchy);

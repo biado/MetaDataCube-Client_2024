@@ -246,7 +246,7 @@ export class CellsDisplayComponent {
    * Function to retrieve the tag in a tagset
    */
   getTag(tagset:Tagset, tagName:string): Tag|null {
-    for (const tag of tagset.tags) {
+    for (const tag of tagset.tagList.tags) {
       if(tag.name===tagName){
         return tag;
       }

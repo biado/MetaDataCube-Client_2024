@@ -5,6 +5,10 @@
                 {{tagset.name}}
                 <input type="checkbox" [checked]="tagset.isVisible" (change)="check_tagset(tagset)"/>
               </div>
+              <div class="pre-selection_popup_labels_subtitle">
+                Tags
+                <input type="checkbox" [checked]="tagset.tagList.isVisible" (change)="check_tagsList(tagset.tagList,tagset)"/>
+              </div>    
               <div *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)" >
                 <div class="pre-selection_popup_labels_subtitle">
                     {{hierarchy.firstNode.name}}

@@ -271,7 +271,7 @@ export class SelectionComponent {
   getTagsetTagList(tagset : Tagset):Tag[]{
     let tags : Tag[] = [];
 
-    tagset.tags.forEach(tag=>{
+    tagset.tagList.tags.forEach(tag=>{
       if(!(this.nodesTagIDList.includes(tag.id))){
         tags.push(tag);
       }
@@ -404,7 +404,7 @@ export class SelectionComponent {
       tagsets.forEach(tagset => {
         tagset.isVisible = true;
         tagset.isExpanded = false;
-        tagset.tags.forEach(tag=>{
+        tagset.tagList.tags.forEach(tag=>{
           tag.isVisible = true;
         });
         tagset.hierarchies.forEach(hierarchy => {
