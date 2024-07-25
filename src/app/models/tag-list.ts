@@ -19,6 +19,6 @@ export class TagList {
         this.isVisible = true;
         this.isExpanded = false;
 
-        this.asRange = true;
+        this.asRange = false;
     }
 }

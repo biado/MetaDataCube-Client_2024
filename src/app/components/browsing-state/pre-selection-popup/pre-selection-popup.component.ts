@@ -6,6 +6,7 @@ import { GetTagsetListService } from '../../../services/get-tagset-list.service'
 import { Hierarchy } from '../../../models/hierarchy';
 import { UndoRedoService } from '../../../services/undo-redo.service';
 import { TagList } from '../../../models/tag-list';
+import { Tag } from '../../../models/tag';
 
 @Component({
   selector: 'app-pre-selection-popup',
@@ -106,6 +107,19 @@ export class PreSelectionPopupComponent {
     }
 
     this.undoRedoService.addPreSelectionAction(modified_elements);
+  }
+
+  /**
+   * Function that checks whether all the elements in the tag list can be transformed into numbers.
+   */
+  tagsNameToNumbersIsPossible(tags: Tag[]): boolean {
+    for (const tag of tags) {
+        const numberValue = Number(tag.name);
+        if (isNaN(numberValue)) {
+          return false;
+        }
+    }
+    return true;
   }
 
 }

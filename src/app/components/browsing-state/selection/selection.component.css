@@ -106,7 +106,7 @@
     }
     /* ############################################## */
 
-    /* ################ Tags Display ############### */
+    /* ################ Tags Display ################ */
     .selection_checkbox_tags_labels{
         display: flex;
         flex-direction: column;
@@ -126,17 +126,22 @@
         align-items: center;
         margin-left: -115px;
     }
+    /* ############################################## */
 
+    /* ################ Range Display ############### */
     .selection_range_tags_labels{
-        margin-left: -115px;
+        margin-left: -135px;
     }
 
     .selection_tags_range-container{
         margin-bottom: 1.3em;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 
     .selection_tags_range-container ngx-slider {
-        width: 300px; 
+        width: 270px; 
     }
       
     .selection_tags_range-container ngx-slider .ngx-slider-pointer {
@@ -146,6 +151,12 @@
     .selection_tags_range-container ngx-slider .ngx-slider-bubble,
     .selection_tags_range-container ngx-slider .ngx-slider-bubble.ngx-slider-limit{
         color : var(--main-color);
+    }
+
+    .selection_tags_range-container_Button{
+        margin-top: 1em;
+        margin-left:  1em;
+        cursor: pointer;
     }
     /* ############################################## */
 

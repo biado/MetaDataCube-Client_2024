@@ -113,9 +113,12 @@ export class CheckedElementsComponent {
     this.selectionFunctionsService.tagsetFilterSelected(tagset);
   }
 
-
-
-
+  /**
+   * Function that checks whether all the elements in the tag list can be transformed into numbers.
+   * 
+   * We retrieve a list of filters, so we first have to check that the elements are indeed tags (they must be, otherwise we wouldn't reach this stage, 
+   * but we'd have to reverify because of the types).
+   */
   tagsNameToNumbersIsPossible(filters: (Tag|Tagset|Node)[]): boolean {
     for (const filt of filters) {
       if(filt.type==="tag"){
@@ -131,6 +134,10 @@ export class CheckedElementsComponent {
     return true;
   }
 
+  /**
+   * Function that takes a list of tags (we take a list of filters, but they're all tags, otherwise we wouldn't get to this stage),
+   *  that can be transformed into numbers and transforms them into numbers (keeping the corresponding tag on hand).
+   */
   convertTagsNameToNumbers(filters: (Tag|Tagset|Node)[]): { number: number, tag: Tag }[] {
     let tags : Tag[] = [];
     
@@ -145,6 +152,9 @@ export class CheckedElementsComponent {
       .filter(({ number }) => !isNaN(number));
   }
 
+  /**
+   * Gets the smallest element in the list as a parameter.
+   */
   getMin(tagsNumbers : { number: number, tag: Tag }[]){
     let min : number = 999999999999;
     
@@ -158,6 +168,9 @@ export class CheckedElementsComponent {
     return min;
   }
 
+  /**
+   * Gets the largest element of the list in parameter.
+   */
   getMax(tagsNumbers : { number: number, tag: Tag }[]){
     let max : number = -999999999999;
 

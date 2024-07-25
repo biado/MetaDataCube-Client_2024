@@ -365,8 +365,9 @@ export class SelectionComponent {
     }); 
   }
 
-  
-
+  /**
+   * Function that checks whether all the elements in the tag list can be transformed into numbers.
+   */
   tagsNameToNumbersIsPossible(tags: Tag[]): boolean {
     for (const tag of tags) {
       const numberValue = Number(tag.name);

@@ -8,6 +8,7 @@
               <div class="pre-selection_popup_labels_subtitle">
                 Tags
                 <input type="checkbox" [checked]="tagset.tagList.isVisible" (change)="check_tagsList(tagset.tagList,tagset)"/>
+                <input type="checkbox" [checked]="tagset.tagList.asRange" [disabled]="!(tagsNameToNumbersIsPossible(tagset.tagList.tags))" (change)="tagset.tagList.asRange=!tagset.tagList.asRange"/>
               </div>    
               <div *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)" >
                 <div class="pre-selection_popup_labels_subtitle">
