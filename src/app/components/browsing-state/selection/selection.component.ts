@@ -10,6 +10,7 @@ import { Filter } from '../../../models/filter';
 import { SelectedFiltersService } from '../../../services/selected-filters.service';
 import { Tag } from '../../../models/tag';
 import { SelectionFunctionsService } from '../../../services/selection-functions.service';
+import { TagList } from '../../../models/tag-list';
 
 @Component({
   selector: 'app-selection',
@@ -362,6 +363,18 @@ export class SelectionComponent {
         });
       });
     }); 
+  }
+
+  
+
+  tagsNameToNumbersIsPossible(tags: Tag[]): boolean {
+    for (const tag of tags) {
+      const numberValue = Number(tag.name);
+      if (isNaN(numberValue)) {
+        return false;
+      }
+    }
+    return true;
   }
   
 }
