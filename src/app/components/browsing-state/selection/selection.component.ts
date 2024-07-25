@@ -56,6 +56,10 @@ export class SelectionComponent {
     this.selectedFiltersService.filters$.subscribe(data =>{
       this.filtersList = data;
     })
+
+    this.selectionFunctionsService.elementToSearch$.subscribe(data =>{
+      this.elementToSearch = data;
+    })
   }
 
 
@@ -291,6 +295,8 @@ export class SelectionComponent {
         })
       }
     }
+
+    this.selectionFunctionsService.elementToSearch.next(this.elementToSearch);    
 
     // Reset all nodes if nodestosearch is empty
     if (this.elementToSearch === '') {
