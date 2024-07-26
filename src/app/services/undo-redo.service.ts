@@ -23,9 +23,12 @@ export class UndoRedoService {
   /** List of List of filters that have been added. Provides a history of the various Filters selected. */
   AllFiltersAdd : (Filter[])[] =[[]];
 
-  /** List of List of Hierarchy and/or Tagset. When we modify the preselection, we add the modified items to a list, 
-   * which is then stored here to keep a history of the modified items. A PreSelection is a Tagset|Hierarchy List */
-  AllPreSelectionDo : ((Tagset|Hierarchy|TagList)[])[] = [[]]
+  /** List of List of Hierarchy, Tagset and/or TagList. When we modify the preselection, we add the modified items to a list, 
+   * which is then stored here to keep a history of the modified items. A PreSelection is a Tagset|Hierarchy|Taglist List.
+   *  
+   * We also add the preselection type, if it was a preselection to modify the isVisible variable (to hide an element of one of the 3 types) 
+   * or to modify asRange (to transform a list of tags into a range or vice versa, especially for tagList).*/
+  AllPreSelectionDo : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = [[]]
 
   positionDo : number = 0;
   positionAllSelectedDimensionsDid : number = 0;
@@ -132,20 +135,27 @@ export class UndoRedoService {
   }
 
   /**
-   * To undo a PreSelection, we will invert the isVisble values of the elements 
-   * in the current preselection from the AllPreSelectionDo preSelection list.
+   * To undo a PreSelection, we will look after the type of preselection, if it's "isVisible", we will invert the isVisible values of the elements 
+   * in the current preselection from the AllPreSelectionDo preSelection list. If it's "asRange", we will verify that we have a tagList type element and 
+   * invert the asRange.
    * 
-   * Just as to change whether a dimension is pre-selected or not, we invert its isVisible value, to undo/redo 
-   * the action we just need to invert the value again.
+   * To undo/redo the action we just need to invert the value again.
    */
   undoPreSelection(){
     // Get the actual preSelection (list)
     let element = this.AllPreSelectionDo[this.positionAllPreSelectionDo];
 
-    // We go through the list, and invert the isVisible/isVisibleDimensions value of the element.
+    // We go through the list, and invert the corresponding value
     if(Array.isArray(element)){
       element.forEach(elt=>{
-        elt.isVisible = !elt.isVisible;
+        if(elt.preselectionType==='isVisible'){
+          elt.element.isVisible = !elt.element.isVisible;
+        }
+        else if(elt.preselectionType==='asRange'){
+          if(elt.element.type==='tagList'){
+            elt.element.asRange = !elt.element.asRange;
+          }
+        }
       })
     }
 
@@ -256,7 +266,8 @@ export class UndoRedoService {
 
   /**
    * To redo a PreSelection, we'll retrieve the next PreSelection(tagsetList) from the AllPreSelectionDo preSelection(tagsetList) list.
-   * We'll then invert the isVisible values of the elements present in the new PreSelection so that this PreSelection is the current one.
+   * We will look after the type of preselection, if it's "isVisible", we will invert the isVisible values of the element. 
+   * If it's "asRange", we will verify that we have a tagList type element and invert the asRange.
    */
   redoPreSelection(){
     this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
@@ -265,7 +276,14 @@ export class UndoRedoService {
 
     if(Array.isArray(element)){
       element.forEach(elt=>{
-        elt.isVisible = !elt.isVisible;
+        if(elt.preselectionType==='isVisible'){
+          elt.element.isVisible = !elt.element.isVisible;
+        }
+        else if(elt.preselectionType==='asRange'){
+          if(elt.element.type==='tagList'){
+            elt.element.asRange = !elt.element.asRange;
+          }
+        }
       })
     }
   }
@@ -366,7 +384,7 @@ export class UndoRedoService {
    * 
    * We'll add the "File" action to Do and increment all the positions with 1.
    */
-  addFileAction(actualSearchFile:ActualSearchFile,modified_elements:(Hierarchy|Tagset|TagList)[],jsonFiltersList:Filter[]){
+  addFileAction(actualSearchFile:ActualSearchFile,modified_elements:({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[],jsonFiltersList:Filter[]){
     let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
       newDoList.push(this.Do[i]);
@@ -388,7 +406,7 @@ export class UndoRedoService {
       newAllFiltersAdd.push(newfiltersList);
     }
 
-    let newAllPreSelectionDo : ((Hierarchy|Tagset|TagList)[])[] = [];
+    let newAllPreSelectionDo : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = [];
     for (let i = 0; i <= this.positionAllPreSelectionDo; i++) {
       newAllPreSelectionDo.push(this.AllPreSelectionDo[i]);
     }
@@ -425,7 +443,7 @@ export class UndoRedoService {
    * 
    * We'll add the "PreSelection" action to Do and increment the positions.
    */
-  addPreSelectionAction(modified_elements:(Hierarchy|Tagset|TagList)[]){ 
+  addPreSelectionAction(modified_elements:({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[]){ 
     //Delete the DoList Element after the actual position if they exist
     let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
@@ -434,7 +452,7 @@ export class UndoRedoService {
     this.Do = newDoList;
 
     //Delete the PreSelection(tagsetList) after the actual position if they exist
-    let newAllPreSelectionDo : ((Hierarchy|Tagset|TagList)[])[] = [];
+    let newAllPreSelectionDo : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = [];
     for (let i = 0; i <= this.positionAllPreSelectionDo; i++) {
       newAllPreSelectionDo.push(this.AllPreSelectionDo[i]);
     }

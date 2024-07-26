@@ -55,22 +55,22 @@ export class PreSelectionPopupComponent {
    * Function launched when a tagset checkbox is updated
    */
   check_tagset(tagset : Tagset){
-    let modified_elements : (Tagset|Hierarchy|TagList)[] = [];
+    let modified_elements : ({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[] = [];
 
     tagset.hierarchies.forEach(hierarchy => {
       if((hierarchy.isVisible === tagset.isVisible)){
         hierarchy.isVisible = !hierarchy.isVisible;
-        modified_elements.push(hierarchy);
+        modified_elements.push({element : hierarchy, preselectionType:'isVisible'});
       }
     })
 
     if(tagset.tagList.isVisible === tagset.isVisible){
       tagset.tagList.isVisible = !tagset.tagList.isVisible;
-      modified_elements.push(tagset.tagList)
+      modified_elements.push({element : tagset.tagList, preselectionType:'isVisible'})
     }
 
     tagset.isVisible = !tagset.isVisible;
-    modified_elements.push(tagset);
+    modified_elements.push({element : tagset, preselectionType:'isVisible'});
 
     this.undoRedoService.addPreSelectionAction(modified_elements);
   }
@@ -79,14 +79,14 @@ export class PreSelectionPopupComponent {
    * Function launched when a tagset checkbox is updated
    */
   check_tagsList(tagsList : TagList,tagset : Tagset){
-    let modified_elements : (Tagset|Hierarchy|TagList)[] = [];
+    let modified_elements : ({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[] = [];
     
     tagsList.isVisible = !tagsList.isVisible;
-    modified_elements.push(tagsList);
+    modified_elements.push({element : tagsList, preselectionType:'isVisible'});
 
     if(tagsList.isVisible){
       tagset.isVisible = true;
-      modified_elements.push(tagset);
+      modified_elements.push({element : tagset, preselectionType:'isVisible'});
     }
 
     this.undoRedoService.addPreSelectionAction(modified_elements);
@@ -96,15 +96,27 @@ export class PreSelectionPopupComponent {
    * Function launched when a hierarchy checkbox is updated
    */
   check_hierarchy(hierarchy: Hierarchy,tagset : Tagset){
-    let modified_elements : (Tagset|Hierarchy|TagList)[] = [];
+    let modified_elements : ({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[] = [];
     
     hierarchy.isVisible = !hierarchy.isVisible;
-    modified_elements.push(hierarchy);
+    modified_elements.push({element : hierarchy, preselectionType:'isVisible'});
 
     if(hierarchy.isVisible){
       tagset.isVisible = true;
-      modified_elements.push(tagset);
+      modified_elements.push({element : tagset, preselectionType:'isVisible'});
     }
+
+    this.undoRedoService.addPreSelectionAction(modified_elements);
+  }
+
+  /**
+   * Function lauchend when we select a Tags Categorie as a range filter
+   */
+  check_tagsList_as_Range(tagsList : TagList,tagset : Tagset){
+    let modified_elements : ({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[] = [];
+    
+    tagsList.asRange = !tagsList.asRange;
+    modified_elements.push({element : tagsList, preselectionType:'asRange'});
 
     this.undoRedoService.addPreSelectionAction(modified_elements);
   }
