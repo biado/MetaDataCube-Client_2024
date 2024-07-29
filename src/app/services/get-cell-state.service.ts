@@ -15,7 +15,7 @@ export class GetCellStateService {
   
   filters : Filter[] = [];
   
-  private allImagesURI = new BehaviorSubject<string[]>([]);
+  private allImagesURI = new BehaviorSubject<{uri:string,mediaID:number}[]>([]);
   /** Images URI of of all images corresponding to the selected dimensions and filters  */
   allImagesURI$ = this.allImagesURI.asObservable();
 
@@ -47,12 +47,12 @@ export class GetCellStateService {
       const urlAllImage: string = selectedCellState.url;
       console.log("URL :",urlAllImage)
       this.allImagesURI.next([]);
-      let imagesURIs: string[] = [];
+      let imagesURIs: {uri:string,mediaID:number}[] = [];
 
       try {
           const response: any = await this.http.get(`${urlAllImage}`).toPromise();
           response.forEach((elt: any) => {
-              imagesURIs.push(elt.fileURI);
+              imagesURIs.push({uri:elt.fileURI,mediaID:elt.id});
           });
           this.allImagesURI.next(imagesURIs);
       } catch (error) {

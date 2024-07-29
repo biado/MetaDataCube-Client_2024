@@ -48,4 +48,56 @@
 .single-content-button{
     cursor: pointer;
 }
+
+.cell-state-buttons{
+    font-family: 'Shrikhand', serif;
+    font-size: 1.7em;
+    color: var(--main-color);
+    background: var(--button-color);;
+    border: none;
+    border-radius: 50px;
+    height: min-content;
+    width: min-content; 
+    margin: 2.5em 1em 0.5em 1em;
+    padding: 0em 0.5em 0em 0.5em ; 
+    cursor: pointer;
+
+    position: absolute;
+    top: 8%;
+    left: 85%;
+    transform: translate(-8%, -85%);
+    z-index: 9;
+}
 /* ############################################## */
+
+
+/* Pop Up */
+.single-content-tags-list{
+    min-width: 50%;
+    min-height: 50%;
+    max-width: 50%;
+    max-height: 50%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9;
+
+    overflow: hidden;
+    overflow-y: auto;
+
+    background-color: var(--background-color);
+    border-radius:  50px 50px 50px 50px;
+}
+
+.single-content-tags-list-tagsetName{
+    color : var(--main-color);
+    font-size: 1.2em;
+    margin : 1em 0em 0em 1em;
+}
+
+.single-content-tags-list-tagName{
+    margin-left : 25px;
+    font-size: 0.8em;
+}

@@ -3,9 +3,13 @@ export class ImageInfos {
     isLoading : boolean;
     isError : boolean;
 
-    constructor(uri : string){
+    mediaID : number;
+
+    constructor(uri : string,mediaID : number){
         this.uri = uri;
         this.isError = false;
         this.isLoading = true;
+
+        this.mediaID = mediaID;
     }
 }

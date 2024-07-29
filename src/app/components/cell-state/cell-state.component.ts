@@ -13,7 +13,7 @@ export class CellStateComponent {
 
   imagesInfos: ImageInfos[] = [];
   /** Image selected in the grid. The image is kept in memory even when you return to the grid, so as not to lose it when you change view. */
-  currentImage: ImageInfos = new ImageInfos("");     
+  currentImage: ImageInfos = new ImageInfos("",0);     
 
   display_grid : boolean = true;
   display_single : boolean = false;
@@ -25,9 +25,9 @@ export class CellStateComponent {
 
   ngOnInit() {    
     this.getCellStateService.allImagesURI$.subscribe(data => {
-      data.forEach(uri => {
-        const completeURL = this.getCompleteUrl(uri);
-        const imageInfo: ImageInfos = new ImageInfos(completeURL);
+      data.forEach(imageInfos => {
+        const completeURL = this.getCompleteUrl(imageInfos.uri);
+        const imageInfo: ImageInfos = new ImageInfos(completeURL,imageInfos.mediaID);
         this.imagesInfos.push(imageInfo);
         this.currentImage = this.imagesInfos[0];
       })
@@ -64,7 +64,7 @@ export class CellStateComponent {
   //Test Function
   test(){
     for(let i of [1,2,3,4,5,6]){
-      const imageInfo: ImageInfos = new ImageInfos(`assets/images/test${i}.jpg`);
+      const imageInfo: ImageInfos = new ImageInfos(`assets/images/test${i}.jpg`,1);
       this.imagesInfos.push(imageInfo);
     }
   }

@@ -1,5 +1,7 @@
 <div class="single-content">
 
+    <button class="cell-state-buttons" (click)="display_image_tags_list = !display_image_tags_list">Tags</button>
+
     <div class="single-content-image-div">
         <!-- Current Image -->
         <img      
@@ -31,5 +33,14 @@
                     <path d="M 32.609375 0 L 32.609375 10.609375 L 18.070312 10.609375 C 4.867188 10.609375 0.355469 28.460938 11.886719 35.027344 C 6.039062 30.480469 9.046875 20.882812 16.566406 20.882812 C 21.914062 20.882812 27.261719 20.882812 32.609375 20.882812 L 32.609375 31.492188 L 52.164062 15.828125 Z M 32.609375 0"/>
                 </svg>   
             </div>   
+    </div>
+
+    <div class="single-content-tags-list" *ngIf="display_image_tags_list">
+        <div class="single-content-tags-list-tagsetName" *ngFor="let tagsetName of currentImageTags">
+            {{tagsetName.tagset}}
+            <div class="single-content-tags-list-tagName" *ngFor="let tag of tagsetName.tags">
+                {{tag}}
+            </div>
+        </div>
     </div>
 </div>

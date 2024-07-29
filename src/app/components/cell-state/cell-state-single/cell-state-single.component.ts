@@ -1,6 +1,9 @@
 import { Component, EventEmitter, HostListener, Inject, Input, Output, PLATFORM_ID } from '@angular/core';
 import { ImageInfos } from '../../../models/image-infos';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Tag } from '../../../models/tag';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-cell-state-single',
@@ -11,8 +14,17 @@ export class CellStateSingleComponent {
   @Input() imagesInfos: ImageInfos[] = [];
   @Input() currentImage: ImageInfos = this.imagesInfos[0];
   
-  @Output() change_current_img = new EventEmitter<ImageInfos>();
+  @Output() change_current_img = new EventEmitter<ImageInfos>();  
 
+  display_image_tags_list : boolean = false;
+
+  currentImageTags: { tagset: string; tags: string[] }[] = [];
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(){
+    this.getImageTagList();
+  }
   
   /** 
    * Function launched when an image is correctly loaded. We'll then set the isLoading and isError on true of the corresponding image 
@@ -48,6 +60,7 @@ export class CellStateSingleComponent {
     if(index>0){
       this.currentImage = this.imagesInfos[index-1];
       this.change_current_img.emit(this.currentImage);
+      this.getImageTagList();
     }
   }
 
@@ -58,7 +71,29 @@ export class CellStateSingleComponent {
     if(!(index===-1) && index<this.imagesInfos.length-1){
       this.currentImage = this.imagesInfos[index+1];
       this.change_current_img.emit(this.currentImage);
+      this.getImageTagList();
     }
+  }
+
+  getImageTagList() {
+      this.http.get(`api/cubeobject/${this.currentImage.mediaID}/tags`).toPromise()
+        .then((response: any) => {
+          let currentImageTags: { tagset: string; tags: string[] }[] = [];
+
+          response.forEach((item: any) => {
+            let tagsetObj = currentImageTags.find(t => t.tagset === item.tagsetName);
+
+            if (!tagsetObj) {
+              tagsetObj = { tagset: item.tagsetName, tags: [] };
+              currentImageTags.push(tagsetObj);
+            }
+
+            tagsetObj.tags.push(item.name);
+          });
+
+          this.currentImageTags = currentImageTags;
+          
+        });
   }
 
 }
