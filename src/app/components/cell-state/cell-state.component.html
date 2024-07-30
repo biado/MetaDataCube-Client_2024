@@ -1,6 +1,11 @@
 <body>
     <article>
         <div class="cell-state-buttons-div">
+            <button class="go_back-buttons" (click)="go_to_browsingState_Page()">       
+                <svg fill="var(--main-color)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" viewBox="0 0 53.25 36.000001" height="32.5">
+                    <path d="M 19.847656 0.0078125 L 19.847656 10.390625 L 34.339844 10.390625 C 47.667969 10.390625 52.164062 27.859375 40.503906 34.289062 C 46.335938 29.839844 43.335938 20.445312 35.839844 20.445312 C 30.507812 20.445312 25.175781 20.445312 19.847656 20.445312 L 19.847656 30.828125 L 0.355469 15.5 Z M 19.847656 0.0078125 "/>
+                </svg>
+            </button>
             <button class="cell-state-buttons" (click)="show_grid_component()">Grid</button>
             <button class="cell-state-buttons" (click)="show_single_component(currentImage)">Single</button>
         </div>

@@ -3,6 +3,7 @@ import { GetCellsService } from '../../services/get-cells.service';
 import { combineLatest } from 'rxjs';
 import { GetCellStateService } from '../../services/get-cell-state.service';
 import { ImageInfos } from '../../models/image-infos';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cell-state',
@@ -21,6 +22,7 @@ export class CellStateComponent {
 
   constructor(
     private getCellStateService : GetCellStateService,
+    private router: Router,
   ){}
 
   ngOnInit() {    
@@ -60,6 +62,12 @@ export class CellStateComponent {
     this.display_single = false;
   }
 
+  /**
+   * Change variables to display the grid component instead of the graph component.
+   */
+  go_to_browsingState_Page():void{
+    this.router.navigate(['/browsing-state']);
+  }
 
   //Test Function
   test(){

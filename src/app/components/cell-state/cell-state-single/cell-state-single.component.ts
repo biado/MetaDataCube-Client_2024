@@ -75,6 +75,9 @@ export class CellStateSingleComponent {
     }
   }
 
+  /**
+   * Function to update the list of tags corresponding to those applied to the current media.
+   */
   getImageTagList() {
       this.http.get(`api/cubeobject/${this.currentImage.mediaID}/tags`).toPromise()
         .then((response: any) => {
