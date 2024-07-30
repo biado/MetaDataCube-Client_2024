@@ -17,7 +17,23 @@
     justify-content: space-between;
 }
 
-.pre-selection_popup_dimensions{
+.pre-selection_popup_selection_titles{
+    display: flex;
+    flex-direction: row;
+    font-size: 1.4em;
+}
+
+.pre-selection_popup_selection_titles_Visible{
+    position: sticky;
+    left: 12em;
+    text-align: center;
+}
+.pre-selection_popup_selection_titles_Range{
+    position: sticky;
+    left: 19.4em;
+}
+
+.pre-selection_popup_selection{
     width: 90%;
     height: 100%;
 
@@ -42,6 +58,10 @@
     margin-left: 50px;
     display: flex;
     align-items: center;
+    
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
 }
 
 .pre-selection_popup_close{
@@ -54,4 +74,23 @@
 .pre-selection_popup_close_button{
     width: min-content;
     cursor: pointer;
+}
+
+
+.isVisible_Checkbox{
+    position: sticky;
+    left: 21em;
+    
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.asRange_Checkbox{
+    position: sticky;
+    left: 31em;
+    
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
 }

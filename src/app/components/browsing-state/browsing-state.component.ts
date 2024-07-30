@@ -119,7 +119,7 @@ export class BrowsingStateComponent {
   }
 
   /**
-   * Change variables to display the grid component instead of the graph component.
+   * Change variables to display the cell-state Page
    */
   go_to_cellState_Page():void{
     this.router.navigate(['/cell-state']);
