@@ -30,19 +30,33 @@ export class CellsDisplayComponent {
   AxisX: string[] = [];
   AxisY: string[] = [];
   
-  /**For x name and y name (of AxixX & AxixY we get the corresponding url (--See getGraphService--)). */
+  /**
+   * Url for the presentation media of a cell
+   * 
+   * For x name and y name (of AxixX & AxixY we get the corresponding url (--See getGraphService--)). 
+   */
   contentUrl: { [key: string]: string } = {};    
   
-  /**For x name and y name (of AxixX & AxixY we get the corresponding number of images (--See getGraphService--)). */
-  contentCount: { [key: string]: number } = {};    
+  /** Number of media for a cell.
+   * 
+   * For x name and y name (of AxixX & AxixY we get the corresponding number of media (--See getGraphService--)). 
+   */
+  contentCount: { [key: string]: number } = {};   
+  
+  /** 
+   * Type of the media of a cell
+   * 
+   * For x name and y name (of AxixX & AxixY we get the corresponding number of media (--See getGraphService--)). 
+   */
+  mediaType: { [key: string]: string } = {};   
 
   /**graph.component.html will go straight inside. Used to avoid looking directly into content, or calling a function directly (because <img src=...> will continuously call the function). */ 
-  imageUrls: { [key: string]: string } = {}; 
+  mediaUrls: { [key: string]: string } = {}; 
 
-  /** For each x-y duo, we check whether the image is loading or not (starts at true, changes to false as soon as the image is loaded (or there's an error)). */
+  /** For each x-y duo, we check whether the media is loading or not (starts at true, changes to false as soon as the media is loaded (or there's an error)). */
   isLoading: { [key: string]: boolean } = {};
 
-  /** For each x-y duo, If loading the image causes an error, set to true. False otherwise. */
+  /** For each x-y duo, If loading the media causes an error, set to true. False otherwise. */
   isError: { [key: string]: boolean } = {};
 
   /** Send message to app-component to display grid instead of graph.  */
@@ -83,32 +97,33 @@ export class CellsDisplayComponent {
       this.contentCount = data;
     });
 
-    // If AxixX, Y or contents get update, it will launch getImagesURL. That way we're sure to have the latest version.
+    // If AxixX, Y or contents get update, it will launch getMediasURL. That way we're sure to have the latest version.
     combineLatest([
       this.getCellsService.AxisX$,
       this.getCellsService.AxisY$,
       this.getCellsService.contentUrl$,
     ]).subscribe(([x, y,contentUrl]) => {
-      this.getImagesURL(x,y);
+      this.getMediasURL(x,y);
     });
   }
 
   /**
    * Each time a dimension changes or the content is updated, this function is called.
    * 
-   * Initializes isLoading and isError and loads image urls into imageUrls with getContent.
+   * Initializes isLoading and isError and loads medias urls into mediaUrls with getContent.
    * 
-   * This function ensures that the images displayed are the most recent, without allowing <img> to continually launch a function
+   * This function ensures that the medias displayed are the most recent, without allowing <img> to continually launch a function
    */
-  getImagesURL(x:string[],y:string[]){
-    this.imageUrls = {};
+  getMediasURL(x:string[],y:string[]){
+    this.mediaUrls = {};
     this.isLoading = {};
     this.isError = {};
     if(x && x.length > 0 && y && y.length > 0){
       x.forEach(x => {
         y.forEach(y => {
           const key = `${x}-${y}`;
-          this.imageUrls[key] = this.getContent(key);
+          this.mediaUrls[key] = this.getContent(key);
+          this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
           this.isLoading[key] = true;
           this.isError[key] = false;
         });
@@ -117,7 +132,8 @@ export class CellsDisplayComponent {
     else if(x && x.length > 0){
       x.forEach(x => {
         const key = `${x}`;
-        this.imageUrls[key] = this.getContent(x);
+        this.mediaUrls[key] = this.getContent(x);
+        this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
       });
@@ -125,34 +141,20 @@ export class CellsDisplayComponent {
     else if(y && y.length > 0){
       y.forEach(y => {
         const key = `${y}`;
-        this.imageUrls[key] = this.getContent(y);
+        this.mediaUrls[key] = this.getContent(y);
+        this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
       });
-    }
-    
+    }    
   }
 
   /**
-   * This function returns the url corresponding to one cell in the table (duo x-y) using content and baseurl (to be modified by hand depending on where the images are stored).
+   * This function returns the url corresponding to one cell in the table (duo x-y) using content and baseurl (to be modified by hand depending on where the medias are stored).
    * 
    * Returns the url if there is one, if there are no results for the cells in the array, then an empty string is returned.
    */
-  getContent(key:string): string {
-    // Test code to check whether the display is correct in html. Take a random number between 1 and 7. We have 6 test images. 
-    // We'll be able to test the display of different images and check that if we can't find the image we'll get an error display.
-    /*function getRandomInt(min: number, max: number): number {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    const rand = getRandomInt(1,7)
-    if(this.content[`${key}`]){
-      return `assets/images/test${rand}.jpg`;
-    }
-    return '';*/
-    
-    // Actual function code, which returns the url corresponding to the cell image.
+  getContent(key:string): string {    
     let baseurl = `assets/images/lsc_thumbs512/thumbnails512/`;
     const url = this.contentUrl[key];
     if(url){
@@ -161,13 +163,22 @@ export class CellsDisplayComponent {
     return '';
   }
 
-  /** Function launched when an image is correctly loaded. We'll then set the isLoading and isError of the corresponding array cell to false. */
+  /**
+   * Get the type of the extension of the media
+   */
+  getMediasType(url : string) : string{
+    const parts = url.split('.');
+    const extension = parts[parts.length - 1];
+    return extension;
+  }
+
+  /** Function launched when a media is correctly loaded. We'll then set the isLoading and isError of the corresponding array cell to false. */
   onLoad(key: string) {
     this.isLoading[key] = false;
     this.isError[key] = false;
   }
 
-  /** Function launched when there's an error loading the image. We'll then set the isLoading to False and isError on true of the corresponding array cell to false. */
+  /** Function launched when there's an error loading the media. We'll then set the isLoading to False and isError on true of the corresponding array cell to false. */
   onError(key: string) {
     this.isLoading[key] = false;
     this.isError[key] = true;
@@ -255,7 +266,7 @@ export class CellsDisplayComponent {
   }
 
   /**
-   * Function for viewing all the images contained in a cell.
+   * Function for viewing all the medias contained in a cell.
    * 
    * If one of the cell's labbels is a node, then, if this node has children, we zoom in on the corresponding child node. 
    * If the node is a leaf, then in this case we'll replace the coordinate with the tag corresponding to the child node.
@@ -264,7 +275,7 @@ export class CellsDisplayComponent {
    * 
    * Finally, we send a signal to app-component to display the grid component and hide the graph component.
    */
-  viewAllImage(xname?: string, yname?: string): void {
+  viewAllMedia(xname?: string, yname?: string): void {
     let actualX, actualY, newElementX, newElementY;
     let selectedCellState = new SelectedCellState();
 
@@ -319,6 +330,11 @@ export class CellsDisplayComponent {
             this.go_to_cellState_Page.emit();
         }
     }
+  }
+
+
+  test(){
+
   }
 }
 

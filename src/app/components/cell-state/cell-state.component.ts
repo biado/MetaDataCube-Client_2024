@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { GetCellsService } from '../../services/get-cells.service';
 import { combineLatest } from 'rxjs';
 import { GetCellStateService } from '../../services/get-cell-state.service';
-import { ImageInfos } from '../../models/image-infos';
+import { MediaInfos } from '../../models/media-infos';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,13 +12,12 @@ import { Router } from '@angular/router';
 })
 export class CellStateComponent {
 
-  imagesInfos: ImageInfos[] = [];
+  mediasInfos: MediaInfos[] = [];
   /** Image selected in the grid. The image is kept in memory even when you return to the grid, so as not to lose it when you change view. */
-  currentImage: ImageInfos = new ImageInfos("",0);     
+  currentMedia: MediaInfos = new MediaInfos("",0,"");     
 
   display_grid : boolean = true;
   display_single : boolean = false;
-
 
   constructor(
     private getCellStateService : GetCellStateService,
@@ -26,16 +25,18 @@ export class CellStateComponent {
   ){}
 
   ngOnInit() {    
-    this.getCellStateService.allImagesURI$.subscribe(data => {
-      data.forEach(imageInfos => {
-        const completeURL = this.getCompleteUrl(imageInfos.uri);
-        const imageInfo: ImageInfos = new ImageInfos(completeURL,imageInfos.mediaID);
-        this.imagesInfos.push(imageInfo);
-        this.currentImage = this.imagesInfos[0];
+    this.getCellStateService.allMediasInfos$.subscribe(data => {
+      data.forEach(mediaInfos => {
+        const completeURL = this.getCompleteUrl(mediaInfos.uri);
+        const imageInfo: MediaInfos = new MediaInfos(completeURL,mediaInfos.mediaID,mediaInfos.extension);
+        imageInfo.songName = mediaInfos.songName;
+        imageInfo.artistName = mediaInfos.artistName;
+
+        this.mediasInfos.push(imageInfo);
+        this.currentMedia = this.mediasInfos[0];
       })
     });
   }
-
 
   /**
    * We add to the initial url the end of the url leading to the image 
@@ -48,8 +49,8 @@ export class CellStateComponent {
   /**
    * Displays the view with the image clicked in the grid view. We will therefore hide the grid view, but also update the current image.
    */
-  show_single_component(currentImage : ImageInfos){
-    this.currentImage = currentImage;
+  show_single_component(currentMedia : MediaInfos){
+    this.currentMedia = currentMedia;
     this.display_grid  = false;
     this.display_single = true;
   }
@@ -72,9 +73,13 @@ export class CellStateComponent {
   //Test Function
   test(){
     for(let i of [1,2,3,4,5,6]){
-      const imageInfo: ImageInfos = new ImageInfos(`assets/images/test${i}.jpg`,1);
-      this.imagesInfos.push(imageInfo);
+      const mediaInfo: MediaInfos = new MediaInfos(`assets/images/test${i}.jpg`,1,"jpg");
+      this.mediasInfos.push(mediaInfo);
     }
+    const mediaInfo: MediaInfos = new MediaInfos(`assets/images/audio_test.mp3`,1,"mp3");
+    mediaInfo.songName = "SPECIALZ";
+    mediaInfo.artistName = "King Gnu";
+    this.mediasInfos.push(mediaInfo);
   }
 
 }

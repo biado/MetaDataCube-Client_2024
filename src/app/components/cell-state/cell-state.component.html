@@ -7,13 +7,14 @@
                 </svg>
             </button>
             <button class="cell-state-buttons" (click)="show_grid_component()">Grid</button>
-            <button class="cell-state-buttons" (click)="show_single_component(currentImage)">Single</button>
+            <button class="cell-state-buttons" (click)="show_single_component(currentMedia)">Single</button>
+            <button class="cell-state-buttons" (click)="test()">Test</button>
         </div>
 
         <!-- Component to display the grid if the boolean is true -->
         <app-cell-state-grid 
             *ngIf="display_grid" 
-            [imagesInfos]="imagesInfos" 
+            [mediaInfos]="mediasInfos" 
             (show_single)="show_single_component($event)"
         >
         </app-cell-state-grid>
@@ -21,9 +22,9 @@
         <!-- Component to display the view with a single image if the boolean is true -->
         <app-cell-state-single 
             *ngIf="display_single" 
-            [imagesInfos]="imagesInfos" 
-            [currentImage]="currentImage"
-            (change_current_img)="currentImage=$event"
+            [mediaInfos]="mediasInfos" 
+            [currentMedia]="currentMedia"
+            (change_current_media)="currentMedia=$event"
         >            
         </app-cell-state-single>
     </article>

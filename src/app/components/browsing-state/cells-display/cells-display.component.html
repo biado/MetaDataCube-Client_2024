@@ -14,33 +14,48 @@
       <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
         <tr *ngFor="let y of AxisY">
           <td (click)="zoomOnLabels(y,'Y')">{{ y }}</td>
-          <td *ngFor="let x of AxisX" (click)="viewAllImage(x,y)">
+          <td *ngFor="let x of AxisX" (click)="viewAllMedia(x,y)">
             <ng-container>
-              <div *ngIf="imageUrls[x + '-' + y]; let imageUrl">
+              <div *ngIf="mediaUrls[x + '-' + y]; let mediaUrl">
 
-                <!-- Block loading: Waiting for the image to load -->
-                <div *ngIf="isLoading[x + '-' + y] && imageUrl" class="loading">
+                <!-- Block loading: Waiting for the media to load -->
+                <div *ngIf="isLoading[x + '-' + y] && mediaUrl" class="loading">
                   Loading...
                 </div>
                 
-                <!-- Block Image: When image loading is successful -->
+                <!-- Block Image: When image loading is successful (possible extension : 'jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico')-->
                 <img
-                  *ngIf="!isError[x + '-' + y] && imageUrl"
+                  *ngIf="['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(mediaType[x + '-' + y].toLowerCase()) && !isError[x + '-' + y] && mediaUrl"
                   class="cell-content_img"
-                  [src]="imageUrl"
+                  [src]="mediaUrl"
                   alt="Cell Image"
                   (load)="onLoad(x + '-' + y)"
                   (error)="onError(x + '-' + y)"
                 />
+              
+                <!-- Block Audio: When audio loading is successful (possible extension : 'mp3','wav')-->
+                <audio controls
+                  *ngIf="['mp3','wav'].includes(mediaType[x + '-' + y].toLowerCase()) && !isError[x + '-' + y] && mediaUrl"
+                  class="cell-content_img"
+                  alt="Cell Audio"
+                  (loadeddata)="onLoad(x + '-' + y)"
+                >
+                  <source *ngIf="['mp3'].includes(mediaType[x + '-' + y].toLowerCase())" [src]="mediaUrl" type="audio/mpeg"
+                    (error)="onError(x + '-' + y)"
+                  >   
+                  <source *ngIf="['wav'].includes(mediaType[x + '-' + y].toLowerCase())" [src]="mediaUrl" type="audio/wav"
+                    (error)="onError(x + '-' + y)"
+                  >   
+                </audio>
                 
-                <!-- Block error: When image loading fails -->
+                <!-- Block error: When media loading fails -->
                 <div *ngIf="isError[x + '-' + y]" class="error">
-                  Image Not Found!
+                  Media Not Found!
                 </div>
                     
-                <!-- Block Number of images: When image loading is successful -->
-                <div *ngIf="imageUrl && contentCount[x + '-' + y]; let contentCount">
-                  Images : {{contentCount}}
+                <!-- Block Number of medias: When media loading is successful -->
+                <div *ngIf="mediaUrl && contentCount[x + '-' + y]; let contentCount">
+                  Medias : {{contentCount}}
                 </div>
                 
               </div>
@@ -59,33 +74,45 @@
   <tbody>
     <tr>
         <td></td>
-        <td *ngFor="let x of AxisX" (click)="viewAllImage(x)">
+        <td *ngFor="let x of AxisX" (click)="viewAllMedia(x)">
           <ng-container>
-            <div *ngIf="imageUrls[x]; let imageUrl">
+            <div *ngIf="mediaUrls[x]; let mediaUrl">
 
-              <!-- Block loading: Waiting for the image to load -->
-              <div *ngIf="isLoading[x] && imageUrl" class="loading">
+              <!-- Block loading: Waiting for the media to load -->
+              <div *ngIf="isLoading[x] && mediaUrl" class="loading">
                 Loading...
               </div>
                     
               <!-- Block Image: When image loading is successful -->
               <img
-                *ngIf="!isError[x] && imageUrl"
+                *ngIf="(mediaType[x]==='jpg') && !isError[x] && mediaUrl"
                 class="cell-content_img"
-                [src]="imageUrl"
+                [src]="mediaUrl"
                 alt="Cell Image"
                 (load)="onLoad(x)"
                 (error)="onError(x)"
               />
+              
+              <!-- Block Audio: When audio loading is successful -->
+              <audio controls
+                *ngIf="(mediaType[x]==='mp3') !isError[x] && mediaUrl"
+                class="cell-content_img"
+                alt="Cell Audio"
+                (load)="onLoad(x)"
+                (error)="onError(x)"
+              >
+                <source [src]="mediaUrl" type="audio/mpeg">
+                Votre navigateur ne supporte pas l'élément audio.
+              </audio>
                     
-              <!-- Block error: When image loading fails -->
+              <!-- Block error: When media loading fails -->
               <div *ngIf="isError[x]" class="error">
-                Image Not Found!
+                Media Not Found!
               </div>
                     
-              <!-- Block Number of images: When image loading is successful -->
-              <div *ngIf="imageUrl && contentCount[x]; let contentCount">
-                Images : {{contentCount}}
+              <!-- Block Number of medias: When media loading is successful -->
+              <div *ngIf="mediaUrl && contentCount[x]; let contentCount">
+                Medias : {{contentCount}}
               </div>
 
             </div>
@@ -108,33 +135,45 @@
     <tbody *ngIf="AxisY && AxisY.length>0; else XButNoY">
       <tr *ngFor="let y of AxisY">
         <td (click)="zoomOnLabels(y,'Y')">{{ y }}</td>
-        <td (click)="viewAllImage(undefined,y)">
+        <td (click)="viewAllMedia(undefined,y)">
           <ng-container>
-            <div *ngIf="imageUrls[y]; let imageUrl">
+            <div *ngIf="mediaUrls[y]; let mediaUrl">
 
-              <!-- Block loading: Waiting for the image to load -->
-              <div *ngIf="isLoading[y] && imageUrl" class="loading">
+              <!-- Block loading: Waiting for the media to load -->
+              <div *ngIf="isLoading[y] && mediaUrl" class="loading">
                 Loading...
               </div>
               
               <!-- Block Image: When image loading is successful -->
               <img
-                *ngIf="!isError[y] && imageUrl"
+                *ngIf="(mediaType[y]==='jpg') && !isError[y] && mediaUrl"
                 class="cell-content_img"
-                [src]="imageUrl"
+                [src]="mediaUrl"
                 alt="Cell Image"
                 (load)="onLoad(y)"
                 (error)="onError(y)"
               />
               
-              <!-- Block error: When image loading fails -->
+              <!-- Block Audio: When audio loading is successful -->
+              <audio controls
+                *ngIf="(mediaType[y]==='mp3') !isError[y] && mediaUrl"
+                class="cell-content_img"
+                alt="Cell Audio"
+                (load)="onLoad(y)"
+                (error)="onError(y)"
+              >
+                <source [src]="mediaUrl" type="audio/mpeg">
+                Votre navigateur ne supporte pas l'élément audio.
+              </audio>
+              
+              <!-- Block error: When media loading fails -->
               <div *ngIf="isError[y]" class="error">
-                Image Not Found!
+                Media Not Found!
               </div>
                     
-              <!-- Block Number of images: When image loading is successful -->
-              <div *ngIf="imageUrl && contentCount[y]; let contentCount">
-                Images : {{contentCount}}
+              <!-- Block Number of medias: When media loading is successful -->
+              <div *ngIf="mediaUrl && contentCount[y]; let contentCount">
+                Medias : {{contentCount}}
               </div>
               
             </div>

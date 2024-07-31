@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { SelectedCellState } from '../models/selected-cell-state';
 import { SelectedCellStateService } from './selected-cell-state.service';
 import { GetUrlToSelectedDimensionsOrCellStateService } from './get-url-to-selected-dimensions-or-cell-state.service';
+import { MediaInfos } from '../models/media-infos';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +16,9 @@ export class GetCellStateService {
   
   filters : Filter[] = [];
   
-  private allImagesURI = new BehaviorSubject<{uri:string,mediaID:number}[]>([]);
+  private allMediasInfos = new BehaviorSubject<MediaInfos[]>([]);
   /** Images URI of of all images corresponding to the selected dimensions and filters  */
-  allImagesURI$ = this.allImagesURI.asObservable();
+  allMediasInfos$ = this.allMediasInfos.asObservable();
 
 
   constructor(
@@ -35,26 +36,41 @@ export class GetCellStateService {
       this.getUrlToSelectedDimensionsOrCellStateService.selectedCellStatesWithUrl$,
       this.selectedFiltersService.filters$
     ]).subscribe(([selectedCellState, filters]) => {
-      this.getAllImages(selectedCellState,filters);
+      this.getAllMedias(selectedCellState,filters);
     });
   }
 
   /**
-   * Function to retrieve all images that match the selected dimensions and filters.
+   * Function to retrieve all medias that match the selected dimensions and filters.
    */
-  private async getAllImages(selectedCellState : SelectedCellState, filters : Filter[]) {
+  private async getAllMedias(selectedCellState : SelectedCellState, filters : Filter[]) {
     if ((selectedCellState.xid && selectedCellState.xtype && !(selectedCellState.xtype==='tagset')) || (selectedCellState.yid && selectedCellState.ytype) && !(selectedCellState.ytype==='tagset')) {
-      const urlAllImage: string = selectedCellState.url;
-      console.log("URL :",urlAllImage)
-      this.allImagesURI.next([]);
-      let imagesURIs: {uri:string,mediaID:number}[] = [];
+      const urlAllMedia: string = selectedCellState.url;
+      console.log("URL :",urlAllMedia)
+      this.allMediasInfos.next([]);
+      let mediasInfo: MediaInfos[] = [];
 
       try {
-          const response: any = await this.http.get(`${urlAllImage}`).toPromise();
+          const response: any = await this.http.get(`${urlAllMedia}`).toPromise();
+          console.log("TEST : ", response)
           response.forEach((elt: any) => {
-              imagesURIs.push({uri:elt.fileURI,mediaID:elt.id});
+            const parts = elt.fileURI.split('.');
+            const extension : string = parts[parts.length - 1];
+            const mediaInfo = new MediaInfos(elt.fileURI, elt.id, extension);
+
+            /* 
+              These two lines are used to add the name and artist of a piece of music. 
+              Currently, the api doesn't return this information, so it will be undefined. 
+              To be seen in the future 
+            */
+            if(['mp3','wav'].includes(extension.toLowerCase())){
+              mediaInfo.songName = elt.songName;
+              mediaInfo.artistName = elt.artistName;
+            }
+
+            mediasInfo.push(mediaInfo);
           });
-          this.allImagesURI.next(imagesURIs);
+          this.allMediasInfos.next(mediasInfo);
       } catch (error) {
           console.error("Error in getAllImages:", error);
       }

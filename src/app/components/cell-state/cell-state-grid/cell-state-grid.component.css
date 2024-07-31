@@ -1,10 +1,14 @@
-.all_images_container {
+.all_medias_container {
     display: flex;
     justify-content:  center;
     flex-wrap: wrap;
     max-width: 100%;
 }
 
+.all_medias_container_div{
+    display: flex;
+    align-items: center;
+}
 
 .grid-content_img {
     max-width: 10em;
@@ -12,4 +16,21 @@
     object-position: center; 
     object-fit: contain;
     margin: 0.3em 0.3em 0.3em 0.3em;
+}
+
+.grid_content_audio_div{
+    max-width: 15em;
+    height: auto;
+    margin: 0.3em 0.3em 0.3em 0.3em;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    color: var(--main-color);
+}
+
+.grid-content_audio{
+    max-width: 15em;
 }
