@@ -4,6 +4,7 @@ import { combineLatest } from 'rxjs';
 import { GetCellStateService } from '../../services/get-cell-state.service';
 import { MediaInfos } from '../../models/media-infos';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-cell-state',
@@ -22,26 +23,38 @@ export class CellStateComponent {
   constructor(
     private getCellStateService : GetCellStateService,
     private router: Router,
+    private sanitizer: DomSanitizer 
   ){}
 
   ngOnInit() {    
     this.getCellStateService.allMediasInfos$.subscribe(data => {
       data.forEach(mediaInfos => {
         const completeURL = this.getCompleteUrl(mediaInfos.uri);
-        const imageInfo: MediaInfos = new MediaInfos(completeURL,mediaInfos.mediaID,mediaInfos.extension);
-        imageInfo.songName = mediaInfos.songName;
-        imageInfo.artistName = mediaInfos.artistName;
+        let imageInfo: MediaInfos;
+        
+        // Handle special cases for YouTube and Spotify where we sanitized the url
+        if (['youtube', 'spotify'].includes(mediaInfos.extension.toLowerCase())) {
+          const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(completeURL);
+          imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
+        } else {
+          imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
+        }
+
+        if(['mp3','wav'].includes(mediaInfos.extension.toLowerCase())){
+          imageInfo.songName = mediaInfos.songName;
+          imageInfo.artistName = mediaInfos.artistName;
+        }
 
         this.mediasInfos.push(imageInfo);
         this.currentMedia = this.mediasInfos[0];
-      })
+      });
     });
   }
 
   /**
    * We add to the initial url the end of the url leading to the image 
    */
-  getCompleteUrl(URI:string): string{
+  getCompleteUrl(URI:string|SafeResourceUrl): string{
     let baseurl = `assets/images/lsc_thumbs512/thumbnails512/`;
     return baseurl+URI;
   }
@@ -80,6 +93,14 @@ export class CellStateComponent {
     mediaInfo.songName = "SPECIALZ";
     mediaInfo.artistName = "King Gnu";
     this.mediasInfos.push(mediaInfo);
+
+    const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed/track/0GWNtMohuYUEHVZ40tcnHF');
+    const testSpotify: MediaInfos = new MediaInfos(sanitizedUrl,1,"spotify");
+    this.mediasInfos.push(testSpotify);
+
+    const sanitizedUrl2 = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/zQO7J483Dng?si=__Oqsv9QF4lUWKCz');
+    const testYoutube: MediaInfos = new MediaInfos(sanitizedUrl2,1,"youtube");
+    this.mediasInfos.push(testYoutube);
   }
 
 }

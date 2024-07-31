@@ -46,7 +46,29 @@
                   <source *ngIf="['wav'].includes(mediaType[x + '-' + y].toLowerCase())" [src]="mediaUrl" type="audio/wav"
                     (error)="onError(x + '-' + y)"
                   >   
-                </audio>
+                </audio>   
+
+                <div class="cell_content_iframe_youtube_div" *ngIf="['youtube'].includes(mediaType[x + '-' + y].toLowerCase()) &&  !isError[x + '-' + y]">
+                  <iframe [src]='mediaUrl'
+                    frameborder="0" 
+                    allowtransparency="true" 
+                    allow="encrypted-media"
+                    loading="eager"
+                    (load)="onLoad(x + '-' + y)"
+                    (error)="onError(x + '-' + y)">                      
+                  </iframe>
+                </div>
+        
+                <div class="cell_content_iframe_spotify_div" *ngIf="['spotify'].includes(mediaType[x + '-' + y].toLowerCase()) &&  !isError[x + '-' + y]">
+                    <iframe [src]='mediaUrl'
+                      frameborder="0" 
+                      allowtransparency="true" 
+                      allow="encrypted-media"
+                      loading="eager"
+                      (load)="onLoad(x + '-' + y)"
+                      (error)="onError(x + '-' + y)">                      
+                    </iframe>
+                </div>
                 
                 <!-- Block error: When media loading fails -->
                 <div *ngIf="isError[x + '-' + y]" class="error">
@@ -104,6 +126,14 @@
                 <source [src]="mediaUrl" type="audio/mpeg">
                 Votre navigateur ne supporte pas l'élément audio.
               </audio>
+
+              <div class="cell_content_iframe_youtube_div" *ngIf="['youtube'].includes(mediaType[x].toLowerCase()) &&  !isError[x]">
+                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              </div>
+      
+              <div class="cell_content_iframe_spotify_div" *ngIf="['spotify'].includes(mediaType[x].toLowerCase()) &&  !isError[x]">
+                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              </div>
                     
               <!-- Block error: When media loading fails -->
               <div *ngIf="isError[x]" class="error">
@@ -163,8 +193,15 @@
                 (error)="onError(y)"
               >
                 <source [src]="mediaUrl" type="audio/mpeg">
-                Votre navigateur ne supporte pas l'élément audio.
               </audio>
+
+              <div class="cell-cell_content_iframe_youtube_div" *ngIf="['youtube'].includes(mediaType[y].toLowerCase()) &&  !isError[y]">
+                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              </div>
+      
+              <div class="cell-cell_content_iframe_spotify_div" *ngIf="['spotify'].includes(mediaType[y].toLowerCase()) &&  !isError[y]">
+                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              </div>
               
               <!-- Block error: When media loading fails -->
               <div *ngIf="isError[y]" class="error">

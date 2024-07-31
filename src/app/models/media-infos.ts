@@ -1,7 +1,7 @@
-import e from "express";
+import { SafeResourceUrl } from "@angular/platform-browser";
 
 export class MediaInfos {
-    uri: string;
+    uri: string|SafeResourceUrl;
     isLoading : boolean;
     isError : boolean;
 
@@ -11,7 +11,7 @@ export class MediaInfos {
     songName : string | undefined;
     artistName : string | undefined;
 
-    constructor(uri : string,mediaID : number,extension : string){
+    constructor(uri : string|SafeResourceUrl,mediaID : number,extension : string){
         this.uri = uri;
         this.isError = false;
         this.isLoading = true;

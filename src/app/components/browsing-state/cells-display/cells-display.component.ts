@@ -13,6 +13,7 @@ import { UndoRedoService } from '../../../services/undo-redo.service';
 import { SelectedCellState } from '../../../models/selected-cell-state';
 import { SelectedCellStateService } from '../../../services/selected-cell-state.service';
 import { FindElement } from '../../../services/find-element.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-cells-display',
@@ -35,7 +36,7 @@ export class CellsDisplayComponent {
    * 
    * For x name and y name (of AxixX & AxixY we get the corresponding url (--See getGraphService--)). 
    */
-  contentUrl: { [key: string]: string } = {};    
+  contentUrl: { [key: string]: string|SafeResourceUrl } = {};    
   
   /** Number of media for a cell.
    * 
@@ -51,7 +52,7 @@ export class CellsDisplayComponent {
   mediaType: { [key: string]: string } = {};   
 
   /**graph.component.html will go straight inside. Used to avoid looking directly into content, or calling a function directly (because <img src=...> will continuously call the function). */ 
-  mediaUrls: { [key: string]: string } = {}; 
+  mediaUrls: { [key: string]: string|SafeResourceUrl } = {}; 
 
   /** For each x-y duo, we check whether the media is loading or not (starts at true, changes to false as soon as the media is loaded (or there's an error)). */
   isLoading: { [key: string]: boolean } = {};
@@ -62,7 +63,6 @@ export class CellsDisplayComponent {
   /** Send message to app-component to display grid instead of graph.  */
   @Output() go_to_cellState_Page = new EventEmitter();
 
-
   constructor(
     private selectedFiltersService : SelectedFiltersService,
     private selectedDimensionsService : SelectedDimensionsService,
@@ -71,6 +71,7 @@ export class CellsDisplayComponent {
     private getTagsetListService : GetTagsetListService,
     private undoredoService : UndoRedoService,
     private findElementService : FindElement,
+    private sanitizer: DomSanitizer 
   ){}
 
 
@@ -126,6 +127,9 @@ export class CellsDisplayComponent {
           this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
           this.isLoading[key] = true;
           this.isError[key] = false;
+          if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+            this.cleanUrl(key);
+          }
         });
       });
     }
@@ -136,6 +140,9 @@ export class CellsDisplayComponent {
         this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
+        if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+          this.cleanUrl(key);
+        }
       });
     }
     else if(y && y.length > 0){
@@ -145,6 +152,9 @@ export class CellsDisplayComponent {
         this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
+        if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+          this.cleanUrl(key);
+        }
       });
     }    
   }
@@ -166,10 +176,35 @@ export class CellsDisplayComponent {
   /**
    * Get the type of the extension of the media
    */
-  getMediasType(url : string) : string{
-    const parts = url.split('.');
-    const extension = parts[parts.length - 1];
+  getMediasType(url : string|SafeResourceUrl) : string{
+    let extension : string = 'unknown';
+
+    if(typeof url === 'string'){
+      const match = url.match(/\.(\w+)(?:\?|#|$)/);
+  
+      if (match) {
+        extension =  match[1]; 
+      } else if (url.includes('spotify.com')) {
+        extension =  'spotify';  
+      } else if (url.includes('youtube.com')) {
+        extension =  'youtube';  
+      } else {
+        extension =  'unknown';  
+      }
+    }
+
     return extension;
+  }
+
+  /**
+   * Sanitized the url : allow the url to be use in an iframe
+   */
+  cleanUrl(url : string|SafeResourceUrl){
+    let sanitizedUrl :string|SafeResourceUrl = url;
+    if(typeof url === 'string'){
+      sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+    return sanitizedUrl;
   }
 
   /** Function launched when a media is correctly loaded. We'll then set the isLoading and isError of the corresponding array cell to false. */
@@ -330,11 +365,6 @@ export class CellsDisplayComponent {
             this.go_to_cellState_Page.emit();
         }
     }
-  }
-
-
-  test(){
-
   }
 }
 

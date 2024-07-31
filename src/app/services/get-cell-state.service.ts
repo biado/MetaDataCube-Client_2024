@@ -54,8 +54,20 @@ export class GetCellStateService {
           const response: any = await this.http.get(`${urlAllMedia}`).toPromise();
           console.log("TEST : ", response)
           response.forEach((elt: any) => {
-            const parts = elt.fileURI.split('.');
-            const extension : string = parts[parts.length - 1];
+
+            let extension : string;
+            const match = elt.fileURI.match(/\.(\w+)(?:\?|#|$)/);
+
+            if (match) {
+              extension =  match[1]; 
+            } else if (elt.fileURI.includes('spotify.com')) {
+              extension =  'spotify';  
+            } else if (elt.fileURI.includes('youtube.com')) {
+              extension =  'youtube';  
+            } else {
+              extension =  'unknown';  
+            }
+
             const mediaInfo = new MediaInfos(elt.fileURI, elt.id, extension);
 
             /* 
