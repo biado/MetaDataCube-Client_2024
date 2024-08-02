@@ -58,27 +58,17 @@ export class GetCellStateService {
             let extension : string;
             const match = elt.fileURI.match(/\.(\w+)(?:\?|#|$)/);
 
-            if (match) {
+            if (match && ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico','mp3','wav'].includes(match[1].toLowerCase())) {
               extension =  match[1]; 
             } else if (elt.fileURI.includes('spotify.com')) {
               extension =  'spotify';  
-            } else if (elt.fileURI.includes('youtube.com')) {
+            } else if (elt.fileURI.includes('youtube.com') || elt.fileURI.includes('youtu.be')) {
               extension =  'youtube';  
             } else {
               extension =  'unknown';  
             }
 
             const mediaInfo = new MediaInfos(elt.fileURI, elt.id, extension);
-
-            /* 
-              These two lines are used to add the name and artist of a piece of music. 
-              Currently, the api doesn't return this information, so it will be undefined. 
-              To be seen in the future 
-            */
-            if(['mp3','wav'].includes(extension.toLowerCase())){
-              mediaInfo.songName = elt.songName;
-              mediaInfo.artistName = elt.artistName;
-            }
 
             mediasInfo.push(mediaInfo);
           });

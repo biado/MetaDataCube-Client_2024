@@ -22,7 +22,7 @@
                 <div *ngIf="isLoading[x + '-' + y] && mediaUrl" class="loading">
                   Loading...
                 </div>
-                
+
                 <!-- Block Image: When image loading is successful (possible extension : 'jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico')-->
                 <img
                   *ngIf="['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(mediaType[x + '-' + y].toLowerCase()) && !isError[x + '-' + y] && mediaUrl"
@@ -128,11 +128,27 @@
               </audio>
 
               <div class="cell_content_iframe_youtube_div" *ngIf="['youtube'].includes(mediaType[x].toLowerCase()) &&  !isError[x]">
-                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                <iframe 
+                  [src]='mediaUrl' 
+                  frameborder="0" 
+                  allowtransparency="true" 
+                  allow="encrypted-media"
+                  (load)="onLoad(x)"
+                  (error)="onError(x)"
+                >
+                </iframe>
               </div>
       
               <div class="cell_content_iframe_spotify_div" *ngIf="['spotify'].includes(mediaType[x].toLowerCase()) &&  !isError[x]">
-                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                <iframe 
+                  [src]='mediaUrl' 
+                  frameborder="0" 
+                  allowtransparency="true" 
+                  allow="encrypted-media"
+                  (load)="onLoad(x)"
+                  (error)="onError(x)"
+                >
+                </iframe>
               </div>
                     
               <!-- Block error: When media loading fails -->
@@ -195,12 +211,28 @@
                 <source [src]="mediaUrl" type="audio/mpeg">
               </audio>
 
-              <div class="cell-cell_content_iframe_youtube_div" *ngIf="['youtube'].includes(mediaType[y].toLowerCase()) &&  !isError[y]">
-                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              <div class="cell_content_iframe_youtube_div" *ngIf="['youtube'].includes(mediaType[y].toLowerCase()) &&  !isError[y]">
+                <iframe 
+                  [src]='mediaUrl' 
+                  frameborder="0" 
+                  allowtransparency="true" 
+                  allow="encrypted-media"
+                  (load)="onLoad(y)"
+                  (error)="onError(y)"
+                >
+                </iframe>
               </div>
       
-              <div class="cell-cell_content_iframe_spotify_div" *ngIf="['spotify'].includes(mediaType[y].toLowerCase()) &&  !isError[y]">
-                  <iframe [src]='mediaUrl' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              <div class="cell_content_iframe_spotify_div" *ngIf="['spotify'].includes(mediaType[y].toLowerCase()) &&  !isError[y]">
+                <iframe 
+                  [src]='mediaUrl' 
+                  frameborder="0" 
+                  allowtransparency="true" 
+                  allow="encrypted-media"
+                  (load)="onLoad(y)"
+                  (error)="onError(y)"
+                >
+                </iframe>
               </div>
               
               <!-- Block error: When media loading fails -->

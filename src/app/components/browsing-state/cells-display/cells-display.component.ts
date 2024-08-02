@@ -123,12 +123,15 @@ export class CellsDisplayComponent {
       x.forEach(x => {
         y.forEach(y => {
           const key = `${x}-${y}`;
-          this.mediaUrls[key] = this.getContent(key);
-          this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
+          this.mediaType[key] = this.getMediasType(this.contentUrl[key]);
           this.isLoading[key] = true;
           this.isError[key] = false;
+  
           if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
-            this.cleanUrl(key);
+            this.mediaUrls[key] = this.cleanUrl(this.contentUrl[key]);
+          }
+          else{
+            this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.contentUrl[key];
           }
         });
       });
@@ -136,41 +139,33 @@ export class CellsDisplayComponent {
     else if(x && x.length > 0){
       x.forEach(x => {
         const key = `${x}`;
-        this.mediaUrls[key] = this.getContent(x);
-        this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
+        this.mediaType[key] = this.getMediasType(this.contentUrl[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
+
         if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
-          this.cleanUrl(key);
+          this.mediaUrls[key] = this.cleanUrl(this.contentUrl[key]);
+        }
+        else{
+          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.contentUrl[key];
         }
       });
     }
     else if(y && y.length > 0){
       y.forEach(y => {
         const key = `${y}`;
-        this.mediaUrls[key] = this.getContent(y);
-        this.mediaType[key] = this.getMediasType(this.mediaUrls[key]);
+        this.mediaType[key] = this.getMediasType(this.contentUrl[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
+
         if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
-          this.cleanUrl(key);
+          this.mediaUrls[key] = this.cleanUrl(this.contentUrl[key]);
+        }
+        else{
+          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.contentUrl[key];
         }
       });
     }    
-  }
-
-  /**
-   * This function returns the url corresponding to one cell in the table (duo x-y) using content and baseurl (to be modified by hand depending on where the medias are stored).
-   * 
-   * Returns the url if there is one, if there are no results for the cells in the array, then an empty string is returned.
-   */
-  getContent(key:string): string {    
-    let baseurl = `assets/images/lsc_thumbs512/thumbnails512/`;
-    const url = this.contentUrl[key];
-    if(url){
-      return baseurl+url;
-    }
-    return '';
   }
 
   /**
@@ -182,11 +177,11 @@ export class CellsDisplayComponent {
     if(typeof url === 'string'){
       const match = url.match(/\.(\w+)(?:\?|#|$)/);
   
-      if (match) {
+      if (match && ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico','mp3','wav'].includes(match[1].toLowerCase())) {
         extension =  match[1]; 
       } else if (url.includes('spotify.com')) {
         extension =  'spotify';  
-      } else if (url.includes('youtube.com')) {
+      } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
         extension =  'youtube';  
       } else {
         extension =  'unknown';  

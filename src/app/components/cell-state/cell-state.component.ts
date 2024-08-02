@@ -29,34 +29,28 @@ export class CellStateComponent {
   ngOnInit() {    
     this.getCellStateService.allMediasInfos$.subscribe(data => {
       data.forEach(mediaInfos => {
-        const completeURL = this.getCompleteUrl(mediaInfos.uri);
+
+        /**
+         * Complete URL because in the database is juste the name of the file, so we need to add the path
+         * 
+         * The aim is to have the complete link in the database! Here's a problem with the LSC22 database
+         */
+        const completeURL = `assets/images/lsc_thumbs512/thumbnails512/`+ mediaInfos.uri;
+        
         let imageInfo: MediaInfos;
         
         // Handle special cases for YouTube and Spotify where we sanitized the url
         if (['youtube', 'spotify'].includes(mediaInfos.extension.toLowerCase())) {
-          const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(completeURL);
+          const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.uri.toString());
           imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
         } else {
           imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
-        }
-
-        if(['mp3','wav'].includes(mediaInfos.extension.toLowerCase())){
-          imageInfo.songName = mediaInfos.songName;
-          imageInfo.artistName = mediaInfos.artistName;
         }
 
         this.mediasInfos.push(imageInfo);
         this.currentMedia = this.mediasInfos[0];
       });
     });
-  }
-
-  /**
-   * We add to the initial url the end of the url leading to the image 
-   */
-  getCompleteUrl(URI:string|SafeResourceUrl): string{
-    let baseurl = `assets/images/lsc_thumbs512/thumbnails512/`;
-    return baseurl+URI;
   }
 
   /**
@@ -98,8 +92,14 @@ export class CellStateComponent {
     const testSpotify: MediaInfos = new MediaInfos(sanitizedUrl,1,"spotify");
     this.mediasInfos.push(testSpotify);
 
-    const sanitizedUrl2 = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/zQO7J483Dng?si=__Oqsv9QF4lUWKCz');
-    const testYoutube: MediaInfos = new MediaInfos(sanitizedUrl2,1,"youtube");
+
+    const sanitizedUrl2 = this.sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed/track/2O6X9nPVVQSefg3xOQAo5u');
+    const testSpotify2: MediaInfos = new MediaInfos(sanitizedUrl2,1,"spotify");
+    this.mediasInfos.push(testSpotify2);
+    
+
+    const sanitizedUrl3 = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/zQO7J483Dng?si=__Oqsv9QF4lUWKCz');
+    const testYoutube: MediaInfos = new MediaInfos(sanitizedUrl3,1,"youtube");
     this.mediasInfos.push(testYoutube);
   }
 
