@@ -95,6 +95,50 @@
     vertical-align: middle;
     margin:0.1em 0.1em 0.1em 0.1em;
   }
+
+  .cell_content_iframe_spotify_div {
+    max-width: 10em;
+    max-height: 6em;
+    margin : 0 auto 0 auto;
+
+    vertical-align: middle;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+
+  .cell_content_iframe_youtube_div {
+    max-width: 9.5em;
+    max-height: 7em;
+    margin : 0 auto 0 auto;
+
+    vertical-align: middle;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+
+  .cell_content_iframe_spotify_div iframe, 
+  .cell_content_iframe_youtube_div iframe {
+    width: 100%; 
+    height: 100%; 
+    border: none; 
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
   /* ############################################## */
 
 

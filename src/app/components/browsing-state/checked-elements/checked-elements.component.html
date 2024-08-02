@@ -49,7 +49,7 @@
         </div>
 
         <div class="checked_element" *ngIf="filters.tagset.tagList.asRange && tagsNameToNumbersIsPossible(filters.filters) && convertTagsNameToNumbers(filters.filters) as tagsNumbers ">
-          <app-selection-tag-by-range [test]="'checked'" [tagsetID]="filters.tagset.id"></app-selection-tag-by-range>
+          <app-selection-tag-by-range [tagsetID]="filters.tagset.id"></app-selection-tag-by-range>
         </div>  
       </div>
     </div>

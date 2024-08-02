@@ -41,6 +41,18 @@ article {
     display: flex;
     justify-content: center;
 }
+
+.go_back-buttons{
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+
+    position: absolute;
+    top: 3%;
+    left: 5%;
+    transform: translate(-3%, -5%);
+    z-index: 9;
+}
 /* ############################################## */
 
 

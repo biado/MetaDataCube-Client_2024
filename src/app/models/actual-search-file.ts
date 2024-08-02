@@ -7,9 +7,9 @@ import { Tagset } from "./tagset";
 export class ActualSearchFile {
     selectedDimensions : SelectedDimensions;
     selectedFilters : Filter[];
-    preSelection : ((Hierarchy|Tagset|TagList)[])[];
+    preSelection : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[];
 
-    constructor(selectedDimensions : SelectedDimensions, selectedFilters : Filter[], preSelection : ((Hierarchy|Tagset|TagList)[])[]){
+    constructor(selectedDimensions : SelectedDimensions, selectedFilters : Filter[], preSelection : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[]){
         this.selectedDimensions = selectedDimensions;
         this.selectedFilters = selectedFilters;
         this.preSelection = preSelection;

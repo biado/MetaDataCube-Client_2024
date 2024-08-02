@@ -35,7 +35,7 @@
                 <app-selection-tag *ngFor="let tag of sortedtags" [tag]="tag"></app-selection-tag>
               </div>  
               <div class="selection_range_tags_labels" *ngIf="tagset.tagList.asRange && tagsNameToNumbersIsPossible(sortedtags)">
-                <app-selection-tag-by-range [test]="'selection'" [tagsetID]="tagset.id"></app-selection-tag-by-range>
+                <app-selection-tag-by-range [tagsetID]="tagset.id"></app-selection-tag-by-range>
               </div>  
             </div>
           </div>

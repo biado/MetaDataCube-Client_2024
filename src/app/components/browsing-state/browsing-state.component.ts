@@ -119,7 +119,7 @@ export class BrowsingStateComponent {
   }
 
   /**
-   * Change variables to display the grid component instead of the graph component.
+   * Change variables to display the cell-state Page
    */
   go_to_cellState_Page():void{
     this.router.navigate(['/cell-state']);
@@ -208,38 +208,49 @@ export class BrowsingStateComponent {
                 }
               });
 
-              // PreSelection - Everything is visible
-              let modified_elements : (Hierarchy|Tagset|TagList)[] = [];
+              // PreSelection - Everything is visible and nothing is a range
+              let modified_elements : ({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[] = [];
               this.tagsetList.forEach(tagset=>{
                 tagset.hierarchies.forEach(hierarchy =>{
                   if(hierarchy.isVisible===false){
                     hierarchy.isVisible = true;
-                    modified_elements.push(hierarchy);
+                    modified_elements.push({element : hierarchy, preselectionType:'isVisible'});
                   }
                 })
                 if(tagset.tagList.isVisible===false){
                   tagset.tagList.isVisible = true;
-                  modified_elements.push(tagset.tagList);
+                  modified_elements.push({element : tagset.tagList, preselectionType:'isVisible'});
+                }
+                if(tagset.tagList.asRange===true){
+                  tagset.tagList.asRange = false;
+                  modified_elements.push({element : tagset.tagList, preselectionType:'asRange'});
                 }
                 if(tagset.isVisible===false){
                   tagset.isVisible = true;
-                  modified_elements.push(tagset);
+                  modified_elements.push({element : tagset, preselectionType:'isVisible'});
                 }
               });
               
               // PreSelection - We change the elements in the same way as they have been changed in the conf file
-              json.preSelection.forEach((list:(Hierarchy|Tagset|TagList)[]) =>{
+              json.preSelection.forEach((list:({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[]) =>{
                 list.forEach(elt =>{
                   let element;
-                  if(elt.type==='tagList'){
-                    element = this.findElementService.findElementinTagsetList(elt.tagsetID, elt.type);
+                  let result : {element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'};
+                  if(elt.element.type==='tagList'){
+                    element = this.findElementService.findElementinTagsetList(elt.element.tagsetID, elt.element.type);
                   }
                   else{
-                    element = this.findElementService.findElementinTagsetList(elt.id, elt.type);
+                    element = this.findElementService.findElementinTagsetList(elt.element.id, elt.element.type);
                   }
                   if(element && ((element.type==='hierarchy') || (element.type === 'tagList') || (element.type === 'tagset'))){
-                    element.isVisible = elt.isVisible;
-                    modified_elements.push(element);
+                    if(elt.preselectionType==='isVisible'){
+                      element.isVisible = elt.element.isVisible;
+                      modified_elements.push({element : element, preselectionType:'isVisible'});                      
+                    }
+                    if((element.type === 'tagList') && elt.element.type==='tagList' && elt.preselectionType==='asRange'){
+                      element.asRange = elt.element.asRange;
+                      modified_elements.push({element : element, preselectionType:'asRange'});                      
+                    }
                   }
                 })
               })
@@ -264,7 +275,7 @@ export class BrowsingStateComponent {
   saveSearch(){
     let actualDimensions : SelectedDimensions = this.selectedDimensions;
     let actualFilters : Filter[] = this.selectedFilters;
-    let actualPreSelection : ((Hierarchy|Tagset|TagList)[])[] = this.undoredoService.AllPreSelectionDo;
+    let actualPreSelection : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = this.undoredoService.AllPreSelectionDo;
     let actualSearch : ActualSearchFile = new ActualSearchFile(actualDimensions,actualFilters,actualPreSelection);
 
     if (actualSearch) {
