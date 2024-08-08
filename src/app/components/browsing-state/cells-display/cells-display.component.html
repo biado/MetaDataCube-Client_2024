@@ -17,7 +17,6 @@
           <td *ngFor="let x of AxisX" (click)="viewAllMedia(x,y)">
             <ng-container>
               <div *ngIf="mediaUrls[x + '-' + y]; let mediaUrl">
-
                 <!-- Block loading: Waiting for the media to load -->
                 <div *ngIf="isLoading[x + '-' + y] && mediaUrl" class="loading">
                   Loading...
@@ -76,7 +75,7 @@
                 </div>
                     
                 <!-- Block Number of medias: When media loading is successful -->
-                <div *ngIf="mediaUrl && contentCount[x + '-' + y]; let contentCount">
+                <div *ngIf="mediaUrl && cellsContentCount[x + '-' + y]; let contentCount">
                   Medias : {{contentCount}}
                 </div>
                 
@@ -157,7 +156,7 @@
               </div>
                     
               <!-- Block Number of medias: When media loading is successful -->
-              <div *ngIf="mediaUrl && contentCount[x]; let contentCount">
+              <div *ngIf="mediaUrl && cellsContentCount[x]; let contentCount">
                 Medias : {{contentCount}}
               </div>
 
@@ -241,7 +240,7 @@
               </div>
                     
               <!-- Block Number of medias: When media loading is successful -->
-              <div *ngIf="mediaUrl && contentCount[y]; let contentCount">
+              <div *ngIf="mediaUrl && cellsContentCount[y]; let contentCount">
                 Medias : {{contentCount}}
               </div>
               

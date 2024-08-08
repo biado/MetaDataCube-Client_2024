@@ -8,7 +8,7 @@
         <img class="header_undoredo_img" src="../assets/icons/redo.svg" (click)="redo()">
       </div>
       <div class="header_buttons_div">
-        <button class="header_buttons" (click)="display_dimensions_preselection()">Pre-Selection</button>
+        <button class="header_buttons" (click)="display_dimensions_configuration()">Configuration</button>
         <button class="header_buttons" (click)="reload_tagset_list()">Reload Data</button>
         <button class="header_buttons" (click)="saveSearch()">Save</button>
         <button class="header_buttons" (click)="loadSearch()">Load</button>
@@ -39,7 +39,7 @@
         </div>
       </section>
 
-      <app-pre-selection-popup *ngIf="display_popup_preselection" (close_popup_event)="display_dimensions_preselection()"></app-pre-selection-popup>      
+      <app-configuration-popup *ngIf="display_popup_configuration" (close_popup_event)="display_dimensions_configuration()"></app-configuration-popup>      
     </article>
   
     <!-- Article Tag for small screen -->
@@ -67,7 +67,7 @@
           </div>
         </section>
 
-        <app-pre-selection-popup *ngIf="display_popup_preselection" (close_popup_event)="display_dimensions_preselection()"></app-pre-selection-popup>
+        <app-configuration-popup *ngIf="display_popup_configuration" (close_popup_event)="display_dimensions_configuration()"></app-configuration-popup>
       </article>
     </ng-template>
 

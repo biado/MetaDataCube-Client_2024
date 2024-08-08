@@ -29,8 +29,8 @@ export class BrowsingStateComponent {
   /** If true, we show the filters pannel, otherwise no */
   display_filters: boolean = true;     
 
-  /** If true, we show the pop-up for the dimension pre-selection, otherwise no */
-  display_popup_preselection: boolean = false;    
+  /** If true, we show the pop-up for the configuration, otherwise no */
+  display_popup_configuration: boolean = false;    
 
   /** If true, we use the small screen version of the article tag. Otherwise we use the first version, which is the large screen version */
   smallscreen: boolean = false;      
@@ -88,8 +88,8 @@ export class BrowsingStateComponent {
   /**
    * Used to invert the value of display_filters, in order to display the filters pannel or not.
    */
-  display_dimensions_preselection(): void {
-    this.display_popup_preselection = !this.display_popup_preselection;
+  display_dimensions_configuration(): void {
+    this.display_popup_configuration = !this.display_popup_configuration;
   }
 
   /**
@@ -128,7 +128,7 @@ export class BrowsingStateComponent {
   /**
    * Function for loading a configuration file to obtain a precise search in one go.
    * 
-   * From this file, we'll retrieve the selected dimensions, the selected filters and the Pre-Selection on dimensions.
+   * From this file, we'll retrieve the selected dimensions, the selected filters and the configuration.
    */
   loadSearch() {
     const input = document.createElement('input');
@@ -208,34 +208,34 @@ export class BrowsingStateComponent {
                 }
               });
 
-              // PreSelection - Everything is visible and nothing is a range
-              let modified_elements : ({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[] = [];
+              // Configuration - Everything is visible and nothing is a range
+              let modified_elements : ({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[] = [];
               this.tagsetList.forEach(tagset=>{
                 tagset.hierarchies.forEach(hierarchy =>{
                   if(hierarchy.isVisible===false){
                     hierarchy.isVisible = true;
-                    modified_elements.push({element : hierarchy, preselectionType:'isVisible'});
+                    modified_elements.push({element : hierarchy, configurationType:'isVisible'});
                   }
                 })
                 if(tagset.tagList.isVisible===false){
                   tagset.tagList.isVisible = true;
-                  modified_elements.push({element : tagset.tagList, preselectionType:'isVisible'});
+                  modified_elements.push({element : tagset.tagList, configurationType:'isVisible'});
                 }
                 if(tagset.tagList.asRange===true){
                   tagset.tagList.asRange = false;
-                  modified_elements.push({element : tagset.tagList, preselectionType:'asRange'});
+                  modified_elements.push({element : tagset.tagList, configurationType:'asRange'});
                 }
                 if(tagset.isVisible===false){
                   tagset.isVisible = true;
-                  modified_elements.push({element : tagset, preselectionType:'isVisible'});
+                  modified_elements.push({element : tagset, configurationType:'isVisible'});
                 }
               });
               
-              // PreSelection - We change the elements in the same way as they have been changed in the conf file
-              json.preSelection.forEach((list:({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[]) =>{
+              // Configuration - We change the elements in the same way as they have been changed in the conf file
+              json.configuration.forEach((list:({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[]) =>{
                 list.forEach(elt =>{
                   let element;
-                  let result : {element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'};
+                  let result : {element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'};
                   if(elt.element.type==='tagList'){
                     element = this.findElementService.findElementinTagsetList(elt.element.tagsetID, elt.element.type);
                   }
@@ -243,13 +243,13 @@ export class BrowsingStateComponent {
                     element = this.findElementService.findElementinTagsetList(elt.element.id, elt.element.type);
                   }
                   if(element && ((element.type==='hierarchy') || (element.type === 'tagList') || (element.type === 'tagset'))){
-                    if(elt.preselectionType==='isVisible'){
+                    if(elt.configurationType==='isVisible'){
                       element.isVisible = elt.element.isVisible;
-                      modified_elements.push({element : element, preselectionType:'isVisible'});                      
+                      modified_elements.push({element : element, configurationType:'isVisible'});                      
                     }
-                    if((element.type === 'tagList') && elt.element.type==='tagList' && elt.preselectionType==='asRange'){
+                    if((element.type === 'tagList') && elt.element.type==='tagList' && elt.configurationType==='asRange'){
                       element.asRange = elt.element.asRange;
-                      modified_elements.push({element : element, preselectionType:'asRange'});                      
+                      modified_elements.push({element : element, configurationType:'asRange'});                      
                     }
                   }
                 })
@@ -275,8 +275,8 @@ export class BrowsingStateComponent {
   saveSearch(){
     let actualDimensions : SelectedDimensions = this.selectedDimensions;
     let actualFilters : Filter[] = this.selectedFilters;
-    let actualPreSelection : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = this.undoredoService.AllPreSelectionDo;
-    let actualSearch : ActualSearchFile = new ActualSearchFile(actualDimensions,actualFilters,actualPreSelection);
+    let actualConfiguration : (({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[])[] = this.undoredoService.AllConfigurationDo;
+    let actualSearch : ActualSearchFile = new ActualSearchFile(actualDimensions,actualFilters,actualConfiguration);
 
     if (actualSearch) {
       const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(actualSearch));

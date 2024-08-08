@@ -13,10 +13,10 @@ import { CellStateComponent } from './components/cell-state/cell-state.component
 import { AppRoutingModule } from './app-routing.module';
 import { CellStateGridComponent } from './components/cell-state/cell-state-grid/cell-state-grid.component';
 import { CellStateSingleComponent } from './components/cell-state/cell-state-single/cell-state-single.component';
-import { PreSelectionPopupComponent } from './components/browsing-state/pre-selection-popup/pre-selection-popup.component';
 import { SelectionTagComponent } from './components/browsing-state/selection/selection-tag/selection-tag.component';
 import { CheckedElementsComponent } from './components/browsing-state/checked-elements/checked-elements.component';
 import { SelectionTagByRangeComponent } from './components/browsing-state/selection/selection-tag-by-range/selection-tag-by-range.component';
+import { ConfigurationPopupComponent } from './components/browsing-state/configuration-popup/configuration-popup.component';
 
 
 @NgModule({
@@ -29,10 +29,10 @@ import { SelectionTagByRangeComponent } from './components/browsing-state/select
     BrowsingStateComponent,
     CellStateGridComponent,
     CellStateSingleComponent,
-    PreSelectionPopupComponent,
     SelectionTagComponent,
     CheckedElementsComponent,
-    SelectionTagByRangeComponent,    
+    SelectionTagByRangeComponent,  
+    ConfigurationPopupComponent,  
   ],
   imports: [
     BrowserModule,

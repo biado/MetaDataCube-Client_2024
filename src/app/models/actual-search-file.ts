@@ -7,11 +7,11 @@ import { Tagset } from "./tagset";
 export class ActualSearchFile {
     selectedDimensions : SelectedDimensions;
     selectedFilters : Filter[];
-    preSelection : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[];
+    configuration : (({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[])[];
 
-    constructor(selectedDimensions : SelectedDimensions, selectedFilters : Filter[], preSelection : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[]){
+    constructor(selectedDimensions : SelectedDimensions, selectedFilters : Filter[], configuration : (({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[])[]){
         this.selectedDimensions = selectedDimensions;
         this.selectedFilters = selectedFilters;
-        this.preSelection = preSelection;
+        this.configuration = configuration;
     }
 }

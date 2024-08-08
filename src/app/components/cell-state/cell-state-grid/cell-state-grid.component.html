@@ -3,7 +3,7 @@
         <img      
             *ngIf="['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(media.extension.toLowerCase()) && !(media.isError)"          
             class="grid-content_img"
-            [src]="media.uri"
+            [src]="media.file_uri"
             alt="Image"
             (load)="onLoad(media)"
             (error)="onError(media)"
@@ -11,11 +11,11 @@
         />
 
         <div class="grid_content_iframe_youtube_div" *ngIf="['youtube'].includes(media.extension.toLowerCase()) &&  !(media.isError)">
-            <iframe [src]='media.uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+            <iframe [src]='media.file_uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
 
         <div class="grid_content_iframe_spotify_div" *ngIf="['spotify'].includes(media.extension.toLowerCase()) &&  !(media.isError)">
-            <iframe [src]='media.uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+            <iframe [src]='media.file_uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
 
         <div class="grid_content_audio_div" *ngIf="['mp3','wav'].includes(media.extension.toLowerCase()) &&  !(media.isError)">
@@ -25,16 +25,12 @@
                 (click)="zoom_on_media(media)"
             >
                 <source 
-                    [src]="media.uri" 
+                    [src]="media.file_uri" 
                     type="audio/mpeg"
                     (load)="onLoad(media)"
                     (error)="onError(media)"
                 >
             </audio>
-            <!-- Not Use for the moment -->
-            <div *ngIf="media.songName"> 
-                {{ media.songName }}{{ media.artistName ? ' - ' + media.artistName : '' }}
-            </div>
         </div>
       
         <!-- Block error: When image loading fails -->

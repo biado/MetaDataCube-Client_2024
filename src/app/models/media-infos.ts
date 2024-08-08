@@ -1,18 +1,15 @@
 import { SafeResourceUrl } from "@angular/platform-browser";
 
 export class MediaInfos {
-    uri: string|SafeResourceUrl;
+    file_uri: string|SafeResourceUrl;
     isLoading : boolean;
     isError : boolean;
 
     mediaID : number;
     extension : string;
 
-    songName : string | undefined;
-    artistName : string | undefined;
-
-    constructor(uri : string|SafeResourceUrl,mediaID : number,extension : string){
-        this.uri = uri;
+    constructor(file_uri : string|SafeResourceUrl,mediaID : number,extension : string){
+        this.file_uri = file_uri;
         this.isError = false;
         this.isLoading = true;
 

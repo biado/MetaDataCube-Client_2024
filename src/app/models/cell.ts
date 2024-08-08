@@ -3,11 +3,11 @@ export class Cell {
     yCoordinate: number|undefined;
 
     count: number;
-    img_url: string;
+    file_uri: string;
 
-    constructor(count:number, img_url : string, xCoordinate?: number, yCoordinate?: number) {
+    constructor(count:number, file_uri : string, xCoordinate?: number, yCoordinate?: number) {
         this.count = count;
-        this.img_url = img_url;
+        this.file_uri = file_uri;
         if (xCoordinate !== undefined) {
             this.xCoordinate = xCoordinate;
         }

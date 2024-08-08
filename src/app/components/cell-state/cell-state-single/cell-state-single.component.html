@@ -7,7 +7,7 @@
         <img      
             *ngIf="['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(currentMedia.extension.toLowerCase()) && !(currentMedia.isError)"          
             class="single-img"
-            [src]="currentMedia.uri"
+            [src]="currentMedia.file_uri"
             alt="Image"
             (load)="onLoad(currentMedia, $event)"
             (error)="onError(currentMedia)"
@@ -17,25 +17,21 @@
         <div class="single-audio" *ngIf="['mp3','wav'].includes(currentMedia.extension.toLowerCase()) &&  !(currentMedia.isError)">
             <audio controls alt="Cell Audio">
                 <source 
-                    [src]="currentMedia.uri" 
+                    [src]="currentMedia.file_uri" 
                     type="audio/mpeg"
                     (loadeddata)="onLoad(currentMedia, $event)"
                     (error)="onError(currentMedia)"
                 >
                 Error to load the audio
-            </audio>            
-            <!-- Not Use for the moment -->
-            <div *ngIf="currentMedia.songName">
-                {{ currentMedia.songName }}{{ currentMedia.artistName ? ' - ' + currentMedia.artistName : '' }}
-            </div>
+            </audio>     
         </div>        
 
         <div class="single_content_iframe_youtube_div" *ngIf="['youtube'].includes(currentMedia.extension.toLowerCase()) &&  !(currentMedia.isError)">
-            <iframe [src]='currentMedia.uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+            <iframe [src]='currentMedia.file_uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
 
         <div class="single_content_iframe_spotify_div" *ngIf="['spotify'].includes(currentMedia.extension.toLowerCase()) &&  !(currentMedia.isError)">
-            <iframe [src]='currentMedia.uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+            <iframe [src]='currentMedia.file_uri' frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
 
         <!-- Block error: When image loading fails -->

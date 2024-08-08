@@ -1,4 +1,4 @@
-.pre-selection_popup{
+.configuration_popup{
     width: 50%;
     height: 50%;
 
@@ -17,23 +17,23 @@
     justify-content: space-between;
 }
 
-.pre-selection_popup_selection_titles{
+.configuration_popup_selection_titles{
     display: flex;
     flex-direction: row;
     font-size: 1.4em;
 }
 
-.pre-selection_popup_selection_titles_Visible{
+.configuration_popup_selection_titles_Visible{
     position: sticky;
     left: 12em;
     text-align: center;
 }
-.pre-selection_popup_selection_titles_Range{
+.configuration_popup_selection_titles_Range{
     position: sticky;
     left: 19.4em;
 }
 
-.pre-selection_popup_selection{
+.configuration_popup_selection{
     width: 90%;
     height: 100%;
 
@@ -43,17 +43,17 @@
     white-space: nowrap;
 }
 
-.pre-selection_popup_tagset_labels{
+.configuration_popup_tagset_labels{
     margin: 0.8em 0 0.8em 0;
 }
 
-.pre-selection_popup_labels_title{
+.configuration_popup_labels_title{
     font-size: 1.2em;
     display: flex;
     align-items: center;
 }
 
-.pre-selection_popup_labels_subtitle{
+.configuration_popup_labels_subtitle{
     font-size: 1em;
     margin-left: 50px;
     display: flex;
@@ -64,14 +64,14 @@
     overflow-y: auto;
 }
 
-.pre-selection_popup_close{
+.configuration_popup_close{
     width: 7%;
     width: auto;
     display: flex;
     justify-content: center;
 }
 
-.pre-selection_popup_close_button{
+.configuration_popup_close_button{
     width: min-content;
     cursor: pointer;
 }

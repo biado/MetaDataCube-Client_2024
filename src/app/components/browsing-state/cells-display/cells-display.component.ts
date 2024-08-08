@@ -31,28 +31,19 @@ export class CellsDisplayComponent {
   AxisX: string[] = [];
   AxisY: string[] = [];
   
-  /**
-   * Url for the presentation media of a cell
-   * 
-   * For x name and y name (of AxixX & AxixY we get the corresponding url (--See getGraphService--)). 
-   */
-  contentUrl: { [key: string]: string|SafeResourceUrl } = {};    
+  /** Url for the presentation media of a cell. For x name and y name (of AxixX & AxixY we get the corresponding url (--See getCellsService--)). */
+  cellsContentUrl: { [key: string]: string|SafeResourceUrl } = {};    
   
-  /** Number of media for a cell.
-   * 
-   * For x name and y name (of AxixX & AxixY we get the corresponding number of media (--See getGraphService--)). 
-   */
-  contentCount: { [key: string]: number } = {};   
+  /** Number of media for a cell. For x name and y name (of AxixX & AxixY we get the corresponding number of media (--See getCellsService--)). */
+  cellsContentCount: { [key: string]: number } = {};   
+
   
-  /** 
-   * Type of the media of a cell
-   * 
-   * For x name and y name (of AxixX & AxixY we get the corresponding number of media (--See getGraphService--)). 
-   */
+  /** Type of the media of a cell For x name and y name (of AxixX & AxixY we get the corresponding number of media (--See getCellsService--)). */
   mediaType: { [key: string]: string } = {};   
 
-  /**graph.component.html will go straight inside. Used to avoid looking directly into content, or calling a function directly (because <img src=...> will continuously call the function). */ 
+  /** Usable Url from contentUrl (either completed, neutralised for use in Iframe, or identical to contentUrl). */ 
   mediaUrls: { [key: string]: string|SafeResourceUrl } = {}; 
+
 
   /** For each x-y duo, we check whether the media is loading or not (starts at true, changes to false as soon as the media is loaded (or there's an error)). */
   isLoading: { [key: string]: boolean } = {};
@@ -60,8 +51,10 @@ export class CellsDisplayComponent {
   /** For each x-y duo, If loading the media causes an error, set to true. False otherwise. */
   isError: { [key: string]: boolean } = {};
 
+
   /** Send message to app-component to display grid instead of graph.  */
   @Output() go_to_cellState_Page = new EventEmitter();
+
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
@@ -91,18 +84,18 @@ export class CellsDisplayComponent {
     this.getCellsService.AxisY$.subscribe(async data => {
       this.AxisY = data;
     });
-    this.getCellsService.contentUrl$.subscribe(async data => {
-      this.contentUrl = data;
+    this.getCellsService.cellsContentUrl$.subscribe(async data => {
+      this.cellsContentUrl = data;
     });
-    this.getCellsService.contentCount$.subscribe(async data => {
-      this.contentCount = data;
+    this.getCellsService.cellsContentCount$.subscribe(async data => {
+      this.cellsContentCount = data;
     });
 
     // If AxixX, Y or contents get update, it will launch getMediasURL. That way we're sure to have the latest version.
     combineLatest([
       this.getCellsService.AxisX$,
       this.getCellsService.AxisY$,
-      this.getCellsService.contentUrl$,
+      this.getCellsService.cellsContentUrl$,
     ]).subscribe(([x, y,contentUrl]) => {
       this.getMediasURL(x,y);
     });
@@ -123,15 +116,17 @@ export class CellsDisplayComponent {
       x.forEach(x => {
         y.forEach(y => {
           const key = `${x}-${y}`;
-          this.mediaType[key] = this.getMediasType(this.contentUrl[key]);
-          this.isLoading[key] = true;
-          this.isError[key] = false;
+          if(this.cellsContentUrl[key]){
+            this.mediaType[key] = this.getMediasType(this.cellsContentUrl[key]);
+            this.isLoading[key] = true;
+            this.isError[key] = false;
   
-          if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
-            this.mediaUrls[key] = this.cleanUrl(this.contentUrl[key]);
-          }
-          else{
-            this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.contentUrl[key];
+            if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+              this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
+            }
+            else{
+              this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+            }
           }
         });
       });
@@ -139,30 +134,30 @@ export class CellsDisplayComponent {
     else if(x && x.length > 0){
       x.forEach(x => {
         const key = `${x}`;
-        this.mediaType[key] = this.getMediasType(this.contentUrl[key]);
+        this.mediaType[key] = this.getMediasType(this.cellsContentUrl[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
 
         if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
-          this.mediaUrls[key] = this.cleanUrl(this.contentUrl[key]);
+          this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
         }
         else{
-          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.contentUrl[key];
+          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
         }
       });
     }
     else if(y && y.length > 0){
       y.forEach(y => {
         const key = `${y}`;
-        this.mediaType[key] = this.getMediasType(this.contentUrl[key]);
+        this.mediaType[key] = this.getMediasType(this.cellsContentUrl[key]);
         this.isLoading[key] = true;
         this.isError[key] = false;
 
         if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
-          this.mediaUrls[key] = this.cleanUrl(this.contentUrl[key]);
+          this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
         }
         else{
-          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.contentUrl[key];
+          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
         }
       });
     }    

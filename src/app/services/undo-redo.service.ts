@@ -15,7 +15,7 @@ import { TagList } from '../models/tag-list';
 export class UndoRedoService {
 
   /** List of actions carried out. Shows whether a Dimension, Filter or ActualSearchFile has been added at a given time. "Start" corresponds to the Initial state. */
-  Do : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = ["Start"];
+  Do : ("Dim"|"Filter"|"File"|"Configuration"|"Start")[] = ["Start"];
 
   /** List of the various SelectedDimensions that have been added. Provides a history of the various dimensions selected. */
   AllSelectedDimensionsDid : SelectedDimensions[] = [new SelectedDimensions()];
@@ -23,17 +23,17 @@ export class UndoRedoService {
   /** List of List of filters that have been added. Provides a history of the various Filters selected. */
   AllFiltersAdd : (Filter[])[] =[[]];
 
-  /** List of List of Hierarchy, Tagset and/or TagList. When we modify the preselection, we add the modified items to a list, 
-   * which is then stored here to keep a history of the modified items. A PreSelection is a Tagset|Hierarchy|Taglist List.
+  /** List of List of Hierarchy, Tagset and/or TagList. When we modify the configuration, we add the modified items to a list, 
+   * which is then stored here to keep a history of the modified items. A Configuration is a Tagset|Hierarchy|Taglist List.
    *  
-   * We also add the preselection type, if it was a preselection to modify the isVisible variable (to hide an element of one of the 3 types) 
+   * We also add the configuration type, if it was a configuration to modify the isVisible variable (to hide an element of one of the 3 types) 
    * or to modify asRange (to transform a list of tags into a range or vice versa, especially for tagList).*/
-  AllPreSelectionDo : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = [[]]
+  AllConfigurationDo : (({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[])[] = [[]]
 
   positionDo : number = 0;
   positionAllSelectedDimensionsDid : number = 0;
   positionAllFiltersAdd : number = 0;
-  positionAllPreSelectionDo : number = 0;
+  positionAllConfigurationDo : number = 0;
 
   constructor( 
     private selectedDimensionsService : SelectedDimensionsService,
@@ -43,7 +43,7 @@ export class UndoRedoService {
   {}
 
   /**
-   * Undo Function, four cases if you want to undo a Dimension, a Filter or a ActualSearchFile or a Pre-Selection.
+   * Undo Function, four cases if you want to undo a Dimension, a Filter or a ActualSearchFile or a Configuration.
    */
   undo(){
     if(!(this.positionDo===0) && this.Do[this.positionDo]==="Dim"){
@@ -55,8 +55,8 @@ export class UndoRedoService {
     else if (!(this.positionDo===0) && this.Do[this.positionDo]==="File"){
       this.undoFile();
     }
-    else if (!(this.positionDo===0) && this.Do[this.positionDo]==="PreSelection"){
-      this.undoPreSelection();
+    else if (!(this.positionDo===0) && this.Do[this.positionDo]==="Configuration"){
+      this.undoConfiguration();
     }
 
     if(!(this.positionDo===0)){
@@ -135,23 +135,23 @@ export class UndoRedoService {
   }
 
   /**
-   * To undo a PreSelection, we will look after the type of preselection, if it's "isVisible", we will invert the isVisible values of the elements 
-   * in the current preselection from the AllPreSelectionDo preSelection list. If it's "asRange", we will verify that we have a tagList type element and 
+   * To undo a Configuration, we will look after the type of configuration, if it's "isVisible", we will invert the isVisible values of the elements 
+   * in the current configuration from the AllConfigurationDo configuration list. If it's "asRange", we will verify that we have a tagList type element and 
    * invert the asRange.
    * 
    * To undo/redo the action we just need to invert the value again.
    */
-  undoPreSelection(){
-    // Get the actual preSelection (list)
-    let element = this.AllPreSelectionDo[this.positionAllPreSelectionDo];
+  undoConfiguration(){
+    // Get the actual Configuration (list)
+    let element = this.AllConfigurationDo[this.positionAllConfigurationDo];
 
     // We go through the list, and invert the corresponding value
     if(Array.isArray(element)){
       element.forEach(elt=>{
-        if(elt.preselectionType==='isVisible'){
+        if(elt.configurationType==='isVisible'){
           elt.element.isVisible = !elt.element.isVisible;
         }
-        else if(elt.preselectionType==='asRange'){
+        else if(elt.configurationType==='asRange'){
           if(elt.element.type==='tagList'){
             elt.element.asRange = !elt.element.asRange;
           }
@@ -160,24 +160,24 @@ export class UndoRedoService {
     }
 
     //Modify position
-    this.positionAllPreSelectionDo = this.positionAllPreSelectionDo - 1;
+    this.positionAllConfigurationDo = this.positionAllConfigurationDo - 1;
   }
 
   /**
-   * To undo a ActualSearchFile, we will undo at the same time dimensions, filters and pre-selectiob
+   * To undo a ActualSearchFile, we will undo at the same time dimensions, filters and configuration
    */
   async undoFile(){
     this.undoFilter();   
     await this.wait(100);       //Wait, because otherwise the elements won't wait and there's a chance that the display will be incorrect.
     this.undoDim();
     await this.wait(100); 
-    this.undoPreSelection()
+    this.undoConfiguration()
   }
 
 
 
   /**
-   * Redo Function, four cases if you want to redo a Dimension, a Filter or a ActualSearchFile or a PreSelection.
+   * Redo Function, four cases if you want to redo a Dimension, a Filter or a ActualSearchFile or a Configuration.
    */
   redo(){
     if(!(this.positionDo===this.Do.length-1) && (this.Do[this.positionDo+1]==="Dim")){           
@@ -189,8 +189,8 @@ export class UndoRedoService {
     else if (!(this.positionDo===this.Do.length-1) && (this.Do[this.positionDo+1]==="File")){          
       this.redoFile();
     }
-    else if (!(this.positionDo===this.Do.length-1) && (this.Do[this.positionDo+1]==="PreSelection")){          
-      this.redoPreSelection();
+    else if (!(this.positionDo===this.Do.length-1) && (this.Do[this.positionDo+1]==="Configuration")){          
+      this.redoConfiguration();
     }
 
     if(!(this.positionDo===this.Do.length-1)){
@@ -265,21 +265,21 @@ export class UndoRedoService {
   }
 
   /**
-   * To redo a PreSelection, we'll retrieve the next PreSelection(tagsetList) from the AllPreSelectionDo preSelection(tagsetList) list.
-   * We will look after the type of preselection, if it's "isVisible", we will invert the isVisible values of the element. 
+   * To redo a Configuration, we'll retrieve the next Configuration(tagsetList) from the AllConfigurationDo Configuration(tagsetList) list.
+   * We will look after the type of configuration, if it's "isVisible", we will invert the isVisible values of the element. 
    * If it's "asRange", we will verify that we have a tagList type element and invert the asRange.
    */
-  redoPreSelection(){
-    this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
+  redoConfiguration(){
+    this.positionAllConfigurationDo = this.positionAllConfigurationDo + 1;
 
-    let element = this.AllPreSelectionDo[this.positionAllPreSelectionDo];
+    let element = this.AllConfigurationDo[this.positionAllConfigurationDo];
 
     if(Array.isArray(element)){
       element.forEach(elt=>{
-        if(elt.preselectionType==='isVisible'){
+        if(elt.configurationType==='isVisible'){
           elt.element.isVisible = !elt.element.isVisible;
         }
-        else if(elt.preselectionType==='asRange'){
+        else if(elt.configurationType==='asRange'){
           if(elt.element.type==='tagList'){
             elt.element.asRange = !elt.element.asRange;
           }
@@ -289,14 +289,14 @@ export class UndoRedoService {
   }
 
   /**
-   * To redo a File, we redo at the same time Dimension, Filter and Pre-Selection
+   * To redo a File, we redo at the same time Dimension, Filter and Configuration
    */
   async redoFile(){
     this.redoDim();
     await this.wait(100); 
     this.redoFilter();
     await this.wait(100); 
-    this.redoPreSelection();
+    this.redoConfiguration();
   }
 
 
@@ -311,7 +311,7 @@ export class UndoRedoService {
    */
   addFilterAction(filters:Filter[]){    
     //Delete the DoList Element after the actual position if they exist
-    let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
+    let newDoList : ("Dim"|"Filter"|"File"|"Configuration"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
       newDoList.push(this.Do[i]);
     }
@@ -353,7 +353,7 @@ export class UndoRedoService {
    */
   addDimensionsAction(selectedDimensions:SelectedDimensions){
     //Delete the DoList Element after the actual position if they exist
-    let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
+    let newDoList : ("Dim"|"Filter"|"File"|"Configuration"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
       newDoList.push(this.Do[i]);
     }
@@ -384,8 +384,8 @@ export class UndoRedoService {
    * 
    * We'll add the "File" action to Do and increment all the positions with 1.
    */
-  addFileAction(actualSearchFile:ActualSearchFile,modified_elements:({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[],jsonFiltersList:Filter[]){
-    let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
+  addFileAction(actualSearchFile:ActualSearchFile,modified_elements:({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[],jsonFiltersList:Filter[]){
+    let newDoList : ("Dim"|"Filter"|"File"|"Configuration"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
       newDoList.push(this.Do[i]);
     }
@@ -406,11 +406,11 @@ export class UndoRedoService {
       newAllFiltersAdd.push(newfiltersList);
     }
 
-    let newAllPreSelectionDo : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = [];
-    for (let i = 0; i <= this.positionAllPreSelectionDo; i++) {
-      newAllPreSelectionDo.push(this.AllPreSelectionDo[i]);
+    let newAllConfigurationDo : (({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[])[] = [];
+    for (let i = 0; i <= this.positionAllConfigurationDo; i++) {
+      newAllConfigurationDo.push(this.AllConfigurationDo[i]);
     }
-    this.AllPreSelectionDo = newAllPreSelectionDo;
+    this.AllConfigurationDo = newAllConfigurationDo;
 
 
 
@@ -423,49 +423,49 @@ export class UndoRedoService {
 
     this.AllSelectedDimensionsDid.push(actualSearchFile.selectedDimensions);
 
-    this.AllPreSelectionDo.push(modified_elements);
+    this.AllConfigurationDo.push(modified_elements);
 
 
 
     this.Do.push("File");
     this.positionAllSelectedDimensionsDid = this.positionAllSelectedDimensionsDid + 1;
     this.positionAllFiltersAdd = this.positionAllFiltersAdd + 1;
-    this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
+    this.positionAllConfigurationDo = this.positionAllConfigurationDo + 1;
     this.positionDo = this.positionDo + 1;
   }
 
   /**
-   * Function to add a PreSelection (who is a tagsetList) to the undo/redo list of PreSelection.
+   * Function to add a Configuration (who is a tagsetList) to the undo/redo list of Configuration.
    * 
    * Each time, we'll recreate the list up to the position we're currently at (because if we add several actions after undo, it deletes all these undo actions).
    * Also enables to avoid copying the object address (and therefore having only one object). The only requirement is that tagset and Hierarchy are not linked 
    * in terms of path. No need to redo the nodes.
    * 
-   * We'll add the "PreSelection" action to Do and increment the positions.
+   * We'll add the "Configuration" action to Do and increment the positions.
    */
-  addPreSelectionAction(modified_elements:({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[]){ 
+  addConfigurationAction(modified_elements:({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[]){ 
     //Delete the DoList Element after the actual position if they exist
-    let newDoList : ("Dim"|"Filter"|"File"|"PreSelection"|"Start")[] = [];
+    let newDoList : ("Dim"|"Filter"|"File"|"Configuration"|"Start")[] = [];
     for (let i = 0; i <= this.positionDo; i++) {
       newDoList.push(this.Do[i]);
     }
     this.Do = newDoList;
 
-    //Delete the PreSelection(tagsetList) after the actual position if they exist
-    let newAllPreSelectionDo : (({element : Hierarchy|Tagset|TagList, preselectionType:'isVisible'|'asRange'})[])[] = [];
-    for (let i = 0; i <= this.positionAllPreSelectionDo; i++) {
-      newAllPreSelectionDo.push(this.AllPreSelectionDo[i]);
+    //Delete the Configuration(tagsetList) after the actual position if they exist
+    let newAllConfigurationDo : (({element : Hierarchy|Tagset|TagList, configurationType:'isVisible'|'asRange'})[])[] = [];
+    for (let i = 0; i <= this.positionAllConfigurationDo; i++) {
+      newAllConfigurationDo.push(this.AllConfigurationDo[i]);
     }
-    this.AllPreSelectionDo = newAllPreSelectionDo;
+    this.AllConfigurationDo = newAllConfigurationDo;
 
     //Add the new SelectedDimensions to the list of SelectedDimensions
-    this.AllPreSelectionDo.push(modified_elements);
+    this.AllConfigurationDo.push(modified_elements);
 
     //Add the name of the element added to the Do List
-    this.Do.push("PreSelection");
+    this.Do.push("Configuration");
 
     //Increment position
-    this.positionAllPreSelectionDo = this.positionAllPreSelectionDo + 1;
+    this.positionAllConfigurationDo = this.positionAllConfigurationDo + 1;
     this.positionDo = this.positionDo + 1;
   }
 

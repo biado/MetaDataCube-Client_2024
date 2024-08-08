@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SelectedFiltersService } from './selected-filters.service';
 import { Filter } from '../models/filter';
-import { BehaviorSubject, catchError, combineLatest, forkJoin, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin, map } from 'rxjs';
 import { Cell } from '../models/cell';
 import { HttpClient } from '@angular/common/http';
 import { SelectedDimensions } from '../models/selected-dimensions';
@@ -17,11 +17,11 @@ export class GetCellsService {
   selectedDimensions : SelectedDimensions = new SelectedDimensions();
 
   private AxisX = new BehaviorSubject<string[]>([]);      
-  /** Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort*/
+  /** Names we will display on the cells-display.component (X axis). Only the name where there is a cell. List is sort*/
   AxisX$ = this.AxisX.asObservable();
 
   private AxisY = new BehaviorSubject<string[]>([]);      
-  /** Names we will display on the graph.component (X axis). Only the name where there is a cell. List is sort */
+  /** Names we will display on the cells-display.component (X axis). Only the name where there is a cell. List is sort */
   AxisY$ = this.AxisY.asObservable();
 
   private cells = new BehaviorSubject<Cell[]>([]);
@@ -31,13 +31,13 @@ export class GetCellsService {
   CoordToNameX : string[]=[];     //All the names of the AxisX sort (we will used it to ge the name of the coordinate in getContent)
   CoordToNameY : string[]=[];     //All the names of the AxisY sort (we will used it to ge the name of the coordinate in getContent)
   
-  private contentUrl = new BehaviorSubject<{ [key: string]: string }>({});     
-  /** Content of the graph (coordXName-coordYname : img_url of corresponding cell) */
-  contentUrl$ = this.contentUrl.asObservable();
+  private cellsContentUrl = new BehaviorSubject<{ [key: string]: string }>({});     
+  /** Content of the table of cells-display (coordXName-coordYname : img_url of corresponding cell) */
+  cellsContentUrl$ = this.cellsContentUrl.asObservable();
 
-  private contentCount = new BehaviorSubject<{ [key: string]: number }>({});     
-  /** Content of the graph (coordXName-coordYname : number of imgage of corresponding cell)  */
-  contentCount$ = this.contentCount.asObservable();
+  private cellsContentCount = new BehaviorSubject<{ [key: string]: number }>({});     
+  /** Content of the table of cells-display (coordXName-coordYname : number of imgage of corresponding cell)  */
+  cellsContentCount$ = this.cellsContentCount.asObservable();
 
   
   constructor(
@@ -89,8 +89,8 @@ export class GetCellsService {
           this.AxisY.next([]);
           this.CoordToNameX = [];
           this.CoordToNameY = [];
-          this.contentUrl.next({});
-          this.contentCount.next({});
+          this.cellsContentCount.next({});
+          this.cellsContentCount.next({});
   
           response.forEach((elt : any) => {
             this.addCellToList(elt);
@@ -146,23 +146,7 @@ export class GetCellsService {
           }
              
           const uniqueNames = new Set<string>();
-          let SortUniqueNames :string[] = [];
-
-          /*try{
-            const items: string[] = [
-              "1a", "2b", "10Z", "A1", "a10", "Z2", "A2", "a1", " ", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "+", "=","$$$4", "10000 Hours","100 Years","€€1" ,"===","{", "}", "[", "]", ":", ";", '"', "'", "<", ">", ",", ".", "?", "/",
-              "1aA", "1aB", "1bA", "2aA", "2aB", "2bA", "A1a", "A1b", "A2a", "aA1", "aB1", "bA1", "10aA", "10aB", "10bA", "Z1a", "Z1b", "Z2a", "Z2A", "A2Z", "A2Y", "A2X", "Z2Y", "Z2X", "a2Z", "b2Z", "c2Z",
-              " 1", " 2", " 3", "!1", "@2", "#3", "$4", "%5", "^6", "&7", "*8", "(9", ")0", "-1", "_2", "+3", "=4", "{5", "}6", "[7", "]8", ":9", "$$0", "\"a", "\'b", "<c", ">d", ",e", ".f", "?g", "/h", "|i",
-              "A 1", "A 2", "A 25","ù","£",'§','é','e é','e e'
-            ];
-            const res = this.sql_OrderBy_Sort(items);
-            //const res = items.sort(((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })));
-            console.log ("Test Tri : ", res);
-          }
-          catch{
-            console.error("Erreur")
-          }*/
-          
+          let SortUniqueNames :string[] = [];          
         
           if (xtype === 'node') { 
             const SortName = this.sql_OrderBy_Sort(NamesX)
@@ -279,7 +263,7 @@ export class GetCellsService {
   
   /**
    * Function that allows you to set the correct content format for displaying the URLs and the number of images
-   * of the cell images corresponding to the coordinates in the graph.component table.
+   * of the cell images corresponding to the coordinates in cells-display.component table.
    */  
   private getCellsContent(){
     const resUrl : { [key: string]: string } = {};
@@ -290,7 +274,7 @@ export class GetCellsService {
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (xName && yName) {
             const key = `${xName}-${yName}`;
-            resUrl[key] = cell.img_url;
+            resUrl[key] = cell.file_uri;
             resCount[key] = cell.count;
         }
       }
@@ -298,7 +282,7 @@ export class GetCellsService {
         const xName = this.CoordToNameX[cell.xCoordinate-1];
         if (xName) {
             const key = `${xName}`;
-            resUrl[key] = cell.img_url;
+            resUrl[key] = cell.file_uri;
             resCount[key] = cell.count;
         }
       }
@@ -306,13 +290,13 @@ export class GetCellsService {
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (yName) {
             const key = `${yName}`;
-            resUrl[key] = cell.img_url;
+            resUrl[key] = cell.file_uri;
             resCount[key] = cell.count;
         }
       }
     });
-    this.contentUrl.next(resUrl);
-    this.contentCount.next(resCount);
+    this.cellsContentUrl.next(resUrl);
+    this.cellsContentCount.next(resCount);
   }
   
   /**
@@ -463,7 +447,7 @@ export class GetCellsService {
     //Step 2  : Sort With Symbols and UpperCase
     const newList = sortSameGroupsWithUpperAndSymbols(listSortWithoutSymbolandUpper, originalList);
 
-    return list;
+    return newList;
   }
 
   

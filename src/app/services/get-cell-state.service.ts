@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Filter } from '../models/filter';
-import { SelectedDimensions } from '../models/selected-dimensions';
 import { SelectedFiltersService } from './selected-filters.service';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { BehaviorSubject,  combineLatest } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { SelectedCellState } from '../models/selected-cell-state';
-import { SelectedCellStateService } from './selected-cell-state.service';
 import { GetUrlToSelectedDimensionsOrCellStateService } from './get-url-to-selected-dimensions-or-cell-state.service';
 import { MediaInfos } from '../models/media-infos';
 
@@ -23,7 +21,6 @@ export class GetCellStateService {
 
   constructor(
     private selectedFiltersService : SelectedFiltersService,
-    private selectedCellStateService : SelectedCellStateService,
     private getUrlToSelectedDimensionsOrCellStateService : GetUrlToSelectedDimensionsOrCellStateService,
     private http: HttpClient,
   ) { 
@@ -52,7 +49,6 @@ export class GetCellStateService {
 
       try {
           const response: any = await this.http.get(`${urlAllMedia}`).toPromise();
-          console.log("TEST : ", response)
           response.forEach((elt: any) => {
 
             let extension : string;
