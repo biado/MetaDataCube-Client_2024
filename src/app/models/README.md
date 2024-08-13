@@ -9,9 +9,22 @@ Each class contains attributes and a constructor. No internal functions.
 
 Now let's take a look at the different classes and what their attributes correspond to (I invite you to have a look at the file anyway, as I won't be describing the types specifically).
 
-[TOCM]
 
-[TOC]
+**Table of Content**
+- [Models](#models)
+  - [Tag (tag.ts)](#tag-tagts)
+  - [Tagset (tagset.ts)](#tagset-tagsetts)
+  - [TagList (tag-list.ts)](#taglist-tag-listts)
+  - [Hierarchy (hierarchy.ts)](#hierarchy-hierarchyts)
+  - [Node (node.ts)](#node-nodets)
+  - [Filter (filter.ts)](#filter-filterts)
+  - [Cell (cell.ts)](#cell-cellts)
+  - [SelectedDimensions (selected-dimensions.ts)](#selecteddimensions-selected-dimensionsts)
+  - [ActualSearchFile (actual-search-file.ts)](#actualsearchfile-actual-search-filets)
+  - [SelectedCellState (selected-cell-state.ts)](#selectedcellstate-selected-cell-statets)
+  - [MediaInfos (media-infos.ts)](#mediainfos-media-infosts)
+____________________
+
 
 ## Tag (tag.ts)
 
