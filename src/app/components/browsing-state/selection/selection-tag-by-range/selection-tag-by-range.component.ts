@@ -1,10 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component,  Input} from '@angular/core';
 import { Tag } from '../../../../models/tag';
 import { Options } from '@angular-slider/ngx-slider';
-import { SelectionFunctionsService } from '../../../../services/selection-functions.service';
 import { SelectedFiltersService } from '../../../../services/selected-filters.service';
 import { Filter } from '../../../../models/filter';
-import { FindElement } from '../../../../services/find-element.service';
+import { FindElementService } from '../../../../services/find-element.service';
 import { UndoRedoService } from '../../../../services/undo-redo.service';
 
 @Component({
@@ -23,9 +22,8 @@ export class SelectionTagByRangeComponent {
   filterList : Filter[] = [];
 
   constructor(
-    private selectionFunctionsService : SelectionFunctionsService,
     private selectedFiltersService : SelectedFiltersService,
-    private findElementService : FindElement,
+    private findElementService : FindElementService,
     private undoredoService : UndoRedoService,
   ) {}
   

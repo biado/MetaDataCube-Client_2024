@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { FindElement } from './find-element.service';
+import { FindElementService } from './find-element.service';
 
 describe('FindElementinTagsetListService', () => {
-  let service: FindElement;
+  let service: FindElementService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(FindElement);
+    service = TestBed.inject(FindElementService);
   });
 
   it('should be created', () => {

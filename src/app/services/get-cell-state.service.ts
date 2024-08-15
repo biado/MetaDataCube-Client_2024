@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Filter } from '../models/filter';
-import { SelectedFiltersService } from './selected-filters.service';
 import { BehaviorSubject,  combineLatest } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { SelectedCellState } from '../models/selected-cell-state';
@@ -12,35 +10,28 @@ import { MediaInfos } from '../models/media-infos';
 })
 export class GetCellStateService {
   
-  filters : Filter[] = [];
-  
   private allMediasInfos = new BehaviorSubject<MediaInfos[]>([]);
-  /** Images URI of of all images corresponding to the selected dimensions and filters  */
+  /** Informations of all médias corresponding to the selected dimensions and filters  */
   allMediasInfos$ = this.allMediasInfos.asObservable();
 
 
   constructor(
-    private selectedFiltersService : SelectedFiltersService,
     private getUrlToSelectedDimensionsOrCellStateService : GetUrlToSelectedDimensionsOrCellStateService,
     private http: HttpClient,
   ) { 
-    this.selectedFiltersService.filters$.subscribe(data => {
-      this.filters = data;
-    });
     
-    // If selectedCellState or filters get modification, it will launch getCells
+    // If selectedCellState get modification, it will launch getCells
     combineLatest([
       this.getUrlToSelectedDimensionsOrCellStateService.selectedCellStatesWithUrl$,
-      this.selectedFiltersService.filters$
-    ]).subscribe(([selectedCellState, filters]) => {
-      this.getAllMedias(selectedCellState,filters);
+    ]).subscribe(([selectedCellState]) => {
+      this.getAllMedias(selectedCellState);
     });
   }
 
   /**
    * Function to retrieve all medias that match the selected dimensions and filters.
    */
-  private async getAllMedias(selectedCellState : SelectedCellState, filters : Filter[]) {
+  private async getAllMedias(selectedCellState : SelectedCellState) {
     if ((selectedCellState.xid && selectedCellState.xtype && !(selectedCellState.xtype==='tagset')) || (selectedCellState.yid && selectedCellState.ytype) && !(selectedCellState.ytype==='tagset')) {
       const urlAllMedia: string = selectedCellState.url;
       console.log("URL :",urlAllMedia)
@@ -70,7 +61,7 @@ export class GetCellStateService {
           });
           this.allMediasInfos.next(mediasInfo);
       } catch (error) {
-          console.error("Error in getAllImages:", error);
+          console.error("Error in getAllMedias:", error);
       }
     }
   }

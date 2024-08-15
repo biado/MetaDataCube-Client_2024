@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Tagset } from '../../../models/tagset';
-import { Node } from '../../../models/node';
 import { SelectedDimensions } from '../../../models/selected-dimensions';
 import { GetTagsetListService } from '../../../services/get-tagset-list.service';
 import { Hierarchy } from '../../../models/hierarchy';

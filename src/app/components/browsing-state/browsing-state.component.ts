@@ -9,7 +9,7 @@ import { GetUrlToSelectedDimensionsOrCellStateService } from '../../services/get
 import { Filter } from '../../models/filter';
 import { SelectedFiltersService } from '../../services/selected-filters.service';
 import { ActualSearchFile } from '../../models/actual-search-file';
-import { FindElement } from '../../services/find-element.service';
+import { FindElementService } from '../../services/find-element.service';
 import { Tagset } from '../../models/tagset';
 import { Node } from '../../models/node';
 import { Hierarchy } from '../../models/hierarchy';
@@ -49,7 +49,7 @@ export class BrowsingStateComponent {
       private getUrlToSelectedDimensionsOrCellStateService : GetUrlToSelectedDimensionsOrCellStateService,
       private selectedDimensionsService : SelectedDimensionsService,
       private selectedFiltersService : SelectedFiltersService,
-      private findElementService : FindElement,
+      private findElementService : FindElementService,
     ) {}
 
   ngOnInit(): void {

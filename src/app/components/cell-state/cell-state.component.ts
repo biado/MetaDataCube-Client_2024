@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
-import { GetCellsService } from '../../services/get-cells.service';
-import { combineLatest } from 'rxjs';
 import { GetCellStateService } from '../../services/get-cell-state.service';
 import { MediaInfos } from '../../models/media-infos';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-cell-state',

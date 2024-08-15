@@ -8,6 +8,7 @@ In this interface, it's also to have only one observable object to modify at a t
 Each class contains attributes and a constructor. No internal functions.
 
 Now let's take a look at the different classes and what their attributes correspond to (I invite you to have a look at the file anyway, as I won't be describing the types specifically).
+____________________
 
 
 **Table of Content**

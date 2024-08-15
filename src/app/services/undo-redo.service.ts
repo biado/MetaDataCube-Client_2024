@@ -6,7 +6,7 @@ import { SelectedFiltersService } from './selected-filters.service';
 import { ActualSearchFile } from '../models/actual-search-file';
 import { Tagset } from '../models/tagset';
 import { Hierarchy } from '../models/hierarchy';
-import { FindElement } from './find-element.service';
+import { FindElementService } from './find-element.service';
 import { TagList } from '../models/tag-list';
 
 @Injectable({
@@ -38,7 +38,7 @@ export class UndoRedoService {
   constructor( 
     private selectedDimensionsService : SelectedDimensionsService,
     private selectedFiltersService : SelectedFiltersService,
-    private findElement : FindElement,
+    private findElementService : FindElementService,
   ) 
   {}
 
@@ -217,11 +217,11 @@ export class UndoRedoService {
 
     if(newSelectedDimensions.elementX?.type==="node" || newSelectedDimensions.elementX?.type==="tagset"){
       newSelectedDimensions.elementX.isCheckedX = true;
-      if(newSelectedDimensions.elementX.type==='node'){this.findElement.expandNodeParents(newSelectedDimensions.elementX.parentID)}
+      if(newSelectedDimensions.elementX.type==='node'){this.findElementService.expandNodeParents(newSelectedDimensions.elementX.parentID)}
     }
     if(newSelectedDimensions.elementY?.type==="node" || newSelectedDimensions.elementY?.type==="tagset"){
       newSelectedDimensions.elementY.isCheckedY = true;
-      if(newSelectedDimensions.elementY.type==='node'){this.findElement.expandNodeParents(newSelectedDimensions.elementY.parentID)}
+      if(newSelectedDimensions.elementY.type==='node'){this.findElementService.expandNodeParents(newSelectedDimensions.elementY.parentID)}
     }
 
 
@@ -249,14 +249,14 @@ export class UndoRedoService {
     newListFilters.forEach(filter=>{
       if(filter.element.type==="tag"){
         filter.element.ischecked = true;
-        this.findElement.expandParentTagset(filter.element);
-        this.findElement.expandParentTagList(filter.element);
+        this.findElementService.expandParentTagset(filter.element);
+        this.findElementService.expandParentTagList(filter.element);
       }
       else{
         filter.element.isCheckedFilters = true;
         if(filter.element.type==='node'){
-          this.findElement.expandNodeParents(filter.element.parentID);
-          this.findElement.expandParentTagset(filter.element);
+          this.findElementService.expandNodeParents(filter.element.parentID);
+          this.findElementService.expandParentTagset(filter.element);
         }
       }
     })

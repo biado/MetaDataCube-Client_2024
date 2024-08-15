@@ -20,12 +20,6 @@ export class SelectionFunctionsService {
   /** Set of all selected elements, either as dimensions or filters (observable)*/
   checked_elements$: Observable<Set<Tagset|Node|Tag> > = this.checked_elements.asObservable();
 
-  /** String corresponding to what the user enters in the search field (subject). We create a subject/observable to keep the search in mind between two page. */
-  elementToSearch: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  /** String corresponding to what the user enters in the search field (observable) We create a subject/observable to keep the search in mind between two page. */
-  elementToSearch$: Observable<string> = this.elementToSearch.asObservable();
-  
-
   // Initialization of variables which will then be linked to the various desired observables (see constructor).
   tagsetlist: Tagset[] = [];
   filtersList : Filter[]=[];
