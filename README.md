@@ -105,4 +105,4 @@ The documentation in this github works in the following way: everything is distr
 
 - Separate the save from the configuration and the selection when saving and loading a file (currently all in the same). Why not remove the possibility to do a undo/ redo on the configuration.
 
-- For sorting the names of nodes (sql_OrderBy_Sort in GetCellsService), it is necessary to add the case of many characters (example of the "Location Name" hierarchy of the tagset "Location Name" with the LSC-22 database, where there are symbols like Č or Đ). Be careful, you have to check how the Psql OrderBy sorts these characters so that they are exactly in the same order.
+- For sorting the names of nodes (**sql_OrderBy_Sort** in *GetCellsService*), it is necessary to add the case of many characters (example of the "Location Name" hierarchy of the tagset "Location Name" with the *LSC-22 database*, where there are symbols like Č or Đ). Be careful, you have to check how the Psql OrderBy sorts these characters so that they are exactly in the same order.

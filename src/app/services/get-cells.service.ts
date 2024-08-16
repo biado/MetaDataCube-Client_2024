@@ -344,8 +344,8 @@ export class GetCellsService {
           const maxLength = Math.max(cleanA.length, cleanB.length);
           
           for (let i = 0; i < maxLength; i++) {
-            const charA = cleanA[i] || ''; // Si a est plus court, charA est ''
-            const charB = cleanB[i] || ''; // Si b est plus court, charB est ''
+            const charA = cleanA[i] || ''; 
+            const charB = cleanB[i] || ''; 
             
             const indexA = customOrder.indexOf(charA);
             const indexB = customOrder.indexOf(charB);
@@ -355,7 +355,7 @@ export class GetCellsService {
             }
           }
           
-          return 0; // Les deux mots sont égaux
+          return 0; // The two words are the same
         }
 
         /**
