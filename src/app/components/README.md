@@ -1,7 +1,7 @@
 # Components
 
 
-A component is a group composed of a typescript, HTML and CSS (optional) file that corresponds to a part or all of the page visible in the browser. Each component has its own folder. Using components means you can separate different elements (to hide them, etc.), reuse them, etc.
+A component is a group composed of a typescript, HTML and CSS (optional) file that corresponds to a part or all of the page visible in the browser. Each component has its own folder. It is possible to add a component of another component (at the HTML level). Thus we have a hierarchy of components and can separate the pieces of code. Having different components also allows to juggle between two components, to hide one when you want (like a popup), etc...
 
 
 In the interface, there are two main groups of components (the first two folders) in /components/ : Browsing-State and Cell-State, these two components correspond to the two pages of the interface.
