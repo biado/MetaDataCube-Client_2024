@@ -33,7 +33,6 @@ export class CellStateComponent {
          * 
          * The aim is to have the complete link in the database! Here's a problem with the LSC22 database
          */
-        const completeURL = `assets/images/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
         
         let imageInfo: MediaInfos;
         
@@ -42,6 +41,7 @@ export class CellStateComponent {
           const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.file_uri.toString());
           imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
         } else {
+          const completeURL = `assets/images/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
           imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
         }
 

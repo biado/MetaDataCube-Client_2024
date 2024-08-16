@@ -7,7 +7,7 @@ MetaDataCube is a web interface using the M3 model server.
 - This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.8.
 ____
 
-This part is separated into 2: a  "***User Documentation***" part, explaining how the interface was launched and the functionalities of it. The second part "***Documentation Explanation***" will explain how the documentation for this project works.
+This part is separated into 3: a  "***User Documentation***" part, explaining how the interface was launched and the functionalities of it. The second part "***Documentation Explanation***" will explain how the documentation for this project works. And the last part is for the ideas for the future.
 
 - [MetaDataCube](#metadatacube)
 - [User Documentation](#user-documentation)
@@ -21,6 +21,7 @@ This part is separated into 2: a  "***User Documentation***" part, explaining ho
     - [Grid Mode](#grid-mode)
     - [Single Mode](#single-mode)
 - [Documentation Explanation](#documentation-explanation)
+- [For the Future](#for-the-future)
 
 ----
 # User Documentation
@@ -94,3 +95,14 @@ The documentation in this github works in the following way: everything is distr
 - **/src/app/models/README.md** : Explanations of the different models (their purpose, attributes, etc...)
 
 - **/src/app/services/README.md** : Explanations of the different services (their purpose, functions, variables, etc...)
+
+
+# For the Future
+
+- Instead of loading spotify links each time, put the **Thumbnail** for *CellDisplayComponent* and *CellStateGridComponent* and load only the **spotify link (iframe)** in *CellStateSingleComponent*. For this, it will be necessary to retrieve the thumbnail of the server (normally at the same time as file_uri when fetching cells and media info from GetCellsService and GetCellStateService).
+
+- Instead of checking each time whether each tag in the tagset’s tag list can be transformed into a number to make a selection by range, it should be checked in advance (when retrieving the tagset, or directly from the server) so that you can tell if the tagset type is numeric or otherwise. 
+
+- Separate the save from the configuration and the selection when saving and loading a file (currently all in the same). Why not remove the possibility to do a undo/ redo on the configuration.
+
+- For sorting the names of nodes (sql_OrderBy_Sort in GetCellsService), it is necessary to add the case of many characters (example of the "Location Name" hierarchy of the tagset "Location Name" with the LSC-22 database, where there are symbols like Č or Đ). Be careful, you have to check how the Psql OrderBy sorts these characters so that they are exactly in the same order.
