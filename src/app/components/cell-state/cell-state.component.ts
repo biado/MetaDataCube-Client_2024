@@ -74,29 +74,4 @@ export class CellStateComponent {
   go_to_browsingState_Page():void{
     this.router.navigate(['/browsing-state']);
   }
-
-  //Test Function, if launched, will add some image, audio and link to spotify and youtube to have some sample to play with
-  test(){
-    for(let i of [1,2,3,4,5,6]){
-      const mediaInfo: MediaInfos = new MediaInfos(`assets/images/test${i}.jpg`,1,"jpg");
-      this.mediasInfos.push(mediaInfo);
-    }
-    const mediaInfo: MediaInfos = new MediaInfos(`assets/images/audio_test.mp3`,1,"mp3");
-    this.mediasInfos.push(mediaInfo);
-
-    const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed/track/0GWNtMohuYUEHVZ40tcnHF');
-    const testSpotify: MediaInfos = new MediaInfos(sanitizedUrl,1,"spotify");
-    this.mediasInfos.push(testSpotify);
-
-
-    const sanitizedUrl2 = this.sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed/track/2O6X9nPVVQSefg3xOQAo5u');
-    const testSpotify2: MediaInfos = new MediaInfos(sanitizedUrl2,1,"spotify");
-    this.mediasInfos.push(testSpotify2);
-    
-
-    const sanitizedUrl3 = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/zQO7J483Dng?si=__Oqsv9QF4lUWKCz');
-    const testYoutube: MediaInfos = new MediaInfos(sanitizedUrl3,1,"youtube");
-    this.mediasInfos.push(testYoutube);
-  }
-
 }
