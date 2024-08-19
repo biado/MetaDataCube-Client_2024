@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
-import { GetCellsService } from '../../services/get-cells.service';
-import { combineLatest } from 'rxjs';
 import { GetCellStateService } from '../../services/get-cell-state.service';
 import { MediaInfos } from '../../models/media-infos';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-cell-state',
@@ -35,7 +33,6 @@ export class CellStateComponent {
          * 
          * The aim is to have the complete link in the database! Here's a problem with the LSC22 database
          */
-        const completeURL = `assets/images/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
         
         let imageInfo: MediaInfos;
         
@@ -44,6 +41,7 @@ export class CellStateComponent {
           const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.file_uri.toString());
           imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
         } else {
+          const completeURL = `assets/images/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
           imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
         }
 
@@ -76,29 +74,4 @@ export class CellStateComponent {
   go_to_browsingState_Page():void{
     this.router.navigate(['/browsing-state']);
   }
-
-  //Test Function, if launched, will add some image, audio and link to spotify and youtube to have some sample to play with
-  test(){
-    for(let i of [1,2,3,4,5,6]){
-      const mediaInfo: MediaInfos = new MediaInfos(`assets/images/test${i}.jpg`,1,"jpg");
-      this.mediasInfos.push(mediaInfo);
-    }
-    const mediaInfo: MediaInfos = new MediaInfos(`assets/images/audio_test.mp3`,1,"mp3");
-    this.mediasInfos.push(mediaInfo);
-
-    const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed/track/0GWNtMohuYUEHVZ40tcnHF');
-    const testSpotify: MediaInfos = new MediaInfos(sanitizedUrl,1,"spotify");
-    this.mediasInfos.push(testSpotify);
-
-
-    const sanitizedUrl2 = this.sanitizer.bypassSecurityTrustResourceUrl('https://open.spotify.com/embed/track/2O6X9nPVVQSefg3xOQAo5u');
-    const testSpotify2: MediaInfos = new MediaInfos(sanitizedUrl2,1,"spotify");
-    this.mediasInfos.push(testSpotify2);
-    
-
-    const sanitizedUrl3 = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/zQO7J483Dng?si=__Oqsv9QF4lUWKCz');
-    const testYoutube: MediaInfos = new MediaInfos(sanitizedUrl3,1,"youtube");
-    this.mediasInfos.push(testYoutube);
-  }
-
 }

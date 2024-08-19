@@ -1,9 +1,6 @@
 import { Component, EventEmitter, HostListener, Inject, Input, Output, PLATFORM_ID } from '@angular/core';
 import { MediaInfos } from '../../../models/media-infos';
-import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Tag } from '../../../models/tag';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-cell-state-single',

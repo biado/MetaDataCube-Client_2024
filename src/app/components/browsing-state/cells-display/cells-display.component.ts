@@ -12,7 +12,7 @@ import { Tag } from '../../../models/tag';
 import { UndoRedoService } from '../../../services/undo-redo.service';
 import { SelectedCellState } from '../../../models/selected-cell-state';
 import { SelectedCellStateService } from '../../../services/selected-cell-state.service';
-import { FindElement } from '../../../services/find-element.service';
+import { FindElementService } from '../../../services/find-element.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
@@ -63,7 +63,7 @@ export class CellsDisplayComponent {
     private getCellsService : GetCellsService,
     private getTagsetListService : GetTagsetListService,
     private undoredoService : UndoRedoService,
-    private findElementService : FindElement,
+    private findElementService : FindElementService,
     private sanitizer: DomSanitizer 
   ){}
 

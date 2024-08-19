@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input} from '@angular/core';
 import { Tag } from '../../../../models/tag';
 import { SelectionFunctionsService } from '../../../../services/selection-functions.service';
 

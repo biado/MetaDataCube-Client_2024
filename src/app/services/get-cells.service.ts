@@ -21,12 +21,10 @@ export class GetCellsService {
   AxisX$ = this.AxisX.asObservable();
 
   private AxisY = new BehaviorSubject<string[]>([]);      
-  /** Names we will display on the cells-display.component (X axis). Only the name where there is a cell. List is sort */
+  /** Names we will display on the cells-display.component (Y axis). Only the name where there is a cell. List is sort */
   AxisY$ = this.AxisY.asObservable();
 
-  private cells = new BehaviorSubject<Cell[]>([]);
-  /** List of cells corresponding at the dimensions and filters selected */
-  cells$ = this.cells.asObservable();
+  private cells : Cell[] = [];    // List of the cells get from the server
 
   CoordToNameX : string[]=[];     //All the names of the AxisX sort (we will used it to ge the name of the coordinate in getContent)
   CoordToNameY : string[]=[];     //All the names of the AxisY sort (we will used it to ge the name of the coordinate in getContent)
@@ -70,7 +68,6 @@ export class GetCellsService {
   /**
    * Function that manages the entire service. It is launched each time a dimension or filter is modified. 
    * 
-   * We'll create  the url corresponding to the cell display according to the dimensions/filters chosen. 
    * If the selected dimension types are not tags, then this url will be accessed.  
    * With the result, we'll first reset most of the lists to 0, then update the cell list, then retrieve the list of axisX names (CoordToNameX & AxisX). 
    * Ditto for Y. Next, we'll retrieve the contents of our table cells.
@@ -84,7 +81,7 @@ export class GetCellsService {
     if(!(xtype==='tag' || ytype==='tag')){
       const rawListCell = this.http.get(`${url}`).subscribe(
         async (response: any) => {
-          this.cells.next([]);
+          this.cells = [];
           this.AxisX.next([]);
           this.AxisY.next([]);
           this.CoordToNameX = [];
@@ -151,7 +148,7 @@ export class GetCellsService {
           if (xtype === 'node') { 
             const SortName = this.sql_OrderBy_Sort(NamesX)
             this.CoordToNameX = SortName;
-            this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
+            this.cells.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
               const name = SortName[x - 1];
               if (name !== undefined) {
                 uniqueNames.add(name);
@@ -165,7 +162,7 @@ export class GetCellsService {
             this.CoordToNameX = SortName;
       
             const uniqueNames = new Set<string>();
-            this.cells.value.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
+            this.cells.map((cell: any) => cell.xCoordinate).forEach((x: number) => {
               const name = SortName[x - 1];
               if (name !== undefined) {
                 uniqueNames.add(name);
@@ -229,7 +226,7 @@ export class GetCellsService {
           if (ytype === 'node') { 
             const SortName = this.sql_OrderBy_Sort(NamesY)
             this.CoordToNameY = SortName;
-            this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
+            this.cells.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
               const name = SortName[y - 1];
               if (name !== undefined) {
                 uniqueNames.add(name);
@@ -243,7 +240,7 @@ export class GetCellsService {
             this.CoordToNameY = SortName;
       
             const uniqueNames = new Set<string>();
-            this.cells.value.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
+            this.cells.map((cell: any) => cell.yCoordinate).forEach((y: number) => {
               const name = SortName[y - 1];
               if (name !== undefined) {
                 uniqueNames.add(name);
@@ -268,7 +265,7 @@ export class GetCellsService {
   private getCellsContent(){
     const resUrl : { [key: string]: string } = {};
     const resCount : { [key: string]: number } = {};
-    this.cells.value.forEach(cell => {
+    this.cells.forEach(cell => {
       if(cell.xCoordinate && cell.yCoordinate){
         const xName = this.CoordToNameX[cell.xCoordinate-1];
         const yName = this.CoordToNameY[cell.yCoordinate-1];
@@ -312,8 +309,8 @@ export class GetCellsService {
       yCo = elt.y;
     }
     const cell = new Cell(elt.count, elt.cubeObjects[0].fileURI,xCo,yCo);
-    const currentCells = this.cells.value;
-    this.cells.next([...currentCells, cell]);
+    const currentCells = this.cells;
+    this.cells = [...currentCells, cell];
   }
 
 
@@ -347,8 +344,8 @@ export class GetCellsService {
           const maxLength = Math.max(cleanA.length, cleanB.length);
           
           for (let i = 0; i < maxLength; i++) {
-            const charA = cleanA[i] || ''; // Si a est plus court, charA est ''
-            const charB = cleanB[i] || ''; // Si b est plus court, charB est ''
+            const charA = cleanA[i] || ''; 
+            const charB = cleanB[i] || ''; 
             
             const indexA = customOrder.indexOf(charA);
             const indexB = customOrder.indexOf(charB);
@@ -358,7 +355,7 @@ export class GetCellsService {
             }
           }
           
-          return 0; // Les deux mots sont égaux
+          return 0; // The two words are the same
         }
 
         /**

@@ -9,7 +9,7 @@ import { TagList } from '../models/tag-list';
 @Injectable({
   providedIn: 'root'
 })
-export class FindElement {
+export class FindElementService {
 
   tagsetList:Tagset[] = [];
 

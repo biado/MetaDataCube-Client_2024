@@ -3,7 +3,7 @@ import { Tagset } from '../../../models/tagset';
 import { Tag } from '../../../models/tag';
 import { Node } from '../../../models/node';
 import { SelectionFunctionsService } from '../../../services/selection-functions.service';
-import { FindElement } from '../../../services/find-element.service';
+import { FindElementService } from '../../../services/find-element.service';
 
 interface CheckedElements {
   dimensions: (Tagset|Node)[];
@@ -25,7 +25,7 @@ export class CheckedElementsComponent {
   
   constructor(
     private selectionFunctionsService : SelectionFunctionsService,
-    private findElementService : FindElement,
+    private findElementService : FindElementService,
   ) {}
 
   /**
