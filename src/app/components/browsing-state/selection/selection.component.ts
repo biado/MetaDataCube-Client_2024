@@ -10,6 +10,7 @@ import { Filter } from '../../../models/filter';
 import { SelectedFiltersService } from '../../../services/selected-filters.service';
 import { Tag } from '../../../models/tag';
 import { SelectionFunctionsService } from '../../../services/selection-functions.service';
+import { FindElementService } from '../../../services/find-element.service';
 
 @Component({
   selector: 'app-selection',
@@ -36,6 +37,7 @@ export class SelectionComponent {
     private selectedFiltersService:SelectedFiltersService,                 // Service containing information on selected filters      
     private undoredoService : UndoRedoService,
     private selectionFunctionsService : SelectionFunctionsService,
+    private findElementService : FindElementService,
   ) {}
 
   /**
@@ -55,6 +57,10 @@ export class SelectionComponent {
 
     this.selectedFiltersService.filters$.subscribe(data =>{
       this.filtersList = data;
+    })    
+
+    this.findElementService.searchField$.subscribe(data =>{
+      this.elementToSearch = data;
     })    
   }
 
@@ -292,6 +298,8 @@ export class SelectionComponent {
       }
     }  
 
+    this.findElementService.searchField.next(this.elementToSearch);
+    
     // Reset all nodes if nodestosearch is empty
     if (this.elementToSearch === '') {
       resetSearch(this.tagsetlist);

@@ -5,6 +5,7 @@ import { GetTagsetListService } from './get-tagset-list.service';
 import { Tag } from '../models/tag';
 import { Hierarchy } from '../models/hierarchy';
 import { TagList } from '../models/tag-list';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,9 @@ import { TagList } from '../models/tag-list';
 export class FindElementService {
 
   tagsetList:Tagset[] = [];
+
+  searchField = new BehaviorSubject<string>('');      
+  searchField$ = this.searchField.asObservable();
 
   constructor(
     private getTagsetListService : GetTagsetListService,
