@@ -26,6 +26,8 @@ This part is separated into 3: a  "***User Documentation***" part, explaining ho
 ----
 # User Documentation
 ## Launch the Interface
+- [Install Angular](https://v17.angular.io/guide/setup-local)
+
 - Clone the git directory : https://github.com/Yulgoat/MetaDataCube-Client_2024.git
 - Go into the directory 
 - `npm install`
