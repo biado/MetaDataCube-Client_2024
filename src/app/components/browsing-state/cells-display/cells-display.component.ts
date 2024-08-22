@@ -125,7 +125,7 @@ export class CellsDisplayComponent {
               this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
             }
             else{
-              this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+              this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
             }
           }
         });
@@ -142,7 +142,7 @@ export class CellsDisplayComponent {
           this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
         }
         else{
-          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+          this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
         }
       });
     }
@@ -157,7 +157,7 @@ export class CellsDisplayComponent {
           this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
         }
         else{
-          this.mediaUrls[key] = `assets/images/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+          this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
         }
       });
     }    

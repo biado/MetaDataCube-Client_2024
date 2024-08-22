@@ -41,7 +41,7 @@ export class CellStateComponent {
           const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.file_uri.toString());
           imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
         } else {
-          const completeURL = `assets/images/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
+          const completeURL = `assets/medias/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
           imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
         }
 

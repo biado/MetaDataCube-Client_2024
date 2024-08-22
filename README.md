@@ -11,7 +11,9 @@ This part is separated into 3: a  "***User Documentation***" part, explaining ho
 
 - [MetaDataCube](#metadatacube)
 - [User Documentation](#user-documentation)
+  - [Install the Interface](#install-the-interface)
   - [Launch the Interface](#launch-the-interface)
+  - [Retrieve data](#retrieve-data)
   - [Browsing-State Page](#browsing-state-page)
     - [Header](#header)
     - [Selection (left part)](#selection-left-part)
@@ -25,14 +27,24 @@ This part is separated into 3: a  "***User Documentation***" part, explaining ho
 
 ----
 # User Documentation
-## Launch the Interface
+## Install the Interface
 - [Install Angular](https://v17.angular.io/guide/setup-local)
-
 - Clone the git directory : https://github.com/Yulgoat/MetaDataCube-Client_2024.git
 - Go into the directory 
 - `npm install`
+
+## Launch the Interface
 - `npm start`
 - In a browser, go to the corresponding localhost (http://localhost:4200 if nothing is already using it).
+
+## Retrieve data
+To observe data, you will need : 
+- [Installing the M3 server](https://github.com/Ok2610/PhotoCube-Server)
+- Create a database based on the M3 model principle (example database in *src/assets/SampleDataBase* with guide).
+- Change the ***appsettings.json*** file in the server (“DefaultConnection” section) to link your database.
+- The media (whose links are in the database) must be present in the interface directory (best to put them in */src/assets/medias*). Next, you'll need to change the links in the code (see the README for /src/, the “Change the URL of the medias path (or delete it)” section).
+- Start the server : `dotnet run --project "path/ObjectCubeServer.csproj"`
+- Launch the interface
 
 ## Browsing-State Page
 Initial page of the interface. This is the page that will allow you to select dimensions and filters, in order to see all the corresponding cells.

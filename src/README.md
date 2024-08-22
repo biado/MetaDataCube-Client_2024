@@ -12,7 +12,7 @@ _______
     - [Create a new element (component, service, class)](#create-a-new-element-component-service-class)
     - [Create a new page](#create-a-new-page)
     - [Add new file extension](#add-new-file-extension)
-    - [Change the URL of the image path (or delete it)](#change-the-url-of-the-image-path-or-delete-it)
+    - [Change the URL of the medias path (or delete it)](#change-the-url-of-the-medias-path-or-delete-it)
 
 _______
 
@@ -58,9 +58,9 @@ Go into  src/proxy.conf.json file, and change the url (not the rest).
 - Then, depending on the case you need for display in HTML, add the extension in one of the existing elements or create a new one in the HTML files of components *CellsDisplayComponent*, *CellStateSingleComponent*, *CellStateGridComponent*.
 	
   
-###  Change the URL of the image path (or delete it)
+###  Change the URL of the medias path (or delete it)
 
-For current images (present in /assets/images), the current database did not contain the exact path. So we had to add this.
+For current medias (present in /assets/medias), the current database did not contain the exact path. So we had to add this.
 
 We add, in the ***cell-state.components.ts* (line 44)** and ***cell-display.component.ts* (lines 128, 145 and 160)**, the path (raw code) before the url coming from the database (unless the url is a spotify or youtube url). 
 
