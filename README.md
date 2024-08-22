@@ -39,7 +39,7 @@ This part is separated into 3: a  "***User Documentation***" part, explaining ho
 
 ## Retrieve data
 To observe data, you will need : 
-- [Installing the M3 server](https://github.com/Ok2610/PhotoCube-Server)
+- [Download the server's git directory](https://github.com/Ok2610/PhotoCube-Server)
 - Create a database based on the M3 model principle (example database in *src/assets/SampleDataBase* with guide).
 - Change the ***appsettings.json*** file in the server (“DefaultConnection” section) to link your database.
 - The media (whose links are in the database) must be present in the interface directory (best to put them in */src/assets/medias*). Next, you'll need to change the links in the code (see the README for /src/, the “Change the URL of the medias path (or delete it)” section).
