@@ -23,23 +23,6 @@
           {{tagset.name}}
         </div>
 
-        <!-- Display tags not present in tagset hierarchy nodes -->
-        <div class="selection_tags_labels_div"  *ngIf="tagset.tagList.isVisible">
-          <div class="selection_labels_title">
-            <span class="toggle-button" (click)="tagset.tagList.isExpanded= !tagset.tagList.isExpanded">{{tagset.tagList.isExpanded ? '-' : '+'}}</span>  
-            Tags
-          </div>
-          <div *ngIf="tagset.tagList.isExpanded  && sortTags(getTagsetTagList(tagset)) as sortedtags">
-            <div *ngIf="sortedtags.length>0">
-              <div class="selection_checkbox_tags_labels" *ngIf="(!(tagset.tagList.asRange)||!(tagsNameToNumbersIsPossible(sortedtags)))">
-                <app-selection-tag *ngFor="let tag of sortedtags" [tag]="tag"></app-selection-tag>
-              </div>  
-              <div class="selection_range_tags_labels" *ngIf="tagset.tagList.asRange && tagsNameToNumbersIsPossible(sortedtags)">
-                <app-selection-tag-by-range [tagsetID]="tagset.id"></app-selection-tag-by-range>
-              </div>  
-            </div>
-          </div>
-        </div>
 
         <div class="selection_hierarchy_labels" *ngFor="let hierarchy of sortHierarchy(tagset.hierarchies)" >
           <div *ngIf="hierarchy.isVisible && hierarchy.firstNode.children && hierarchy.firstNode.children.length > 0">
@@ -56,6 +39,24 @@
                 <app-selection-node *ngFor="let childNode of sortNodeChildren(hierarchy.firstNode)" [node]="childNode"  [nodegen]="1"></app-selection-node>
             </ng-container>        
           </div> 
+        </div>
+
+        <!-- Display tags not present in tagset hierarchy nodes -->
+        <div class="selection_tags_labels_div"  *ngIf="tagset.tagList.isVisible">
+          <div class="selection_labels_title">
+            <span class="toggle-button" (click)="tagset.tagList.isExpanded= !tagset.tagList.isExpanded">{{tagset.tagList.isExpanded ? '-' : '+'}}</span>  
+            (Other) Tags
+          </div>
+          <div *ngIf="tagset.tagList.isExpanded  && sortTags(getTagsetTagList(tagset)) as sortedtags">
+            <div *ngIf="sortedtags.length>0">
+              <div class="selection_checkbox_tags_labels" *ngIf="(!(tagset.tagList.asRange)||!(tagsNameToNumbersIsPossible(sortedtags)))">
+                <app-selection-tag *ngFor="let tag of sortedtags" [tag]="tag"></app-selection-tag>
+              </div>  
+              <div class="selection_range_tags_labels" *ngIf="tagset.tagList.asRange && tagsNameToNumbersIsPossible(sortedtags)">
+                <app-selection-tag-by-range [tagsetID]="tagset.id"></app-selection-tag-by-range>
+              </div>  
+            </div>
+          </div>
         </div>
       </div>    
     </div>

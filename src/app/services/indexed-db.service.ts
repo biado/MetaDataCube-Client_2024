@@ -19,6 +19,7 @@ export class IndexedDbService {
   }
 
   private openDatabase(): void {
+    indexedDB.deleteDatabase(this.dbName)
     const request = indexedDB.open(this.dbName, 1);
 
     request.onerror = (event) => {

@@ -121,12 +121,12 @@ export class CellsDisplayComponent {
             this.isLoading[key] = true;
             this.isError[key] = false;
   
-            if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+            //if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
               this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
-            }
-            else{
-              this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
-            }
+            //}
+            //else{
+            //  this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+            //}
           }
         });
       });
@@ -138,12 +138,12 @@ export class CellsDisplayComponent {
         this.isLoading[key] = true;
         this.isError[key] = false;
 
-        if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+        //if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
           this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
-        }
-        else{
-          this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
-        }
+        // }
+        // else{
+        //   this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+        // }
       });
     }
     else if(y && y.length > 0){
@@ -153,12 +153,12 @@ export class CellsDisplayComponent {
         this.isLoading[key] = true;
         this.isError[key] = false;
 
-        if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
+        //if(['spotify','youtube'].includes(this.mediaType[key].toLowerCase())){
           this.mediaUrls[key] = this.cleanUrl(this.cellsContentUrl[key]);
-        }
-        else{
-          this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
-        }
+        // }
+        // else{
+        //   this.mediaUrls[key] = `assets/medias/lsc_thumbs512/thumbnails512/`+this.cellsContentUrl[key];
+        // }
       });
     }    
   }
@@ -174,10 +174,10 @@ export class CellsDisplayComponent {
   
       if (match && ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico','mp3','wav'].includes(match[1].toLowerCase())) {
         extension =  match[1]; 
-      } else if (url.includes('spotify.com')) {
-        extension =  'spotify';  
-      } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
-        extension =  'youtube';  
+      //} else if (url.includes('spotify.com')) {
+      //   extension =  'spotify';  
+      // } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      //   extension =  'youtube';  
       } else {
         extension =  'unknown';  
       }
