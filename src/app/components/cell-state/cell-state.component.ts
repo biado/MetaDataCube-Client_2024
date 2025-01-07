@@ -37,13 +37,13 @@ export class CellStateComponent {
         let imageInfo: MediaInfos;
         
         // Handle special cases for YouTube and Spotify where we sanitized the url
-        if (['youtube', 'spotify'].includes(mediaInfos.extension.toLowerCase())) {
+        //if (['youtube', 'spotify'].includes(mediaInfos.extension.toLowerCase())) {
           const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.file_uri.toString());
           imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
-        } else {
-          const completeURL = `assets/medias/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
-          imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
-        }
+        // } else {
+        //   const completeURL = `assets/medias/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
+        //   imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);
+        // }
 
         this.mediasInfos.push(imageInfo);
         this.currentMedia = this.mediasInfos[0];
