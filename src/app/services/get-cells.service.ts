@@ -275,7 +275,8 @@ export class GetCellsService {
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (xName && yName) {
             const key = `${xName}-${yName}`;
-            resUrl[key] = cell.file_uri;
+            //resUrl[key] = cell.file_uri;
+            resUrl[key] = cell.thumb_uri;
             resCount[key] = cell.count;
         }
       }
@@ -283,7 +284,7 @@ export class GetCellsService {
         const xName = this.CoordToNameX[cell.xCoordinate-1];
         if (xName) {
             const key = `${xName}`;
-            resUrl[key] = cell.file_uri;
+            resUrl[key] = cell.thumb_uri;
             resCount[key] = cell.count;
         }
       }
@@ -291,7 +292,7 @@ export class GetCellsService {
         const yName = this.CoordToNameY[cell.yCoordinate-1];
         if (yName) {
             const key = `${yName}`;
-            resUrl[key] = cell.file_uri;
+            resUrl[key] = cell.thumb_uri;
             resCount[key] = cell.count;
         }
       }
@@ -312,7 +313,7 @@ export class GetCellsService {
     if(this.selectedDimensions.yid && this.selectedDimensions.ytype){
       yCo = elt.y;
     }
-    const cell = new Cell(elt.count, elt.cubeObjects[0].fileURI,xCo,yCo);
+    const cell = new Cell(elt.count, elt.cubeObjects[0].fileURI,elt.cubeObjects[0].thumbnailURI,xCo,yCo);
     const currentCells = this.cells;
     this.cells = [...currentCells, cell];
   }

@@ -47,15 +47,15 @@ export class GetCellStateService {
 
             if (match && ['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico','mp3','wav'].includes(match[1].toLowerCase())) {
               extension =  match[1]; 
-            } else if (elt.fileURI.includes('spotify.com')) {
-              extension =  'spotify';  
-            } else if (elt.fileURI.includes('youtube.com') || elt.fileURI.includes('youtu.be')) {
-              extension =  'youtube';  
+            // } else if (elt.fileURI.includes('spotify.com')) {
+            //   extension =  'spotify';  
+            // } else if (elt.fileURI.includes('youtube.com') || elt.fileURI.includes('youtu.be')) {
+            //   extension =  'youtube';  
             } else {
               extension =  'unknown';  
             }
 
-            const mediaInfo = new MediaInfos(elt.fileURI, elt.id, extension);
+            const mediaInfo = new MediaInfos(elt.thumbnailURI, elt.fileURI, elt.id, extension);
 
             mediasInfo.push(mediaInfo);
           });

@@ -13,7 +13,7 @@ export class CellStateComponent {
 
   mediasInfos: MediaInfos[] = [];
   /** Image selected in the grid. The image is kept in memory even when you return to the grid, so as not to lose it when you change view. */
-  currentMedia: MediaInfos = new MediaInfos("",0,"");     
+  currentMedia: MediaInfos = new MediaInfos("","",0,"");     
 
   display_grid : boolean = true;
   display_single : boolean = false;
@@ -39,7 +39,8 @@ export class CellStateComponent {
         // Handle special cases for YouTube and Spotify where we sanitized the url
         //if (['youtube', 'spotify'].includes(mediaInfos.extension.toLowerCase())) {
           const sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.file_uri.toString());
-          imageInfo = new MediaInfos(sanitizedUrl, mediaInfos.mediaID, mediaInfos.extension);
+          const sanitizedThumbUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mediaInfos.thumb_uri.toString());
+          imageInfo = new MediaInfos(sanitizedUrl, sanitizedThumbUrl, mediaInfos.mediaID, mediaInfos.extension);
         // } else {
         //   const completeURL = `assets/medias/lsc_thumbs512/thumbnails512/`+ mediaInfos.file_uri;
         //   imageInfo = new MediaInfos(completeURL, mediaInfos.mediaID, mediaInfos.extension);

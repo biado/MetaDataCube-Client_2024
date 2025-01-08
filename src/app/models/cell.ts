@@ -4,10 +4,12 @@ export class Cell {
 
     count: number;
     file_uri: string;
+    thumb_uri: string;
 
-    constructor(count:number, file_uri : string, xCoordinate?: number, yCoordinate?: number) {
+    constructor(count:number, file_uri : string, thumb_uri : string, xCoordinate?: number, yCoordinate?: number) {
         this.count = count;
         this.file_uri = file_uri;
+        this.thumb_uri = thumb_uri;
         if (xCoordinate !== undefined) {
             this.xCoordinate = xCoordinate;
         }
