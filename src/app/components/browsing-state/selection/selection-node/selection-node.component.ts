@@ -38,7 +38,8 @@ export class SelectionNodeComponent {
   sortNodes(nodes: Node[] | null = null): Node[] {
     if (nodes) {
       const sortedNodes = nodes.slice();
-      return sortedNodes.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
+      //return sortedNodes.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
+      return sortedNodes;
     } else {
       return [];
     }

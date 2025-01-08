@@ -70,20 +70,23 @@ export class SelectionComponent {
    * Sort a hierarchy list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
   sortHierarchy(hierarchy: Hierarchy[]): Hierarchy[] {
-    return hierarchy.sort((a, b) => a.name.localeCompare(b.name));
+    //return hierarchy.sort((a, b) => a.name.localeCompare(b.name));
+    return hierarchy;
   }
 
   /**
    * Two next function sort a node list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
   sortNodes(nodes: Node[]): Node[] {
-    return nodes.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
+    //return nodes.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
+    return nodes;
   }
   sortNodeChildren(node:Node):Node[]{
     if (!node || !node.children || node.children.length === 0) {
       return [];    
     }
-    let sortedChildren = this.sortNodes(node.children);    
+    //let sortedChildren = this.sortNodes(node.children);    
+    let sortedChildren = node.children;    
     return sortedChildren;
   }
 
@@ -91,7 +94,8 @@ export class SelectionComponent {
   * Sort a Tag list alphabetically (Symbol -> Number ->aAbCdDeF).
   */
   sortTags(tags: Tag[]): Tag[] {
-    return tags.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
+    //return tags.sort((a, b) => a.name.toString().localeCompare(b.name.toString()));
+    return tags;
   }  
 
 

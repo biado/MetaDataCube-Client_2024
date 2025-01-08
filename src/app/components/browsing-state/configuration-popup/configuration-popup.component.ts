@@ -40,7 +40,8 @@ export class ConfigurationPopupComponent {
    * Sort a hierarchy list alphabetically (Symbol -> Number ->aAbCdDeF)
    */
   sortHierarchy(hierarchy: Hierarchy[]): Hierarchy[] {
-    return hierarchy.sort((a, b) => a.name.localeCompare(b.name));
+    //return hierarchy.sort((a, b) => a.name.localeCompare(b.name));
+    return hierarchy;
   }
 
   /**

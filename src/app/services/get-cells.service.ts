@@ -154,7 +154,8 @@ export class GetCellsService {
                 uniqueNames.add(name);
               }
             });    
-            SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
+            //SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
+            SortUniqueNames = Array.from(uniqueNames);
           } 
 
           else if (xtype === 'tagset') { 
@@ -168,7 +169,8 @@ export class GetCellsService {
                 uniqueNames.add(name);
               }
             });    
-            SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+            //SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+            SortUniqueNames = Array.from(uniqueNames);
           }
           this.AxisX.next(SortUniqueNames);
 
@@ -232,7 +234,8 @@ export class GetCellsService {
                 uniqueNames.add(name);
               }
             });    
-            SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
+            //SortUniqueNames = this.sql_OrderBy_Sort(Array.from(uniqueNames));
+            SortUniqueNames = Array.from(uniqueNames);
           } 
 
           else if (ytype === 'tagset') { 
@@ -246,7 +249,8 @@ export class GetCellsService {
                 uniqueNames.add(name);
               }
             });    
-            SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+            //SortUniqueNames = Array.from(uniqueNames).sort((a, b) => a.toString().localeCompare(b.toString()));
+            SortUniqueNames = Array.from(uniqueNames);
           }
          
           this.AxisY.next(SortUniqueNames);
@@ -433,6 +437,8 @@ export class GetCellsService {
     /* Body of sql_OrderBy_sort function */
 
     // Step 1 : Sort Without Symbols and UpperCase
+    return list;
+    
     const originalList = list.sort(customCompare_WithoutSymbolsAndUpperCaseLetters);
 
     let listSortWithoutSymbolandUpper :string[]= []
