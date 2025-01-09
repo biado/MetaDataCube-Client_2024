@@ -1,7 +1,7 @@
 <div class="all_medias_container">
     <div class="all_medias_container_div" *ngFor="let media of mediaInfos" (click)="zoom_on_media(media)">
-        <img      
-            *ngIf="['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(media.extension.toLowerCase()) && !(media.isError)"          
+            <!---*ngIf="['jpg', 'png', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(media.extension.toLowerCase()) && !(media.isError)"          --->
+            <img      
             class="grid-content_img"
             [src]="media.file_uri"
             alt="Image"
